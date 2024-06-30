@@ -1,16 +1,11 @@
 package com.example.smartsave
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,7 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,162 +35,155 @@ import androidx.compose.ui.unit.sp
 import java.time.LocalDate
 import kotlin.math.roundToInt
 
-class KontoansichtActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
 
-        setContent {
-            GenerateLayout()
-        }
+private const val COLOR_OFFSET = 67.5f
+private val standardTextStyle = TextStyle(fontSize = 20.sp)
 
-    }
+
+class KontoansichtActivity : SmartSaveActivity() {
 
     @Preview
     @Composable
-    fun PreviewLayout() {
-        GenerateLayout()
-    }
+    fun PreviewLayout() = GenerateContent()
 
     @Composable
-    fun GenerateLayout() {
-        Scaffold { innerPadding ->
-            Box(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-                    .background(
-                        color = Color(199, 216, 230, 255)
-                    )
-                    .padding(top = 25.dp, end = 20.dp, start = 20.dp)
-            ) {
-                // Datum
-                val currentMonth = LocalDate.now().let {Month(it.year, it.monthValue)}
-                // getBudget des monats
-                val budget = getBudget(currentMonth)
-                // getKategorien
-                val kategorienliste = getKategorienliste()
-                // gesamtausgaben
-                var gesamtausgaben = 0.0
+    override fun BoxScope.GenerateLayout() {
+        // Datum
+        val currentMonth = LocalDate.now().let {Month(it.year, it.monthValue)}
+        // getBudget des monats
+        val budget = getBudget(currentMonth)
+        // getKategorien
+        val kategorienliste = getKategorienliste()
+        // gesamtausgaben
+        var gesamtausgaben = 0.0
 
-                var months by remember { mutableIntStateOf(1) }
+        var months by remember { mutableIntStateOf(1) }
 
 
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    CenteredText(text = currentMonth.toString())
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            CenteredText(text = currentMonth.toString())
 
 
-                    //TODO DRAW RECTANGLE FOR CATEGORIES
-                    // INPUT -> Liste von Kategorien(Name, Betrag) -> Anteil an Ausgaben (Monat) -> Darstellung dann % mäßisch
-                    // Dynamische Anzahl an Kategorien!
-                    // Alle Umsätze & Kontostand
-                    // Kontostand zu begin + alle einkünfte => Budget
-                    // Ausgaben / Budget => Anteil in Prozent
-                    Canvas(modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)) {
-                        inset(horizontal = 100f, vertical = 100f) {
-                            var x = 0f
-                            for ((index, kategorie) in kategorienliste.withIndex()) {
-                                //get anteil, draw rect mit entspr. größe
-                                val umsatzKategorie = getUmsatzKategorie(kategorie, currentMonth)
-                                gesamtausgaben += umsatzKategorie
-                                val percentageSize = calcPercentage(umsatzKategorie, budget)
+            //TODO DRAW RECTANGLE FOR CATEGORIES
+            // INPUT -> Liste von Kategorien(Name, Betrag) -> Anteil an Ausgaben (Monat) -> Darstellung dann % mäßisch
+            // Dynamische Anzahl an Kategorien!
+            // Alle Umsätze & Kontostand
+            // Kontostand zu begin + alle einkünfte => Budget
+            // Ausgaben / Budget => Anteil in Prozent
+            Canvas(modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)) {
+                inset(horizontal = 100f, vertical = 100f) {
+                    var x = 0f
+                    for ((index, kategorie) in kategorienliste.withIndex()) {
+                        //get anteil, draw rect mit entspr. größe
+                        val umsatzKategorie = getUmsatzKategorie(kategorie, currentMonth)
+                        gesamtausgaben += umsatzKategorie
+                        val percentageSize = calcPercentage(umsatzKategorie, budget)
 
-                                val width = size.width*percentageSize.toFloat()
+                        val width = size.width*percentageSize.toFloat()
 
-                                // draw rect irgendwie mit dieser size richtig
-                                drawRect(
-                                    color = Color.hsl((index * 40f)%360, 1f, 0.5f),
-                                    size = Size(width, size.height),
-                                    topLeft = Offset(x, 0f)
-                                )
-                                x += width
-                            }
-
-                            // draw nicht zugewiesenes Rect
-                            drawRect(color = Color.White,
-                                size = Size(size.width - x, size.height),
-                                topLeft = Offset(x, 0f))
-                        }
+                        // draw rect irgendwie mit dieser size richtig
+                        drawRect(
+                            color = Color.hsv((index * COLOR_OFFSET) % 360, 1f, 1f),
+                            size = Size(width, size.height),
+                            topLeft = Offset(x, 0f)
+                        )
+                        x += width
                     }
-                    Column(
+
+                    // draw nicht zugewiesenes Rect
+                    drawRect(color = Color.White,
+                        size = Size(size.width - x, size.height),
+                        topLeft = Offset(x, 0f))
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .weight(0.5f, false),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                for ((index, kategorie) in kategorienliste.withIndex()) {
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .verticalScroll(rememberScrollState())
-                            .weight(0.5f, false),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                            .height(40.dp),
                     ) {
-                        for ((index, kategorie) in kategorienliste.withIndex()) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(40.dp),
-                            ) {
-                                Canvas(modifier = Modifier
-                                    .padding(end = 40.dp)
-                                    .fillMaxHeight()
-                                    .width(30.dp)) {
-                                    drawRect(
-                                        color = Color.hsl((index * 40f)%360, 1f, 0.5f),
-                                        size = Size(50f, 50f)
-                                    )
-                                }
-                                Text(text = kategorie.name, style = TextStyle(fontSize = 20.sp))
-                            }
+                        Canvas(modifier = Modifier
+                            .padding(end = 40.dp)
+                            .fillMaxHeight()
+                            .width(30.dp)) {
+                            drawRect(
+                                color = Color.hsv((index * COLOR_OFFSET) % 360, 1f, 1f),
+                                size = Size(50f, 50f)
+                            )
                         }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(40.dp),
-                        ) {
-                            Canvas(modifier = Modifier
-                                .padding(end = 40.dp)
-                                .fillMaxHeight()
-                                .width(30.dp)) {
-                                drawRect(
-                                    color = Color.White,
-                                    size = Size(50f, 50f)
-                                )
-                            }
-                            Text(text = "Nicht Zugeordnet", style = TextStyle(fontSize = 20.sp))
-                        }
+                        Text(text = kategorie.name, style = standardTextStyle)
                     }
-
-                    Slider(
-                        value = 12 - months.toFloat(),
-                        onValueChange = { months = 12 - it.roundToInt() },
-                        valueRange = 0f..11f,
-                        steps = 10
-                    )
-                    Row (modifier = Modifier.fillMaxWidth()) {
-                        Text(text = (currentMonth - 12).toString(), textAlign = TextAlign.Left, modifier = Modifier.fillMaxWidth(1f/3))
-                        Text(
-                            text = "ab ${currentMonth - months}",
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.ExtraBold,
-                            modifier = Modifier.fillMaxWidth(.5f)
-                        )
-                        Text(text = "Heute", textAlign = TextAlign.Right, modifier = Modifier.fillMaxWidth())
-                    }
-
-
-
-
-                    ElevatedButton(
-                        onClick = {
-                            finish()
-                        },
-                        modifier = Modifier
-                            .padding(bottom = 40.dp, end = 25.dp)
-                            .size(width = 150.dp, height = 80.dp),
-                    ) {
-                        Text(text = "Zurück", style = TextStyle(fontSize = 20.sp))
-                    }
-
                 }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp),
+                ) {
+                    Canvas(modifier = Modifier
+                        .padding(end = 40.dp)
+                        .fillMaxHeight()
+                        .width(30.dp)) {
+                        drawRect(
+                            color = Color.White,
+                            size = Size(50f, 50f)
+                        )
+                    }
+                    Text(text = "Nicht Zugeordnet", style = standardTextStyle)
+                }
+            }
+
+            Column(modifier = Modifier.fillMaxWidth()) {
+                val maxMonths = 12
+                Slider(
+                    value = maxMonths - months.toFloat(),
+                    onValueChange = { months = maxMonths - it.roundToInt() },
+                    valueRange = 0f..(maxMonths - 1f),
+                    steps = maxMonths - 2
+                )
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = "$maxMonths Monate",
+                        textAlign = TextAlign.Left,
+                        modifier = Modifier.fillMaxWidth(1f / 3)
+                    )
+                    Text(
+                        text = "ab ${currentMonth - months}",
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.fillMaxWidth(.5f)
+                    )
+                    Text(
+                        text = "1 Monat",
+                        textAlign = TextAlign.Right,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
+
+
+
+            ElevatedButton(
+                onClick = {
+                    finish()
+                },
+                modifier = Modifier
+                    .padding(bottom = 40.dp, end = 25.dp)
+                    .size(width = 150.dp, height = 80.dp),
+            ) {
+                Text(text = "Zurück", style = standardTextStyle)
             }
         }
     }

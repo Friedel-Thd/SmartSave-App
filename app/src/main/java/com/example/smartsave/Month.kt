@@ -2,9 +2,11 @@ package com.example.smartsave
 
 
 data class Month(val year: Int, val month: Int) {
+
     init {
         require(month in 1..12) {"bruh das kein monat du lellek"}
     }
+
 
     override fun toString() = when (month) {
         1 -> "Januar"
@@ -22,8 +24,8 @@ data class Month(val year: Int, val month: Int) {
         else -> throw IllegalStateException()
     } + " $year"
 
-    operator fun minus(months: Int): Month {
-        var m = month - months
+    operator fun plus(months: Int): Month {
+        var m = month + months
         var y = year
         while (m <= 0) {
             --y
@@ -35,4 +37,7 @@ data class Month(val year: Int, val month: Int) {
         }
         return Month(y, m)
     }
+
+    operator fun minus(months: Int) = this + -months
+
 }
