@@ -53,7 +53,6 @@ class MainActivity : SmartSaveActivity() {
         }
 
 
-
         if (drawerState.isOpen || drawerState.isAnimationRunning) ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
