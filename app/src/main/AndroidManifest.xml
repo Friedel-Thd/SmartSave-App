@@ -13,6 +13,9 @@
         android:theme="@style/Theme.SmartSave"
         tools:targetApi="31">
         <activity
+            android:name=".KontoansichtActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
@@ -23,6 +26,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".KontoAnlegenActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.SmartSave"></activity>
     </application>
 
 </manifest>
