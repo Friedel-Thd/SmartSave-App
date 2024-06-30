@@ -3,12 +3,15 @@ package com.example.smartsave
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,29 +20,37 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import java.time.LocalDate
-import kotlin.math.roundToInt
+import java.util.Date
+import java.util.Random
 
 class KontoansichtActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +70,7 @@ class KontoansichtActivity : ComponentActivity() {
 
     @Composable
     fun GenerateLayout() {
-        Scaffold { innerPadding ->
+        Scaffold() { innerPadding ->
             Box(
                 modifier = Modifier
                     .padding(innerPadding)
@@ -70,22 +81,22 @@ class KontoansichtActivity : ComponentActivity() {
                     .padding(top = 25.dp, end = 20.dp, start = 20.dp)
             ) {
                 // Datum
-                val currentMonth = LocalDate.now().let {Month(it.year, it.monthValue)}
+                val date = LocalDate.of(2024, 1, 1)
                 // getBudget des monats
-                val budget = getBudget(currentMonth)
+                val budget = getBudget(date)
                 // getKategorien
                 val kategorienliste = getKategorienliste()
                 // gesamtausgaben
                 var gesamtausgaben = 0.0
 
-                var months by remember { mutableIntStateOf(1) }
+                var sliderPosition by remember { mutableFloatStateOf(0f) }
 
 
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    CenteredText(text = currentMonth.toString())
+                    CenteredText(text = "Monat Jahr")
 
 
                     //TODO DRAW RECTANGLE FOR CATEGORIES
@@ -101,7 +112,7 @@ class KontoansichtActivity : ComponentActivity() {
                             var x = 0f
                             for ((index, kategorie) in kategorienliste.withIndex()) {
                                 //get anteil, draw rect mit entspr. größe
-                                val umsatzKategorie = getUmsatzKategorie(kategorie, currentMonth)
+                                val umsatzKategorie = getUmsatzKategorie(kategorie, date)
                                 gesamtausgaben += umsatzKategorie
                                 val percentageSize = calcPercentage(umsatzKategorie, budget)
 
@@ -117,8 +128,9 @@ class KontoansichtActivity : ComponentActivity() {
                             }
 
                             // draw nicht zugewiesenes Rect
+                            val percentageSize = calcPercentage(budget - gesamtausgaben, budget)
                             drawRect(color = Color.White,
-                                size = Size(size.width - x, size.height),
+                                size = Size(size.width*percentageSize.toFloat(), size.height),
                                 topLeft = Offset(x, 0f))
                         }
                     }
@@ -166,21 +178,10 @@ class KontoansichtActivity : ComponentActivity() {
                     }
 
                     Slider(
-                        value = 12 - months.toFloat(),
-                        onValueChange = { months = 12 - it.roundToInt() },
-                        valueRange = 0f..11f,
-                        steps = 10
+                        value = sliderPosition,
+                        onValueChange = { sliderPosition = it }
                     )
-                    Row (modifier = Modifier.fillMaxWidth()) {
-                        Text(text = (currentMonth - 12).toString(), textAlign = TextAlign.Left, modifier = Modifier.fillMaxWidth(1f/3))
-                        Text(
-                            text = "ab ${currentMonth - months}",
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.ExtraBold,
-                            modifier = Modifier.fillMaxWidth(.5f)
-                        )
-                        Text(text = "Heute", textAlign = TextAlign.Right, modifier = Modifier.fillMaxWidth())
-                    }
+                    Text(text = sliderPosition.toString())
 
 
 
@@ -206,7 +207,7 @@ class KontoansichtActivity : ComponentActivity() {
         return (umsatzKategorie / budget)
     }
 
-    private fun getUmsatzKategorie(kategorie: Kategorie, month: Month): Double {
+    private fun getUmsatzKategorie(kategorie: Kategorie, date: LocalDate?): Double {
         //TODO summa alle umsätze/ausgaben einer kategorie seit bestimmtem monat/jahr
         return 150.0
     }
@@ -230,7 +231,7 @@ class KontoansichtActivity : ComponentActivity() {
         return kategorienListe
     }
 
-    private fun getBudget(month: Month): Double {
+    private fun getBudget(localDate: LocalDate): Double {
         //TODO Implement datenbank kram, hole kontostand an datum + alle seit dem postiiven umsätze
         return 3000.0
     }
