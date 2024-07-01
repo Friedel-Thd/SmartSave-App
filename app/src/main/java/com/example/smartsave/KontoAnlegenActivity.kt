@@ -20,10 +20,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 class KontoAnlegenActivity : SmartSaveActivity() {
 
@@ -75,7 +73,7 @@ class KontoAnlegenActivity : SmartSaveActivity() {
                         Text(
                             text = text,
                             modifier = Modifier.padding(start = 8.dp),
-                            style = TextStyle(fontSize = 20.sp)
+                            style = standardTextStyle
                         )
                     }
                 }
@@ -91,13 +89,12 @@ class KontoAnlegenActivity : SmartSaveActivity() {
                 .padding(bottom = 40.dp, start = 25.dp)
                 .size(width = 150.dp, height = 80.dp),
         ) {
-            Text(text = "Abbrechen", style = TextStyle(fontSize = 20.sp))
+            Text(text = "Abbrechen", style = standardTextStyle)
         }
 
         ElevatedButton(
             onClick = {
                 //TODO Kontodaten speichern
-
                 finish()
             },
             modifier = Modifier
@@ -105,7 +102,7 @@ class KontoAnlegenActivity : SmartSaveActivity() {
                 .padding(bottom = 40.dp, end = 25.dp)
                 .size(width = 150.dp, height = 80.dp),
         ) {
-            Text(text = "Speichern", style = TextStyle(fontSize = 20.sp))
+            Text(text = "Speichern", style = standardTextStyle)
         }
     }
 }

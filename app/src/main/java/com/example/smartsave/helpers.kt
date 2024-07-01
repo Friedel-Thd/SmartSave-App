@@ -17,6 +17,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 
+val standardTextStyle = TextStyle(fontSize = 20.sp)
+
+
 fun LazyListScope.listItem(text: String, modifier: Modifier = Modifier) = item {ListItem(text, modifier)}
 
 @Composable
@@ -41,9 +44,19 @@ fun ListDivider() = HorizontalDivider(thickness = 2.dp, color = Color.Black)
 
 
 @Composable
-fun LabelledInputField(value: String, label: String, onValueChange: (String) -> Unit) = Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-    Text("$label: ", modifier = Modifier
-        .fillMaxWidth(.3f),
-        style = TextStyle(fontSize = 20.sp))
-    TextField(value = value, singleLine = true, modifier = Modifier.fillMaxWidth(), onValueChange = onValueChange, textStyle = TextStyle(fontSize = 20.sp))
+fun LabelledInputField(value: String, label: String, onValueChange: (String) -> Unit) = Row(
+    modifier = Modifier.fillMaxWidth(),
+    verticalAlignment = Alignment.CenterVertically
+) {
+    Text("$label: ",
+        modifier = Modifier.fillMaxWidth(.3f),
+        style = standardTextStyle
+    )
+    TextField(
+        value = value,
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth(),
+        onValueChange = onValueChange,
+        textStyle = standardTextStyle
+    )
 }

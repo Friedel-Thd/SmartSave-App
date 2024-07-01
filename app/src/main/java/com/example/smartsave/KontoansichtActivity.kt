@@ -26,18 +26,15 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.inset
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import java.time.LocalDate
 import kotlin.math.roundToInt
 
 
-private const val COLOR_OFFSET = 67.5f
-private val standardTextStyle = TextStyle(fontSize = 20.sp)
+private const val MAX_MONTHS = 12
 
 
 class KontoansichtActivity : SmartSaveActivity() {
@@ -75,7 +72,8 @@ class KontoansichtActivity : SmartSaveActivity() {
             // Ausgaben / Budget => Anteil in Prozent
             Canvas(modifier = Modifier
                 .fillMaxWidth()
-                .height(150.dp)) {
+                .height(150.dp)
+            ) {
                 inset(horizontal = 100f, vertical = 100f) {
                     var x = 0f
                     for ((index, kategorie) in kategorienliste.withIndex()) {
@@ -84,11 +82,11 @@ class KontoansichtActivity : SmartSaveActivity() {
                         gesamtausgaben += umsatzKategorie
                         val percentageSize = calcPercentage(umsatzKategorie, budget)
 
-                        val width = size.width*percentageSize.toFloat()
+                        val width = size.width * percentageSize.toFloat()
 
                         // draw rect irgendwie mit dieser size richtig
                         drawRect(
-                            color = Color.hsv((index * COLOR_OFFSET) % 360, 1f, 1f),
+                            color = colorGen(index),
                             size = Size(width, size.height),
                             topLeft = Offset(x, 0f)
                         )
@@ -98,7 +96,8 @@ class KontoansichtActivity : SmartSaveActivity() {
                     // draw nicht zugewiesenes Rect
                     drawRect(color = Color.White,
                         size = Size(size.width - x, size.height),
-                        topLeft = Offset(x, 0f))
+                        topLeft = Offset(x, 0f)
+                    )
                 }
             }
             Column(
@@ -117,9 +116,10 @@ class KontoansichtActivity : SmartSaveActivity() {
                         Canvas(modifier = Modifier
                             .padding(end = 40.dp)
                             .fillMaxHeight()
-                            .width(30.dp)) {
+                            .width(30.dp)
+                        ) {
                             drawRect(
-                                color = Color.hsv((index * COLOR_OFFSET) % 360, 1f, 1f),
+                                color = colorGen(index),
                                 size = Size(50f, 50f)
                             )
                         }
@@ -134,7 +134,8 @@ class KontoansichtActivity : SmartSaveActivity() {
                     Canvas(modifier = Modifier
                         .padding(end = 40.dp)
                         .fillMaxHeight()
-                        .width(30.dp)) {
+                        .width(30.dp)
+                    ) {
                         drawRect(
                             color = Color.White,
                             size = Size(50f, 50f)
@@ -145,16 +146,15 @@ class KontoansichtActivity : SmartSaveActivity() {
             }
 
             Column(modifier = Modifier.fillMaxWidth()) {
-                val maxMonths = 12
                 Slider(
-                    value = maxMonths - months.toFloat(),
-                    onValueChange = { months = maxMonths - it.roundToInt() },
-                    valueRange = 0f..(maxMonths - 1f),
-                    steps = maxMonths - 2
+                    value = MAX_MONTHS - months.toFloat(),
+                    onValueChange = { months = MAX_MONTHS - it.roundToInt() },
+                    valueRange = 0f..(MAX_MONTHS - 1f),
+                    steps = MAX_MONTHS - 2
                 )
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "$maxMonths Monate",
+                        text = "$MAX_MONTHS Monate",
                         textAlign = TextAlign.Left,
                         modifier = Modifier.fillMaxWidth(1f / 3)
                     )
@@ -176,9 +176,7 @@ class KontoansichtActivity : SmartSaveActivity() {
 
 
             ElevatedButton(
-                onClick = {
-                    finish()
-                },
+                onClick = {finish()},
                 modifier = Modifier
                     .padding(bottom = 40.dp, end = 25.dp)
                     .size(width = 150.dp, height = 80.dp),
@@ -198,27 +196,19 @@ class KontoansichtActivity : SmartSaveActivity() {
         return 150.0
     }
 
-    private fun getKategorienliste(): List<Kategorie> {
+    private fun getKategorienliste() = buildList {
         //TODO Implement datenbank kram
-        val kategorienListe = mutableListOf<Kategorie>()
-
-        kategorienListe.add(Kategorie("Miete"))
-        kategorienListe.add(Kategorie("Essen"))
-        kategorienListe.add(Kategorie("Auto"))
-        kategorienListe.add(Kategorie("Etc"))
-        kategorienListe.add(Kategorie("Miete"))
-        kategorienListe.add(Kategorie("Etc"))
-        kategorienListe.add(Kategorie("Miete"))
-        kategorienListe.add(Kategorie("Etc"))
-        kategorienListe.add(Kategorie("Miete"))
-        kategorienListe.add(Kategorie("Essen"))
-        kategorienListe.add(Kategorie("Auto"))
-
-        return kategorienListe
+        repeat(16) {
+            add(Kategorie("Kategorie $it"))
+        }
     }
 
     private fun getBudget(month: Month): Double {
         //TODO Implement datenbank kram, hole kontostand an datum + alle seit dem postiiven umsätze
         return 3000.0
     }
+
 }
+
+
+private fun colorGen(index: Int) = Color.hsv((index * 67.5f) % 360, 1f, 1f)

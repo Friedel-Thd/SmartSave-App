@@ -44,12 +44,15 @@ class MainActivity : SmartSaveActivity() {
             modifier = Modifier.fillMaxWidth()
         ) {
             //TODO Bankkonto Darstellung
-            ListItem("Kontoansicht", Modifier.clickable {
-                val intent = Intent(this@MainActivity, KontoansichtActivity::class.java)
-                startActivity(intent)
-            })
+            ListItem(
+                text = "Kontoansicht",
+                modifier = Modifier.clickable {
+                    val intent = Intent(this@MainActivity, KontoansichtActivity::class.java)
+                    startActivity(intent)
+                }
+            )
 
-            ListItem("First item")
+            ListItem(text = "First item")
         }
 
 
@@ -60,13 +63,16 @@ class MainActivity : SmartSaveActivity() {
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        listItem("Konto anlegen", Modifier.clickable {
-                            //TODO KontoAnlegen aufrufen
-                            val intent = Intent(this@MainActivity, KontoAnlegenActivity::class.java)
-                            startActivity(intent)
-                        })
-                        listItem("Umsätze verwalten")
-                        listItem("Kategorien verwalten")
+                        listItem(
+                            text = "Konto anlegen",
+                            modifier = Modifier.clickable {
+                                //TODO KontoAnlegen aufrufen
+                                val intent = Intent(this@MainActivity, KontoAnlegenActivity::class.java)
+                                startActivity(intent)
+                            }
+                        )
+                        listItem(text = "Umsätze verwalten")
+                        listItem(text = "Kategorien verwalten")
                     }
                 }
             }
@@ -83,8 +89,7 @@ class MainActivity : SmartSaveActivity() {
                 Box {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.piggy_bank),
-                        modifier = Modifier
-                            .size(36.dp),
+                        modifier = Modifier.size(36.dp),
                         contentDescription = "drawable icons",
                         tint = Color.Unspecified
                     )
@@ -109,8 +114,7 @@ class MainActivity : SmartSaveActivity() {
                 Box {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.plus),
-                        modifier = Modifier
-                            .size(36.dp),
+                        modifier = Modifier.size(36.dp),
                         contentDescription = "drawable icons",
                         tint = Color.Unspecified
                     )
