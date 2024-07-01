@@ -8,11 +8,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.material3.ElevatedButton
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +21,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.smartsave.helpers.AlignedButton
+import com.example.smartsave.helpers.LabelledInputField
+import com.example.smartsave.helpers.MainColumn
+import com.example.smartsave.helpers.SmartSaveActivity
+import com.example.smartsave.helpers.StandardText
 
 class KontoAnlegenActivity : SmartSaveActivity() {
 
@@ -40,17 +44,17 @@ class KontoAnlegenActivity : SmartSaveActivity() {
         val radioOptions = listOf("Bankkonto", "Sparkonto", "Kreditkartenkonto")
         val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[1] ) }
 
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+        MainColumn(
+            modifier = Modifier.verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            LabelledInputField(value = textKontoNr,"Konto Nr.") {textKontoNr = it}
-            LabelledInputField(value = textBLZ, "BLZ") { textBLZ = it }
-            LabelledInputField(value = textBIC, "BIC") { textBIC = it }
-            LabelledInputField(value = textIBAN, "IBAN") { textIBAN = it }
-            LabelledInputField(value = textBemerkung, "Bemerkung") { textBemerkung = it }
+            LabelledInputField(label = "Konto Nr.", value = textKontoNr) {textKontoNr = it}
+            LabelledInputField(label = "BLZ", value = textBLZ) { textBLZ = it }
+            LabelledInputField(label = "BIC", value = textBIC) { textBIC = it }
+            LabelledInputField(label = "IBAN", value = textIBAN) { textIBAN = it }
+            LabelledInputField(label = "Bemerkung", value = textBemerkung) { textBemerkung = it }
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Column {
                 radioOptions.forEach { text ->
@@ -70,39 +74,19 @@ class KontoAnlegenActivity : SmartSaveActivity() {
                             selected = (text == selectedOption),
                             onClick = { onOptionSelected(text) }
                         )
-                        Text(
+                        StandardText(
                             text = text,
                             modifier = Modifier.padding(start = 8.dp),
-                            style = standardTextStyle
                         )
                     }
                 }
             }
         }
 
-        ElevatedButton(
-            onClick = {
-                finish()
-            },
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(bottom = 40.dp, start = 25.dp)
-                .size(width = 150.dp, height = 80.dp),
-        ) {
-            Text(text = "Abbrechen", style = standardTextStyle)
-        }
-
-        ElevatedButton(
-            onClick = {
-                //TODO Kontodaten speichern
-                finish()
-            },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(bottom = 40.dp, end = 25.dp)
-                .size(width = 150.dp, height = 80.dp),
-        ) {
-            Text(text = "Speichern", style = standardTextStyle)
+        AlignedButton(alignment = Alignment.BottomStart, text = "Abbrechen") {finish()}
+        AlignedButton(alignment = Alignment.BottomEnd, text = "Speichern") {
+            //TODO Kontodaten speichern
+            finish()
         }
     }
 }

@@ -5,15 +5,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -30,6 +28,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.smartsave.helpers.AlignedButton
+import com.example.smartsave.helpers.CenteredText
+import com.example.smartsave.helpers.MainColumn
+import com.example.smartsave.helpers.SmartSaveActivity
+import com.example.smartsave.helpers.StandardText
 import java.time.LocalDate
 import kotlin.math.roundToInt
 
@@ -57,7 +60,7 @@ class KontoansichtActivity : SmartSaveActivity() {
         var months by remember { mutableIntStateOf(1) }
 
 
-        Column(
+        MainColumn(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -75,6 +78,9 @@ class KontoansichtActivity : SmartSaveActivity() {
                 .height(150.dp)
             ) {
                 inset(horizontal = 100f, vertical = 100f) {
+                    // draw nicht zugewiesenes Rect
+                    drawRect(color = Color.White, size = Size(size.width, size.height))
+
                     var x = 0f
                     for ((index, kategorie) in kategorienliste.withIndex()) {
                         //get anteil, draw rect mit entspr. größe
@@ -92,62 +98,47 @@ class KontoansichtActivity : SmartSaveActivity() {
                         )
                         x += width
                     }
-
-                    // draw nicht zugewiesenes Rect
-                    drawRect(color = Color.White,
-                        size = Size(size.width - x, size.height),
-                        topLeft = Offset(x, 0f)
-                    )
                 }
             }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
-                    .weight(0.5f, false),
+                    .weight(1f, true),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                for ((index, kategorie) in kategorienliste.withIndex()) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(40.dp),
-                    ) {
-                        Canvas(modifier = Modifier
-                            .padding(end = 40.dp)
-                            .fillMaxHeight()
-                            .width(30.dp)
-                        ) {
-                            drawRect(
-                                color = colorGen(index),
-                                size = Size(50f, 50f)
-                            )
-                        }
-                        Text(text = kategorie.name, style = standardTextStyle)
-                    }
-                }
-                Row(
+                @Composable
+                fun CategoryDisplay(color: Color, text: String) = Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(40.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Canvas(modifier = Modifier
-                        .padding(end = 40.dp)
-                        .fillMaxHeight()
-                        .width(30.dp)
+                        .padding(end = 30.dp)
+                        .size(16.dp)
                     ) {
                         drawRect(
-                            color = Color.White,
-                            size = Size(50f, 50f)
+                            color = color,
+                            size = size
                         )
                     }
-                    Text(text = "Nicht Zugeordnet", style = standardTextStyle)
+                    StandardText(text = text)
                 }
+
+                for ((index, kategorie) in kategorienliste.withIndex()) CategoryDisplay(
+                    color = colorGen(index),
+                    text = kategorie.name
+                )
+                CategoryDisplay(color = Color.White, text = "Nicht zugeordnet")
             }
 
             Column(modifier = Modifier.fillMaxWidth()) {
                 Slider(
                     value = MAX_MONTHS - months.toFloat(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(30.dp),
                     onValueChange = { months = MAX_MONTHS - it.roundToInt() },
                     valueRange = 0f..(MAX_MONTHS - 1f),
                     steps = MAX_MONTHS - 2
@@ -171,19 +162,9 @@ class KontoansichtActivity : SmartSaveActivity() {
                     )
                 }
             }
-
-
-
-
-            ElevatedButton(
-                onClick = {finish()},
-                modifier = Modifier
-                    .padding(bottom = 40.dp, end = 25.dp)
-                    .size(width = 150.dp, height = 80.dp),
-            ) {
-                Text(text = "Zurück", style = standardTextStyle)
-            }
         }
+
+        AlignedButton(alignment = Alignment.BottomStart, text = "Zurück") {finish()}
     }
 
     private fun calcPercentage(umsatzKategorie: Double, budget: Double): Double {

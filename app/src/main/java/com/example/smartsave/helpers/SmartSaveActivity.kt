@@ -1,4 +1,4 @@
-package com.example.smartsave
+package com.example.smartsave.helpers
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,9 +12,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-abstract class SmartSaveActivity : ComponentActivity() {
+abstract class SmartSaveActivity(
+    private val padStart: Dp = standardPadH,
+    private val padEnd: Dp = standardPadH,
+    private val padTop: Dp = standardPadTop,
+    private val padBottom: Dp = standardPadBottom,
+) : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,8 +31,6 @@ abstract class SmartSaveActivity : ComponentActivity() {
 
     }
 
-    protected open fun Modifier.modify() = this.padding(top = 25.dp, end = 20.dp, start = 20.dp)
-
     @Composable
     protected fun GenerateContent() = Scaffold {paddingValues ->
         Box(
@@ -34,7 +38,12 @@ abstract class SmartSaveActivity : ComponentActivity() {
                 .fillMaxSize()
                 .background(color = Color(199, 216, 230, 255))
                 .padding(paddingValues)
-                .modify()
+                .padding(
+                    start = padStart,
+                    end = padEnd,
+                    top = padTop,
+                    bottom = padBottom,
+                )
         ) {
             GenerateLayout()
         }
@@ -42,5 +51,14 @@ abstract class SmartSaveActivity : ComponentActivity() {
 
     @Composable
     protected abstract fun BoxScope.GenerateLayout()
+
+
+    companion object {
+
+        val standardPadH = 20.dp
+        val standardPadTop = 25.dp
+        val standardPadBottom = 40.dp
+
+    }
 
 }
