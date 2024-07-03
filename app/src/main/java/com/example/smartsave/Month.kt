@@ -4,7 +4,7 @@ package com.example.smartsave
 data class Month(val year: Int, val month: Int) {
 
     init {
-        require(month in 1..12) {"bruh das kein monat du lellek"}
+        require(month in 1..12) {"Eingabe von 1-12!"}
     }
 
 

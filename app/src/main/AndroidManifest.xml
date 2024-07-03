@@ -11,6 +11,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartSave">
         <activity
+            android:name=".KategorienVerwaltenActivity"
+            android:exported="false" />
+        <activity
             android:name=".KontoansichtUmsaetzeActivity"
             android:exported="false" />
         <activity

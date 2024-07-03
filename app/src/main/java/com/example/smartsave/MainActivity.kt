@@ -92,13 +92,16 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                         ListItem(
                             text = "Konto anlegen",
                             modifier = Modifier.clickable {
-                                //TODO KontoAnlegen aufrufen
                                 val intent = Intent(this@MainActivity, KontoAnlegenActivity::class.java)
                                 startActivity(intent)
                             }
                         )
                         ListItem(text = "Umsätze verwalten")
-                        ListItem(text = "Kategorien verwalten")
+                        ListItem(text = "Kategorien verwalten",
+                            modifier = Modifier.clickable {
+                                val intent = Intent(this@MainActivity, KategorienVerwaltenActivity::class.java)
+                                startActivity(intent)
+                            })
                     }
                 }
             }
