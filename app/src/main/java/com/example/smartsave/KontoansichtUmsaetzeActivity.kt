@@ -158,7 +158,8 @@ fun getKat() : List<Kategorie>{
     val kat4 = Kategorie("Gym")
 
 
-    val katList = listOf(kat4,kat2,kat3,kat1)
+    val katList = mutableListOf(kat4,kat2,kat3,kat1)
+
     return katList
 }
 

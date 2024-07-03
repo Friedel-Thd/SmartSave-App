@@ -204,7 +204,7 @@ class KontoansichtActivity : SmartSaveActivity() {
     }
 
     private fun getBudget(month: Month): Double {
-        //TODO Implement datenbank kram, hole kontostand an datum + alle seit dem postiiven umsätze
+        //TODO Implement datenbank kram, hole summe aller ausgaben
         return 3000.0
     }
 
