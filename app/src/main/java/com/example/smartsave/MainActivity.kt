@@ -46,7 +46,13 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                 }
             )
 
-            ListItem(text = "First item")
+            ListItem(
+                text = "Umsätze verwalten",
+                modifier = Modifier.clickable {
+                    val intent = Intent(this@MainActivity, KontoansichtUmsaetzeActivity::class.java)
+                    startActivity(intent)
+                }
+            )
         }
 
 
