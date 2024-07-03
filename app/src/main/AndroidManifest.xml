@@ -11,6 +11,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartSave">
         <activity
+            android:name=".SparzielAnAufActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SparzielAnsichtActivity"
+            android:exported="false" />
+        <activity
             android:name=".KategorienVerwaltenActivity"
             android:exported="false" />
         <activity

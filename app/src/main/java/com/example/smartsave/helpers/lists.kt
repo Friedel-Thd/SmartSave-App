@@ -91,6 +91,33 @@ fun SparzielListItem(text: String, modifier: Modifier = Modifier, iconId: Int, p
 }
 
 @Composable
+fun SparzielAnsichtListItem(text1: String, text2: String, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ){
+        Text(text = text1, modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 28.sp))
+        Text(text = text2, modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 28.sp))
+    }
+    ListDivider()
+}
+
+@Composable
+fun SparzielEinzahlungListItem(einzahlung: Umsatz, modifier: Modifier = Modifier) {
+    Column( modifier = modifier.fillMaxWidth() ) {
+        Text(text = "Datum", modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ){
+            Text(text = einzahlung.name, modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
+            Text(text = "${einzahlung.value}€", modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
+        }
+    }
+    ListDivider()
+}
+
+@Composable
 fun ListItem(text: String, modifier: Modifier = Modifier) {
     Row (modifier = modifier.fillMaxWidth()){
         CenteredText(text = text)

@@ -57,7 +57,7 @@ abstract class SmartSaveActivity(
 
         val standardPadH = 20.dp
         val standardPadTop = 25.dp
-        val standardPadBottom = 40.dp
+        val standardPadBottom = 20.dp
 
     }
 
