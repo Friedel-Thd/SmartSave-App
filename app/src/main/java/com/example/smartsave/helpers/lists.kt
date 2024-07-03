@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DropdownMenuItem
@@ -39,6 +42,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.smartsave.AlertDialogHandler
 import com.example.smartsave.Kategorie
 import com.example.smartsave.Konto
 import com.example.smartsave.R
@@ -190,6 +194,7 @@ fun LabelledDatePicker() {
 fun LabelledDropdownMenuUmsatz(label: String, options: List<Kategorie>, umsatz: Umsatz) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf(options[0]) }
+    var openAlertDialog  by remember { mutableStateOf(false) }
     Column{
 
         Row(
@@ -237,8 +242,11 @@ fun LabelledDropdownMenuUmsatz(label: String, options: List<Kategorie>, umsatz: 
                             onClick = {
                                 selectedOptionText = selectionOption
                                 expanded = false
+                                openAlertDialog = true
+
                             }
                         )
+
                     }
                 }
 
@@ -262,6 +270,14 @@ fun LabelledDropdownMenuUmsatz(label: String, options: List<Kategorie>, umsatz: 
         }
         Row {
             ListDivider()
+        }
+        if (openAlertDialog){
+            AlertDialog(
+                onDismissRequest = { openAlertDialog = false },
+                confirmButton = {
+                  Button(onClick = {openAlertDialog = false }) {
+                    Text("OK")
+                } })
         }
     }
 }
