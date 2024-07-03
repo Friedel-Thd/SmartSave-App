@@ -1,6 +1,8 @@
 package com.example.smartsave
 
+import android.content.Intent
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -30,6 +32,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.CenteredText
+import com.example.smartsave.helpers.IconListItem
+import com.example.smartsave.helpers.ListItem
 import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
 import com.example.smartsave.helpers.StandardText
@@ -59,12 +63,27 @@ class KontoansichtActivity : SmartSaveActivity() {
 
         var months by remember { mutableIntStateOf(1) }
 
+        var bankkonto = getBankkonto()
+
 
         MainColumn(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            CenteredText(text = currentMonth.toString())
+
+
+            if(bankkonto != null) {
+                IconListItem(
+                    text = bankkonto.kontostand.toString(),
+                    modifier = Modifier.clickable {
+                        val intent = Intent(this@KontoansichtActivity, KontoansichtUmsaetzeActivity::class.java)
+                        startActivity(intent)
+                    },
+                    iconId = R.drawable.arrow_swap
+                )
+            }
+
+            ListItem(text = currentMonth.toString())
 
 
             //TODO DRAW RECTANGLE FOR CATEGORIES
@@ -164,7 +183,7 @@ class KontoansichtActivity : SmartSaveActivity() {
             }
         }
 
-        AlignedButton(alignment = Alignment.BottomStart, text = "Zurück") {finish()}
+        AlignedButton(alignment = Alignment.BottomCenter, text = "Zurück") {finish()}
     }
 
     private fun calcPercentage(umsatzKategorie: Double, budget: Double): Double {

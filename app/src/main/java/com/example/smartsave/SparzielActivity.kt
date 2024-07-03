@@ -27,6 +27,7 @@ import com.example.smartsave.helpers.LabelledDropdownMenu
 import com.example.smartsave.helpers.LabelledInputField
 import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
+import com.example.smartsave.helpers.LabelledDatePicker
 import com.example.smartsave.helpers.StandardText
 
 class SparzielActivity : SmartSaveActivity() {
@@ -47,8 +48,10 @@ class SparzielActivity : SmartSaveActivity() {
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             LabelledInputField(label = "Name", value = textName) {textName = it}
+
             //TODO Auszahlungszeitraum zu Date Format ändern
-            LabelledInputField(label = "Auszahlungszeitraum", value = textAuszahlungszeitraum) { textAuszahlungszeitraum = it }
+            LabelledDatePicker()
+
             LabelledInputField(label = "Betrag", value = textBetrag) { textBetrag = it }
 
             //TODO Bei leerer Kontoliste auf Layout #4a Weiterleiten
@@ -69,10 +72,10 @@ class SparzielActivity : SmartSaveActivity() {
 
     fun getKontolist(): List<Konto> {
         //TODO get liste mit allen angelegten Konten
-        var konto1 = Konto(name = "Konto 1")
-        var konto2 = Konto(name = "Konto 2")
-        var konto3 = Konto(name = "Konto 3")
-        var konto4 = Konto(name = "Konto 4")
+        var konto1 = Konto(name = "Konto 1", 500.0)
+        var konto2 = Konto(name = "Konto 2", 500.0)
+        var konto3 = Konto(name = "Konto 3", 500.0)
+        var konto4 = Konto(name = "Konto 4", 500.0)
         var kontoliste = listOf(konto1, konto2, konto3, konto4)
 
         return kontoliste

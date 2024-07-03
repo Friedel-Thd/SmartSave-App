@@ -18,8 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.smartsave.helpers.AlignedButton
+import com.example.smartsave.helpers.IconListItem
 import com.example.smartsave.helpers.ListItem
 import com.example.smartsave.helpers.SmartSaveActivity
+import com.example.smartsave.helpers.SparzielListItem
 import com.example.smartsave.helpers.listItem
 import kotlinx.coroutines.launch
 
@@ -33,26 +35,51 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
     override fun BoxScope.GenerateLayout() {
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
+        val bankkonto = getBankkonto()
+        val kreditkontenListe = getKreditKontenListe()
+        val sparzielListe = getSparzielListe()
+
 
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
             //TODO Bankkonto Darstellung
-            ListItem(
-                text = "Kontoansicht",
-                modifier = Modifier.clickable {
-                    val intent = Intent(this@MainActivity, KontoansichtActivity::class.java)
-                    startActivity(intent)
-                }
-            )
 
-            ListItem(
-                text = "Umsätze verwalten",
-                modifier = Modifier.clickable {
-                    val intent = Intent(this@MainActivity, KontoansichtUmsaetzeActivity::class.java)
-                    startActivity(intent)
-                }
-            )
+            if(bankkonto != null) {
+                IconListItem(
+                    text = bankkonto.kontostand.toString(),
+                    modifier = Modifier.clickable {
+                        val intent = Intent(this@MainActivity, KontoansichtActivity::class.java)
+                        startActivity(intent)
+                    },
+                    iconId = R.drawable.arrow_swap
+                )
+            }
+
+            for (kreditkonto in kreditkontenListe) {
+                IconListItem(
+                    text = kreditkonto.kontostand.toString(),
+                    modifier = Modifier.clickable {
+                        val intent = Intent(this@MainActivity, KontoansichtUmsaetzeActivity::class.java)
+                        startActivity(intent)
+                    },
+                    iconId = R.drawable.arrow_forward
+                )
+            }
+
+            for (sparziel in sparzielListe) {
+                val progress = getSparzielprogress(sparziel)
+
+                SparzielListItem(
+                    text = sparziel.name,
+                    modifier = Modifier.clickable {
+                        //TODO Activity #11 Starten
+                    },
+                    iconId = R.drawable.piggy_bank,
+                    progress = progress
+                )
+            }
+
         }
 
 
@@ -61,8 +88,8 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
             drawerState = drawerState,
             drawerContent = {
                 ModalDrawerSheet {
-                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                        listItem(
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        ListItem(
                             text = "Konto anlegen",
                             modifier = Modifier.clickable {
                                 //TODO KontoAnlegen aufrufen
@@ -70,14 +97,14 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                                 startActivity(intent)
                             }
                         )
-                        listItem(text = "Umsätze verwalten")
-                        listItem(text = "Kategorien verwalten")
+                        ListItem(text = "Umsätze verwalten")
+                        ListItem(text = "Kategorien verwalten")
                     }
                 }
             }
         ) { }
 
-        if (drawerState.isClosed) {
+        if (drawerState.isClosed && !drawerState.isAnimationRunning) {
             AlignedButton(
                 alignment = Alignment.BottomStart,
                 modifier = Modifier.padding(bottom = standardPadBottom, start = standardPadH),
@@ -100,4 +127,37 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
             }
         }
     }
+}
+
+fun getBankkonto(): Konto? {
+    //TODO Get Angelegtes Bankkonto
+    return Konto("Hauptkonto", 500.0)
+    //return null
+}
+
+fun getKreditKontenListe(): List<Konto> {
+    //TODO Get alle angelegten KreditKartenKonten
+    val konto1 = Konto("Kkonto", 500.0)
+    val konto2 = Konto("Kkonto", 500.0)
+    val konto3 = Konto("Kkonto", 500.0)
+    val kontoliste = mutableListOf(konto1, konto2, konto3)
+    //val kontoliste: MutableList<Konto> = mutableListOf()
+
+    return kontoliste
+}
+
+fun getSparzielListe(): List<Sparziel> {
+    //TODO Get alle angelegten KreditKartenKonten
+    val sparziel1 = Sparziel("Koka")
+    val sparziel2 = Sparziel("Csgo Messer")
+    val sparziel3 = Sparziel("Cl500")
+    val sparzielliste = mutableListOf(sparziel1, sparziel2, sparziel3)
+    //val sparzielliste: MutableList<Konto> = mutableListOf()
+
+    return sparzielliste
+}
+
+fun getSparzielprogress(sparziel: Sparziel): Int {
+    //TODO Progress des Sparziels berchnen (Alle Umsätze des Bankkontos auf Sparkonto / SparzielGesamt)
+    return 50
 }
