@@ -4,14 +4,22 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -22,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -59,13 +68,19 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
         var katList = getKat()
 
         MainColumn(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
         ) {
             LabelledInputField(label = "Filter", value = "") {
 
             }
-            Column(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
                 Slider(
                     value = MAX_MONTHS - months.toFloat(),
                     modifier = Modifier
@@ -130,35 +145,73 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
                     }
 
                 }
-                Column {
-                    for ((index, umsatz) in umsatzlist.withIndex()) Row(){
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                        .fillMaxHeight()
+                        .weight(1f, true),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+
+                ) {
+                    for ((index, umsatz) in umsatzlist.withIndex()) Row() {
                         LabelledDropdownMenuUmsatz(label = "Datum1", options = katList, umsatz)
                     }
 
                 }
 
-            }
+                        }
+                    }
+        AlignedButton(
+            alignment = Alignment.BottomStart,
+            iconId = R.drawable.arrow_forward,
+            modifier = Modifier
+                .height(70.dp)
+                .width(70.dp)
+        ) {
+
+        }
+        AlignedButton(
+            alignment = Alignment.BottomEnd,
+            iconId = R.drawable.plus,
+            modifier = Modifier
+                .height(70.dp)
+                .width(70.dp)
+        ) {
+
+        }
+        AlignedButton(alignment = Alignment.BottomCenter, text = "Zurück", modifier = Modifier.height(70.dp)) { finish()
+
         }
     }
-}
-fun getUmsaetze() : List<Umsatz>{
-    val umsatz1 = Umsatz("umsatz1", 534.55)
-    val umsatz2 = Umsatz("umsatz2", 34.55)
-    val umsatz3 = Umsatz("umsatz3", 4.55)
-    val umsatz4 = Umsatz("umsatz4", 888.55)
-
-    val umsatzliste = listOf(umsatz1,umsatz2,umsatz3,umsatz4)
-    return umsatzliste
 
 }
-fun getKat() : List<Kategorie>{
-    val kat1 = Kategorie("Auto")
-    val kat2 = Kategorie("Essen")
-    val kat3 = Kategorie("COC")
-    val kat4 = Kategorie("Gym")
 
 
-    val katList = listOf(kat4,kat2,kat3,kat1)
-    return katList
-}
+    fun getUmsaetze(): List<Umsatz> {
+        val umsatz1 = Umsatz("umsatz1", 534.55)
+        val umsatz2 = Umsatz("umsatz2", 34.55)
+        val umsatz3 = Umsatz("umsatz3", 4.55)
+        val umsatz4 = Umsatz("umsatz4", 888.55)
+
+        val umsatzliste = listOf(umsatz1, umsatz2, umsatz3, umsatz4)
+        return umsatzliste
+
+    }
+
+    fun getKat(): List<Kategorie> {
+        val kat1 = Kategorie("Auto")
+        val kat2 = Kategorie("Essen")
+        val kat3 = Kategorie("COC")
+        val kat5 = Kategorie("Gym")
+        val kat6 = Kategorie("Gym")
+        val kat7 = Kategorie("Gym")
+        val kat8 = Kategorie("Gym")
+        val kat9 = Kategorie("Gym")
+        val kat10 = Kategorie("Gym")
+
+
+        val katList = listOf(kat5, kat2, kat3, kat1, kat6, kat7, kat8, kat9, kat10)
+        return katList
+    }
 

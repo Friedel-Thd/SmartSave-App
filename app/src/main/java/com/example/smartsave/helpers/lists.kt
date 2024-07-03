@@ -1,15 +1,22 @@
 package com.example.smartsave.helpers
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+
+
 import androidx.compose.foundation.layout.Row
+
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -36,6 +43,8 @@ import com.example.smartsave.Kategorie
 import com.example.smartsave.Konto
 import com.example.smartsave.R
 import com.example.smartsave.Umsatz
+import com.example.smartsave.helpers.AlignedButton
+
 
 
 fun LazyListScope.listItem(text: String, modifier: Modifier = Modifier) = item { ListItem(text, modifier) }
@@ -154,64 +163,78 @@ fun LabelledDatePicker() {
 fun LabelledDropdownMenuUmsatz(label: String, options: List<Kategorie>, umsatz: Umsatz) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf(options[0]) }
+    Column{
 
-    Row (
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ){
-        Text(text = label, textAlign = TextAlign.Center)
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            modifier = Modifier.width(150.dp),
-            onExpandedChange = { expanded = !expanded }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            //horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            TextField(
-                readOnly = true,
-                value = selectedOptionText.name,
-                onValueChange = { },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(
-                        expanded = expanded
-                    )
-                },
-                colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                modifier = Modifier.menuAnchor()
+            Text(
+                text = label,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(start = 20.dp, end = 50.dp)
             )
-            ExposedDropdownMenu(
+            ExposedDropdownMenuBox(
                 expanded = expanded,
-                onDismissRequest = {
-                    expanded = false
+                modifier = Modifier
+                    .width(150.dp)
+                    .height(50.dp)
+                    .padding(end = 50.dp),
+                onExpandedChange = { expanded = !expanded }
+            ) {
+                TextField(
+                    readOnly = true,
+                    value = selectedOptionText.name,
+                    onValueChange = { },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(
+                            expanded = expanded
+                        )
+                    },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    modifier = Modifier.menuAnchor()
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = {
+                        expanded = false
+                    }
+
+                ) {
+                    options.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            text = { Text(text = selectionOption.name) },
+                            onClick = {
+                                selectedOptionText = selectionOption
+                                expanded = false
+                            }
+                        )
+                    }
                 }
 
-            ) {
-                options.forEach { selectionOption ->
-                    DropdownMenuItem(
-                        text = { Text(text = selectionOption.name) },
-                        onClick = {
-                            selectedOptionText = selectionOption
-                            expanded = false
-                        }
-                    )
-                }
             }
+            Text(text = "${umsatz.value}€")
+
 
         }
-       // Text(text = umsatz.value.toString())
-
-
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            //horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = umsatz.name,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(start = 20.dp)
+            )
+        }
+        Row {
+            ListDivider()
+        }
     }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ){
-        Text(text = umsatz.name)
-
-    }
-
 }

@@ -105,23 +105,23 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
         ) { }
 
         if (drawerState.isClosed && !drawerState.isAnimationRunning) {
-            AlignedButton(
-                alignment = Alignment.BottomStart,
-                modifier = Modifier.padding(bottom = standardPadBottom, start = standardPadH),
-                iconId = R.drawable.piggy_bank
-            ) {
-                //TODO SparzielActivity aufrufen
-                val intent = Intent(this@MainActivity, SparzielActivity::class.java)
-                startActivity(intent)
-            }
-            AlignedButton(
-                alignment = Alignment.BottomEnd,
-                modifier = Modifier.padding(bottom = standardPadBottom, end = standardPadH),
-                iconId = R.drawable.plus
-            ) {
-                scope.launch {
-                    drawerState.apply {
-                        if (isClosed) open() else close()
+                        AlignedButton(
+                            alignment = Alignment.BottomStart,
+                            modifier = Modifier.padding(bottom = standardPadBottom, start = standardPadH),
+                            iconId = R.drawable.piggy_bank
+                        ) {
+                            //TODO SparzielActivity aufrufen
+                            val intent = Intent(this@MainActivity, SparzielActivity::class.java)
+                            startActivity(intent)
+                        }
+                        AlignedButton(
+                            alignment = Alignment.BottomEnd,
+                            modifier = Modifier.padding(bottom = standardPadBottom, end = standardPadH),
+                            iconId = R.drawable.plus
+                        ) {
+                            scope.launch {
+                                drawerState.apply {
+                                    if (isClosed) open() else close()
                     }
                 }
             }
