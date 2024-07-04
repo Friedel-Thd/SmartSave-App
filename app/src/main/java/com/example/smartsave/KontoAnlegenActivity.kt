@@ -1,5 +1,8 @@
 package com.example.smartsave
 
+import FeedReaderDbHelper
+import android.os.Bundle
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -28,6 +31,10 @@ import com.example.smartsave.helpers.SmartSaveActivity
 import com.example.smartsave.helpers.StandardText
 
 class KontoAnlegenActivity : SmartSaveActivity() {
+
+    var db = FeedReaderDbHelper(this)
+
+
 
     @Preview
     @Composable
@@ -86,6 +93,9 @@ class KontoAnlegenActivity : SmartSaveActivity() {
         AlignedButton(alignment = Alignment.BottomStart, text = "Abbrechen") {finish()}
         AlignedButton(alignment = Alignment.BottomEnd, text = "Speichern") {
             //TODO Kontodaten speichern
+            var konto = Konto(textKontoNr,500.0)
+            db.insertKonto(konto)
+            Log.d("Entry", "Entry so mesisch")
             finish()
         }
     }
