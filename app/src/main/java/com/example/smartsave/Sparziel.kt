@@ -11,7 +11,11 @@ data class Sparziel(val name: String) : Serializable {
         val einzahlung2 = Umsatz("Einzahlung2", 50.0)
         val einzahlung3 = Umsatz("Einzahlung3", 50.0)
         val einzahlung4 = Umsatz("Einzahlung4", 50.0)
-        val einzahlungsListe: List<Umsatz> = mutableListOf(einzahlung1, einzahlung2, einzahlung3, einzahlung4)
+        val einzahlung5 = Umsatz("Einzahlung5", 50.0)
+        val einzahlung6 = Umsatz("Einzahlung6", 50.0)
+        val einzahlung7 = Umsatz("Einzahlung7", 50.0)
+        val einzahlung8 = Umsatz("Einzahlung8", 50.0)
+        val einzahlungsListe: List<Umsatz> = mutableListOf(einzahlung1, einzahlung2, einzahlung3, einzahlung4, einzahlung5, einzahlung6, einzahlung7, einzahlung8)
 
         return einzahlungsListe
     }

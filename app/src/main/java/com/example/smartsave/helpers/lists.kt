@@ -1,5 +1,7 @@
 package com.example.smartsave.helpers
 import android.app.DatePickerDialog
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 
@@ -13,14 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,9 +26,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,12 +41,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.smartsave.AlertDialogHandler
+import androidx.core.content.ContextCompat.startActivity
 import com.example.smartsave.Kategorie
 import com.example.smartsave.Konto
 import com.example.smartsave.R
+import com.example.smartsave.SparzielActivity
+import com.example.smartsave.UmsaetzeDiffActivity
 import com.example.smartsave.Umsatz
-import com.example.smartsave.helpers.AlignedButton
 import java.util.Calendar
 
 
@@ -114,13 +109,13 @@ fun SparzielAnsichtListItem(text1: String, text2: String, modifier: Modifier = M
 @Composable
 fun SparzielEinzahlungListItem(einzahlung: Umsatz, modifier: Modifier = Modifier) {
     Column( modifier = modifier.fillMaxWidth() ) {
-        Text(text = "Datum", modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
+        Text(text = "Datum", modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
         Row(
             modifier = modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ){
-            Text(text = einzahlung.name, modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
-            Text(text = "${einzahlung.value}€", modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
+            Text(text = einzahlung.name, modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
+            Text(text = "${einzahlung.value}€", modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
         }
     }
     ListDivider()
@@ -226,9 +221,14 @@ fun LabelledDatePickerButton(label: String, selectedDate: String, onDateSelected
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LabelledDropdownMenuUmsatz(label: String, options: List<Kategorie>, umsatz: Umsatz) {
+fun LabelledDropdownMenuUmsatz(
+    label: String,
+    options: List<Kategorie>,
+    umsatz: Umsatz,
+    context: Context
+) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf(options[0]) }
+    var selectedOptionKategorie by remember { mutableStateOf(options[0]) }
     var openAlertDialog  by remember { mutableStateOf(false) }
     Column{
 
@@ -254,7 +254,7 @@ fun LabelledDropdownMenuUmsatz(label: String, options: List<Kategorie>, umsatz: 
             ) {
                 TextField(
                     readOnly = true,
-                    value = selectedOptionText.name,
+                    value = selectedOptionKategorie.name,
                     onValueChange = { },
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(
@@ -275,10 +275,9 @@ fun LabelledDropdownMenuUmsatz(label: String, options: List<Kategorie>, umsatz: 
                         DropdownMenuItem(
                             text = { Text(text = selectionOption.name) },
                             onClick = {
-                                selectedOptionText = selectionOption
+                                selectedOptionKategorie = selectionOption
                                 expanded = false
                                 openAlertDialog = true
-
                             }
                         )
 
@@ -294,7 +293,7 @@ fun LabelledDropdownMenuUmsatz(label: String, options: List<Kategorie>, umsatz: 
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
-            //horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -302,17 +301,44 @@ fun LabelledDropdownMenuUmsatz(label: String, options: List<Kategorie>, umsatz: 
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(start = 20.dp)
             )
+
+
+            ElevatedButton(
+                enabled = if(!umsatz.isAssigned()) true else false,
+                onClick = {
+                //TODO Layout #8 NUR WENN UMSATZ KEINE KATEGORIE ZUGEWIESEN HAT bzw. "NICHT ZUGEWIESEN"
+                // Übergabeparameter aktueller Umsatz mäßisch
+                val intent = Intent(context, UmsaetzeDiffActivity::class.java)
+                context.startActivity(intent)
+            }) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.plus),
+                    modifier = Modifier.size(18.dp),
+                    contentDescription = "drawable icons",
+                    tint = Color.Unspecified
+                )
+            }
         }
-        Row {
-            ListDivider()
-        }
+
+        ListDivider()
+
         if (openAlertDialog){
             AlertDialog(
                 onDismissRequest = { openAlertDialog = false },
                 confirmButton = {
                   Button(onClick = {openAlertDialog = false }) {
+                      //TODO Wenn der Umsatz unterumsätze besitzt -> Alle zugewiesenen unterumsätze der ausgewählten Kategorie zuweisen
+                      if(umsatz.hasAssignedEinzelumsatz()) {
+                          umsatz.setKategorie(selectedOptionKategorie)
+                      }
                     Text("OK")
-                } })
+                } },
+                text = {
+                    if(umsatz.hasAssignedEinzelumsatz()) {
+                        Text("Die Kategorie aller zugewiesenen Einzelumsätze zu $selectedOptionKategorie ändern?")
+                    }
+                }
+            )
         }
     }
 }

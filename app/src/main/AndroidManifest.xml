@@ -11,6 +11,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartSave">
         <activity
+            android:name=".UmsaetzeDiffActivity"
+            android:exported="false" />
+        <activity
             android:name=".SparzielAnAufActivity"
             android:exported="false" />
         <activity
