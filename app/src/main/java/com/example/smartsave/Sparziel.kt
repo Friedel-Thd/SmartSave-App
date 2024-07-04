@@ -6,6 +6,7 @@ data class Sparziel(val name: String) : Serializable {
 
     fun getEinzahlungsliste(): List<Umsatz> {
         //TODO return eine liste mit allen einzahlungen von bankkonto zu sparkonto mit entsprechendem verwendungszweck
+        //TODO Attribute Zielkonto, Auszahlkonto und Betrag
         val einzahlung1 = Umsatz("Einzahlung1", 50.0)
         val einzahlung2 = Umsatz("Einzahlung2", 50.0)
         val einzahlung3 = Umsatz("Einzahlung3", 50.0)
