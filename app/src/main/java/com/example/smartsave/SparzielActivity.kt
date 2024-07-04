@@ -62,7 +62,9 @@ class SparzielActivity : SmartSaveActivity() {
             //TODO Von String zu einem Date Format ändern?
             LabelledDatePickerButton(label = "Auszahlungszeitraum",
                 selectedDate = selectedDate,
-                onDateSelected = { date -> selectedDate = date }
+                onDateSelected = { date -> selectedDate = date },
+                true
+
             )
 
             //TODO Bei leerer Kontoliste auf Layout #4a Weiterleiten

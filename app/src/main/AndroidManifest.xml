@@ -14,6 +14,9 @@
             android:name=".EinzelumsatzVerwaltenActivity"
             android:exported="false" />
         <activity
+            android:name=".EinzelumsatzEditActivity"
+            android:exported="false" />
+        <activity
             android:name=".UmsaetzeDiffActivity"
             android:exported="false" />
         <activity

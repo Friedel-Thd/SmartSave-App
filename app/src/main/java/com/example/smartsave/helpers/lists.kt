@@ -201,12 +201,12 @@ fun LabelledDropdownMenu(label: String, options: List<Konto>) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf(options[0]) }
 
-    Column(
+    Row(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(text = "$label: ", modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 20.sp))
         ExposedDropdownMenuBox(
@@ -245,10 +245,65 @@ fun LabelledDropdownMenu(label: String, options: List<Konto>) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LabelledDropdownMenuKategory(label: String, options: List<Kategorie>) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOptionText by remember { mutableStateOf(options[0]) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "$label: ",
+                style = TextStyle(fontSize = 20.sp),
+
+            )
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded }
+            ) {
+                TextField(
+                    readOnly = true,
+                    value = selectedOptionText.name,
+                    onValueChange = { },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(
+                            expanded = expanded
+                        )
+                    },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    modifier = Modifier.menuAnchor()
+                )
+                ExposedDropdownMenu(
+
+                    expanded = expanded,
+                    onDismissRequest = {
+                        expanded = false
+                    }
+                ) {
+                    options.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            text = { Text(text = selectionOption.name) },
+                            onClick = {
+                                selectedOptionText = selectionOption
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 
 //TODO Layout
 @Composable
-fun LabelledDatePickerButton(label: String, selectedDate: String, onDateSelected: (String) -> Unit) {
+fun LabelledDatePickerButton(label: String, selectedDate: String, onDateSelected: (String) -> Unit, mindate: Boolean) {
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
     val year = calendar.get(Calendar.YEAR)
@@ -261,13 +316,12 @@ fun LabelledDatePickerButton(label: String, selectedDate: String, onDateSelected
             onDateSelected("$dayOfMonth/${monthOfYear + 1}/$year")
         }, year, month, day
     )
-
-    datePickerDialog.datePicker.minDate = calendar.timeInMillis
-
+    if(mindate) {
+        datePickerDialog.datePicker.minDate = calendar.timeInMillis
+    }
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text("$label: ", modifier = Modifier.fillMaxWidth(.6f), style = TextStyle(fontSize = 20.sp))
