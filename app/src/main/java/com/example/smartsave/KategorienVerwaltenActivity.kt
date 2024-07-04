@@ -1,6 +1,8 @@
 package com.example.smartsave
 
-import androidx.compose.foundation.clickable
+import android.os.Bundle
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.rememberScrollState
@@ -22,23 +24,30 @@ import com.example.smartsave.helpers.LabelledInputField
 import com.example.smartsave.helpers.ListItem
 import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
-import com.example.smartsave.helpers.holding
 
 class KategorienVerwaltenActivity : SmartSaveActivity() {
+    private val kategorienListeState = mutableStateOf<List<Kategorie>>(emptyList())
+    override fun onCreate(savedInstanceState: Bundle?) {
+        //TODO getKat (DB)
+        kategorienListeState.value = getKat()
+        super.onCreate(savedInstanceState)
+    }
+
     @Preview
     @Composable
     fun PreviewLayout() = GenerateContent()
 
+    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun BoxScope.GenerateLayout() {
-        val kategorienListe = getKat().toMutableList()
+        val kategorienListe by remember { kategorienListeState }
+        var selectedKategorie by remember { mutableStateOf<Kategorie?>(null) }
 
         var textKategorie by remember { mutableStateOf("") }
 
         var showDialogAnlegen by remember { mutableStateOf(false) }
         var showDialogLoeschen by remember { mutableStateOf(false) }
-
-
+        var showDialogAssignedLoeschen by remember { mutableStateOf(false) }
 
         MainColumn(
             modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -48,33 +57,39 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
             for (kategorie in kategorienListe) {
                 ListItem(
                     text = kategorie.name,
-                    modifier = Modifier.holding {
-                        if (kategorie.isAssigned()) {
-                            showDialogLoeschen = true
-                        }
-                        else {
-                        //TODO Entferne Kategorie aus Kategorienliste in Datenbank, wenn Eintrag lange gehalten wird
+                    modifier = Modifier.combinedClickable(
+                        onClick = {
 
+                        },
+                        onLongClick = {
+                            selectedKategorie = kategorie
+                            if (kategorie.isAssigned()) {
+                                showDialogAssignedLoeschen = true
+                            }
+                            else {
+                                showDialogLoeschen = true
+                            }
                         }
-                    }
+                    )
                 )
             }
-
         }
 
         AlignedButton(alignment = Alignment.BottomStart, text = "Zurück") {finish()}
-
-        AlignedButton(alignment = Alignment.BottomEnd, iconId = R.drawable.plus) {
-            //TODO #12a
-            showDialogAnlegen = true
-        }
+        AlignedButton(alignment = Alignment.BottomEnd, iconId = R.drawable.plus) { showDialogAnlegen = true }
 
         if (showDialogAnlegen) {
             AlertDialog(
                 onDismissRequest = { showDialogAnlegen = false },
                 confirmButton = {
-                    TextButton(onClick = { showDialogAnlegen = false }) {
-                        //TODO Neue Kategorie anlegen
+                    TextButton(onClick = {
+                        showDialogAnlegen = false
+                        val newKategorie = Kategorie(textKategorie)
+                        addKategorieToDatabase(newKategorie)
+                        val newkategorienListe = kategorienListe.toMutableList()
+                        newkategorienListe.add(newKategorie)
+                        kategorienListeState.value = newkategorienListe
+                    }) {
                         Text("OK")
                     }
                 },
@@ -84,23 +99,33 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
                     }
                 },
                 title = { Text("Neue Kategorie anlegen") },
-                text = {
-                    LabelledInputField(label = "Name", value = textKategorie) {textKategorie = it}
-                }
+                text = { LabelledInputField(label = "Name", value = textKategorie) {textKategorie = it} }
             )
         }
 
-        if (showDialogLoeschen) {
+        if (showDialogAssignedLoeschen) {
             AlertDialog(
-                onDismissRequest = { showDialogLoeschen = false },
+                onDismissRequest = { showDialogAssignedLoeschen = false },
                 confirmButton = {
-                    TextButton(onClick = { showDialogLoeschen = false }) {
+                    TextButton(onClick = {
+                        showDialogAssignedLoeschen = false
                         //TODO Kategorie inklusive allen zuweisungen löschen
-                        Text("OK")
+                        if (selectedKategorie != null) {
+                            removeKategorieFromDatabase(selectedKategorie!!)
+                            val newkategorienListe = kategorienListe.toMutableList()
+                            newkategorienListe.remove(selectedKategorie)
+                            kategorienListeState.value = newkategorienListe
+                            selectedKategorie = null
+                        }
+                    }) {
+                        Text("Bestätigen")
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDialogLoeschen = false }) {
+                    TextButton(onClick = {
+                        showDialogAssignedLoeschen = false
+                        selectedKategorie = null
+                    }) {
                         Text("Abbrechen")
                     }
                 },
@@ -109,5 +134,42 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
             )
         }
 
+        if (showDialogLoeschen) {
+            AlertDialog(
+                onDismissRequest = { showDialogLoeschen = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showDialogLoeschen = false
+                        //TODO Kategorie inklusive allen zuweisungen löschen (DB)
+                        if (selectedKategorie != null) {
+                            removeKategorieFromDatabase(selectedKategorie!!)
+                            val newkategorienListe = kategorienListe.toMutableList()
+                            newkategorienListe.remove(selectedKategorie)
+                            kategorienListeState.value = newkategorienListe
+                            selectedKategorie = null
+                        }
+                    }) {
+                        Text("Bestätigen")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        showDialogLoeschen = false
+                        selectedKategorie = null
+                    }) {
+                        Text("Abbrechen")
+                    }
+                },
+                title = { Text("Kategorie Löschen?") }
+            )
+        }
     }
+}
+
+fun addKategorieToDatabase(kategorie: Kategorie) {
+    //TODO Add Logic
+}
+
+fun removeKategorieFromDatabase(kategorie: Kategorie) {
+    //TODO Add Logic
 }
