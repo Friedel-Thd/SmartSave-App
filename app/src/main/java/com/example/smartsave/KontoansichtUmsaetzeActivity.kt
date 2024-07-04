@@ -1,6 +1,7 @@
 package com.example.smartsave
 
 import android.content.Intent
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -63,6 +64,7 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
         val currentMonth = LocalDate.now().let { Month(it.year, it.monthValue) }
         var umsatzlist = getUmsaetze()
         var katList = getKat()
+        var scrollstate = rememberScrollState()
 
 
         MainColumn(
@@ -110,36 +112,22 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp),
+                        .padding(8.dp)
+                        .horizontalScroll(scrollstate),
                     horizontalArrangement = Arrangement.SpaceBetween
                 )
                 {
-                    Button(onClick = { /*TODO*/ }) {
-                        Text(
-                            text = "TBA",
-                            style = TextStyle(fontSize = 15.sp)
-                        )
-                    }
-                    Button(onClick = { /*TODO*/ }) {
-                        Text(
-                            text = "TBA",
-                            style = TextStyle(fontSize = 15.sp)
-                        )
+                    for ( kategorie in katList) {
+                        Button(modifier = Modifier.padding(horizontal = 5.dp),
+                            onClick = {
+                            //TODO set kategory filter für umsätze
 
-                    }
-                    Button(onClick = { /*TODO*/ }) {
-                        Text(
-                            text = "TBA",
-                            style = TextStyle(fontSize = 15.sp)
-                        )
-
-                    }
-                    Button(onClick = { /*TODO*/ }) {
-                        Text(
-                            text = "TBA",
-                            style = TextStyle(fontSize = 15.sp)
-                        )
-
+                        }) {
+                            Text(
+                                text = kategorie.name,
+                                style = TextStyle(fontSize = 15.sp)
+                            )
+                        }
                     }
 
                 }
@@ -180,7 +168,6 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
 
         }
         AlignedButton(alignment = Alignment.BottomCenter, text = "Zurück", modifier = Modifier.height(70.dp)) { finish()
-
         }
     }
 

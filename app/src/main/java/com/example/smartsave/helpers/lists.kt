@@ -2,6 +2,7 @@ package com.example.smartsave.helpers
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 
@@ -25,6 +26,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -42,6 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
+import com.example.smartsave.Einzelumsatz
 import com.example.smartsave.Kategorie
 import com.example.smartsave.Konto
 import com.example.smartsave.R
@@ -102,6 +105,63 @@ fun SparzielAnsichtListItem(text1: String, text2: String, modifier: Modifier = M
     ){
         Text(text = text1, modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 28.sp))
         Text(text = text2, modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 28.sp))
+    }
+    ListDivider()
+}
+
+@Composable
+fun UmsatzDiffDateListItem(umsatz: Umsatz, modifier: Modifier = Modifier) {
+    Column( modifier = modifier.fillMaxWidth() ) {
+        Text(text = "Datum", modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ){
+            Text(text = umsatz.name, modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
+            Text(text = "${umsatz.value}€", modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
+        }
+    }
+    ListDivider()
+}
+
+@Composable
+fun UmsatzDiffListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ){
+        Text(text = einzelumsatz.name, modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
+        Text(text = "${einzelumsatz.value.toString()}€", modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
+    }
+    ListDivider()
+}
+
+@Composable
+fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifier) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier.fillMaxWidth()
+            .holding {
+                //TODO onHolding #9 (einzelumsatz editieren)
+
+            }
+            .clickable {
+                //TODO onClick #8 -> zeige zugehörigen umsatz
+
+            },
+    ){
+        Icon(
+            imageVector = ImageVector.vectorResource(id = R.drawable.plus),
+            modifier = Modifier
+                .size(50.dp)
+                .align(Alignment.CenterVertically)
+                .padding(start = 20.dp),
+            contentDescription = "drawable icons",
+            tint = Color.Unspecified
+        )
+
+        Text(text = einzelumsatz.name, modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
+        Text(text = "${einzelumsatz.value.toString()}€", modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
     }
     ListDivider()
 }
@@ -330,12 +390,27 @@ fun LabelledDropdownMenuUmsatz(
                       //TODO Wenn der Umsatz unterumsätze besitzt -> Alle zugewiesenen unterumsätze der ausgewählten Kategorie zuweisen
                       if(umsatz.hasAssignedEinzelumsatz()) {
                           umsatz.setKategorie(selectedOptionKategorie)
+                          for (einzelumsatz in umsatz.getEinzelumsatzListe()) {
+                              einzelumsatz.setKategorie(selectedOptionKategorie)
+                          }
+                      } else {
+                          //TODO Kategorie für alle Umsätze mit dem gleichen Verwendungszweck übernehmen
+                          // Konto -> Umsatzliste -> Alle mit gleichem Verwendungszweck wie ausgewählte überweisung -> setKategorie
+                          umsatz.setKategorie(selectedOptionKategorie)
                       }
-                    Text("OK")
+
+                    Text("Ja")
                 } },
+                dismissButton = {
+                    TextButton(onClick = { openAlertDialog = false }) {
+                        Text("Abbrechen")
+                    }
+                },
                 text = {
                     if(umsatz.hasAssignedEinzelumsatz()) {
-                        Text("Die Kategorie aller zugewiesenen Einzelumsätze zu $selectedOptionKategorie ändern?")
+                        Text("Die Kategorie aller zugewiesenen Einzelumsätze zu ${selectedOptionKategorie.name} ändern?")
+                    } else {
+                        Text("Kategorie für alle Umsätze mit diesem Verwendungszweck übernehmen?")
                     }
                 }
             )

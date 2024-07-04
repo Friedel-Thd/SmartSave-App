@@ -12,9 +12,15 @@ import java.io.Serializable
    this.kategorie = kategorie
   }
 
+  fun getEinzelumsatzListe(): List<Einzelumsatz> {
+   return einzelumsatzListe
+  }
+
   fun addEinzelumsatz(einzelumsatz: Einzelumsatz) {
    //TODO EInzelumsatzliste ist immer empty why brotha
-    einzelumsatzListe.toMutableList().add(einzelumsatz)
+   val mutableList = einzelumsatzListe.toMutableList()
+   mutableList.add(einzelumsatz)
+   einzelumsatzListe = mutableList
   }
 
   fun hasAssignedEinzelumsatz(): Boolean {
