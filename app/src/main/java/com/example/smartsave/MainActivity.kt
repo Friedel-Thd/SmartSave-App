@@ -96,15 +96,22 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                             modifier = Modifier.clickable {
                                 val intent = Intent(this@MainActivity, KontoAnlegenActivity::class.java)
                                 startActivity(intent)
+                                //TODO Drawer closen
                             }
                         )
                         ListItem(
                             text = "Umsätze verwalten",
+                            modifier = Modifier.clickable {
+                                val intent = Intent(this@MainActivity, EinzelumsatzVerwaltenActivity::class.java)
+                                startActivity(intent)
+                                //TODO Drawer closen
+                            }
                         )
                         ListItem(text = "Kategorien verwalten",
                             modifier = Modifier.clickable {
                                 val intent = Intent(this@MainActivity, KategorienVerwaltenActivity::class.java)
                                 startActivity(intent)
+                                //TODO Drawer closen
                             })
                     }
                 }

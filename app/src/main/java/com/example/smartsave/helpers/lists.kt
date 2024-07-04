@@ -2,7 +2,9 @@ package com.example.smartsave.helpers
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 
@@ -45,12 +47,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
 import com.example.smartsave.Einzelumsatz
+import com.example.smartsave.EinzelumsatzEditActivity
 import com.example.smartsave.Kategorie
 import com.example.smartsave.Konto
+import com.example.smartsave.MainActivity
 import com.example.smartsave.R
 import com.example.smartsave.SparzielActivity
 import com.example.smartsave.UmsaetzeDiffActivity
 import com.example.smartsave.Umsatz
+import com.example.smartsave.UmsatzAuswahlZuordnungActivity
+import com.example.smartsave.getKreditKontenListe
 import java.util.Calendar
 
 
@@ -136,19 +142,25 @@ fun UmsatzDiffListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifier
     ListDivider()
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifier) {
+fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifier, context:Context) {
+    var showDialogAnlegen by remember { mutableStateOf(false) }
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier.fillMaxWidth()
-            .holding {
-                //TODO onHolding #9 (einzelumsatz editieren)
+            .combinedClickable(
+                onClick = {
+                    //TODO onHolding #9 (einzelumsatz editieren)
+                    showDialogAnlegen = true
+                          },
+                onLongClick = {
+                    //TODO onClick #8 -> zeige zugehörigen umsatz
+                    val intent = Intent(context, EinzelumsatzEditActivity::class.java)
+                    context.startActivity(intent)
+                              },
+            )
 
-            }
-            .clickable {
-                //TODO onClick #8 -> zeige zugehörigen umsatz
-
-            },
     ){
         Icon(
             imageVector = ImageVector.vectorResource(id = R.drawable.plus),
@@ -164,6 +176,32 @@ fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifi
         Text(text = "${einzelumsatz.value.toString()}€", modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
     }
     ListDivider()
+    if (showDialogAnlegen) {
+        AlertDialog(
+            onDismissRequest = { showDialogAnlegen = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDialogAnlegen = false
+                    val intent = Intent(context, UmsatzAuswahlZuordnungActivity::class.java)
+                    context.startActivity(intent)
+                }) {
+                    //TODO Neue Kategorie anlegen
+                    Text("OK")
+
+                }
+
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialogAnlegen = false }) {
+                    Text("Abbrechen")
+                }
+            },
+            title = { Text("Neue Kategorie anlegen") },
+            text = {
+                LabelledDropdownMenu(label = "Konto", options = getKreditKontenListe() )
+            }
+        )
+    }
 }
 
 @Composable
