@@ -1,5 +1,7 @@
 package com.example.smartsave
 
+import android.app.DatePickerDialog
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -11,7 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.smartsave.helpers.AlignedButton
@@ -27,8 +32,9 @@ import com.example.smartsave.helpers.LabelledDropdownMenu
 import com.example.smartsave.helpers.LabelledInputField
 import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
-import com.example.smartsave.helpers.LabelledDatePicker
+import com.example.smartsave.helpers.LabelledDatePickerButton
 import com.example.smartsave.helpers.StandardText
+import java.util.Calendar
 
 class SparzielActivity : SmartSaveActivity() {
 
@@ -39,9 +45,10 @@ class SparzielActivity : SmartSaveActivity() {
     @Composable
     override fun BoxScope.GenerateLayout() {
         var textName by remember { mutableStateOf("") }
-        var textAuszahlungszeitraum by remember { mutableStateOf("") }
+        var selectedDate by remember { mutableStateOf("") }
         var textBetrag by remember { mutableStateOf("") }
         var kontolist = getKontolist()
+        var monatsRate = 0.0
 
         MainColumn(
             modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -49,24 +56,33 @@ class SparzielActivity : SmartSaveActivity() {
         ) {
             LabelledInputField(label = "Name", value = textName) {textName = it}
 
-            //TODO Auszahlungszeitraum zu Date Format ändern
-            LabelledDatePicker()
-
+            //TODO Input auf zahlen beschränken
             LabelledInputField(label = "Betrag", value = textBetrag) { textBetrag = it }
+
+            //TODO Von String zu einem Date Format ändern?
+            LabelledDatePickerButton(label = "Auszahlungszeitraum",
+                selectedDate = selectedDate,
+                onDateSelected = { date -> selectedDate = date }
+            )
 
             //TODO Bei leerer Kontoliste auf Layout #4a Weiterleiten
             LabelledDropdownMenu("Auszahlungskonto", kontolist)
             LabelledDropdownMenu("Zielkonto", kontolist)
 
-            CenteredText(text = "Monatliche Rate: ")
             //TODO Monatliche Rate aus Betrag und Auszahlungszeitraum berechnen
+            monatsRate = calcMonatsRate(selectedDate, textBetrag)
+            CenteredText(text = "Monatliche Rate: ")
+            CenteredText(text = "$monatsRate€")
 
         }
 
         AlignedButton(alignment = Alignment.BottomStart, text = "Abbrechen") {finish()}
         AlignedButton(alignment = Alignment.BottomEnd, text = "Weiter") {
             //TODO Spaziel Anlegen/Auflösen (Layout #5)
-
+            //TODO Sparziel Objekt mitgeben
+            val intent = Intent(this@SparzielActivity, SparzielAnAufActivity::class.java)
+            startActivity(intent)
+            finish()
         }
     }
 
@@ -79,5 +95,10 @@ class SparzielActivity : SmartSaveActivity() {
         var kontoliste = listOf(konto1, konto2, konto3, konto4)
 
         return kontoliste
+    }
+
+    fun calcMonatsRate(selectedDate: String, textBetrag: String): Double {
+        //TODO Berechne Monatsrate
+        return 10.0
     }
 }

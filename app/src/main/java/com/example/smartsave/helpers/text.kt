@@ -21,7 +21,7 @@ fun LabelledInputField(label: String, value: String, onValueChange: (String) -> 
     modifier = Modifier.fillMaxWidth(),
     verticalAlignment = Alignment.CenterVertically
 ) {
-    StandardText("$label: ", modifier = Modifier.fillMaxWidth(.35f))
+    Text("$label: ", modifier = Modifier.fillMaxWidth(.35f), style = TextStyle(fontSize = 20.sp))
     TextField(
         value = value,
         singleLine = true,
