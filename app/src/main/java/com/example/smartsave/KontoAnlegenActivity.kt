@@ -50,11 +50,8 @@ class KontoAnlegenActivity : SmartSaveActivity() {
         var textIBAN by remember { mutableStateOf("") }
         var textBemerkung by remember { mutableStateOf("") }
         var isError by remember { mutableStateOf(false) }
-
         val bundle = intent.extras
         val bankkontoExists = bundle!!.getBoolean("BankkontoExists")
-
-
         val radioOptions = listOf("Bankkonto", "Sparkonto", "Kreditkartenkonto")
         val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[1] ) }
 

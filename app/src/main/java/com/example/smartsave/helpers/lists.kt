@@ -193,7 +193,7 @@ fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifi
             },
             title = { Text("Neue Kategorie anlegen") },
             text = {
-                LabelledDropdownMenu(label = "Konto", options = kontenListe )
+                labelledDropdownMenu(label = "Konto", options = kontenListe )
             }
         )
     }
@@ -230,7 +230,7 @@ fun ListDivider() = HorizontalDivider(thickness = 2.dp, color = Color.Black)
 //TODO Layout Anpassen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LabelledDropdownMenu(label: String, options: List<Konto>) {
+fun labelledDropdownMenu(label: String, options: List<Konto>): Konto {
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf(options[0]) }
 
@@ -276,6 +276,7 @@ fun LabelledDropdownMenu(label: String, options: List<Konto>) {
             }
         }
     }
+    return selectedOptionText
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

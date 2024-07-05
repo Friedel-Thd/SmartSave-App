@@ -22,9 +22,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.smartsave.dataClasses.Konto
+import com.example.smartsave.dataClasses.Sparziel
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.CenteredText
-import com.example.smartsave.helpers.LabelledDropdownMenu
+import com.example.smartsave.helpers.labelledDropdownMenu
 import com.example.smartsave.helpers.LabelledInputField
 import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
@@ -37,10 +38,12 @@ import java.util.Locale
 
 class SparzielActivity : SmartSaveActivity() {
     private val kontoListState = mutableStateOf(listOf<Konto>())
+    private val sparzielListeState = mutableStateOf<List<Sparziel>>(emptyList())
     var db = DbHelper(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         kontoListState.value = db.getAllKonten()
+        sparzielListeState.value = db.getSparzielListe()
 
         super.onCreate(savedInstanceState)
     }
@@ -55,40 +58,42 @@ class SparzielActivity : SmartSaveActivity() {
         var selectedDate by remember { mutableStateOf("") }
         var textBetrag by remember { mutableStateOf("") }
         var isError by remember { mutableStateOf(false) }
+        var nameExistsError by remember { mutableStateOf(false) }
         var kontolist by remember { kontoListState }
+        val sparzielListe by remember { sparzielListeState }
+        var ausgangKonto by remember { mutableStateOf<Konto?>(null) }
+        var zielKonto by remember { mutableStateOf<Konto?>(null) }
         var monatsRate = 0.0
 
         MainColumn(
             modifier = Modifier.verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            LabelledInputField(label = "Name*", value = textName, KeyboardOptions()) { textName = it }
-
-            //TODO Input auf zahlen beschränken
+            LabelledInputField(label = "Name*", value = textName, KeyboardOptions()) {
+                nameExistsError = false
+                for (sparziel in sparzielListe) {
+                    if(textName == sparziel.name) {
+                        nameExistsError = true
+                    }
+                }
+                textName = it
+            }
             LabelledInputField(label = "Betrag*", value = textBetrag, KeyboardOptions(keyboardType = KeyboardType.Number)) { textBetrag = it }
-
-            //TODO Von String zu einem Date Format ändern?
             LabelledDatePickerButton(label = "Auszahlungszeitraum*",
                 selectedDate = selectedDate,
-                onDateSelected = {
-                    date -> selectedDate = date
-                    isError = date.isEmpty()
-
-                                 },
+                onDateSelected = { date -> selectedDate = date },
                 true
-
             )
 
             //TODO Bei leerer Kontoliste auf Layout #4a Weiterleiten ( Popup alter mäßisch aber erst bei click auf die menues)
-            LabelledDropdownMenu("Auszahlungskonto*", kontolist)
-            LabelledDropdownMenu("Zielkonto*", kontolist)
+            ausgangKonto = labelledDropdownMenu("Auszahlungskonto*", kontolist)
+            zielKonto = labelledDropdownMenu("Zielkonto*", kontolist)
             if (kontolist.isEmpty()) {
                 val intent = Intent(this@SparzielActivity, SparzielActivity::class.java)
                 startActivity(intent)
                 finish()
             }
 
-            //TODO Monatliche Rate aus Betrag und Auszahlungszeitraum berechnen
             monatsRate = calcMonatsRate(selectedDate, textBetrag)
             CenteredText(text = "Monatliche Rate: ")
             CenteredText(text = "$monatsRate€")
@@ -100,41 +105,44 @@ class SparzielActivity : SmartSaveActivity() {
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }
+            if (nameExistsError){
+                Text(
+                    text = "Sparziel mit diesem Namen existiert bereits!",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
 
         }
 
         //TODO Beschränkungen hinzugügen: Auszahlungskonto != Zielkonto und Zielkonto muss Kontotyp Sparkonto sein
         AlignedButton(alignment = Alignment.BottomStart, text = "Abbrechen") {finish()}
         AlignedButton(alignment = Alignment.BottomEnd, text = "Weiter") {
-            isError = textBetrag.isEmpty() || textName.isEmpty() || selectedDate.isEmpty()
+            isError = textBetrag.isEmpty() || textName.isEmpty() || selectedDate.isEmpty() || zielKonto == null || ausgangKonto == null
             if(!isError){
                 //TODO Spaziel Anlegen/Auflösen (Layout #5)
                 //TODO Sparziel Objekt mitgeben (noch nicht in datenbank schreiben mäßisch)
                 val intent = Intent(this@SparzielActivity, SparzielAnAufActivity::class.java)
+                val tempSparziel = Sparziel(textName, textBetrag.toDouble(), SimpleDateFormat("dd/MM/yyyy").parse(selectedDate)!!, monatsRate, zielKonto!!, ausgangKonto!!)
+                intent.putExtra("tempSparziel", tempSparziel)
+                intent.putExtra("mode", "anlegen")
                 startActivity(intent)
                 finish()
             }
-
         }
-
     }
 
     private fun calcMonatsRate(selectedDate: String, textBetrag: String): Double {
         if (selectedDate.isEmpty() || textBetrag.isEmpty()) return 0.0
-
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val date = dateFormat.parse(selectedDate)
         val today = Calendar.getInstance().time
 
         val monatsDiff = ((date.time - today.time) / (1000L * 60 * 60 * 24 * 30)).toInt()
-
         val betrag = textBetrag.toDoubleOrNull() ?: return 0.0
 
-        val result = if (monatsDiff > 0) {
-            betrag / monatsDiff
-        } else {
-            betrag
-        }
+        val result = if (monatsDiff > 0) { betrag / monatsDiff } else { betrag }
 
         return BigDecimal(result).setScale(2, RoundingMode.HALF_EVEN).toDouble()
     }

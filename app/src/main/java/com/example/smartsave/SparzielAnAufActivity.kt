@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.smartsave.dataClasses.Konto
+import com.example.smartsave.dataClasses.Sparziel
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
@@ -19,9 +20,6 @@ import com.example.smartsave.helpers.StandardText
 
 
 class SparzielAnAufActivity: SmartSaveActivity() {
-//TODO Werte für vars aus Sparziel holen
-
-
 
     @Preview
     @Composable
@@ -29,10 +27,10 @@ class SparzielAnAufActivity: SmartSaveActivity() {
 
     @Composable
     override fun BoxScope.GenerateLayout() {
-        var zielkonto = getZielkonto()
-        var auszahlkonto = getAuszahlkonto()
-        var rate = getRate()
-        var zweck = getZweck()
+        val bundle = intent.extras
+        val tempSparziel = bundle!!.getSerializable("tempSparziel") as Sparziel
+        val mode = bundle.getString("mode")
+
 
         MainColumn(
             modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -41,42 +39,35 @@ class SparzielAnAufActivity: SmartSaveActivity() {
             StandardText("Bitte richten Sie folgenden Dauerauftrag/Terminüberweisung ein:")
             Row (modifier = Modifier.fillMaxWidth(),  horizontalArrangement = Arrangement.SpaceBetween){
                 StandardText("Auszahlkonto")
-                StandardText(auszahlkonto.kontonr.toString())
-
+                StandardText(tempSparziel.auszahlungsKonto.kontonr.toString())
             }
             Row (modifier = Modifier.fillMaxWidth(),  horizontalArrangement = Arrangement.SpaceBetween){
                 StandardText("Zielkonto")
-                StandardText(zielkonto.kontonr.toString())
+                StandardText(tempSparziel.zielKonto.kontonr.toString())
             }
             Row (modifier = Modifier.fillMaxWidth(),  horizontalArrangement = Arrangement.SpaceBetween){
                 StandardText("Betrag")
-                StandardText(rate.toString())
+                StandardText(tempSparziel.monatsrate.toString())
             }
             Row (modifier = Modifier.fillMaxWidth(),  horizontalArrangement = Arrangement.SpaceBetween){
                 StandardText("Verwendungszweck")
-                StandardText(zweck)
+                StandardText(tempSparziel.name)
             }
         }
 
+        //TODO Darstellung Drucken/QR-Code und so mäßig
+
         AlignedButton(alignment = Alignment.BottomStart, text = "Abbrechen") {finish()}
         AlignedButton(alignment = Alignment.BottomEnd, text = "Anlegen/Auflösen") {
+            if(mode == "anlegen") {
+                //TODO Sparziel in datenbank speichern
+
+            } else if(mode == "auflösen") {
+                //TODO Sparziel aus Datenbank entfernen
+
+            } else {
+                throw error("Kein gültiger mode!")
+            }
         }
     }
-}
-@Composable
-fun getAuszahlkonto() : Konto {
-    return Konto(5000,"23","23","23","23","2")
-}
-@Composable
-fun getZielkonto() : Konto {
-    return Konto(5000,"23","23","23","23","2")
-}
-@Composable
-fun getRate() : Double{
-    return 300.0
-}
-
-@Composable
-fun getZweck(): String  {
-    return "Testzweck"
 }

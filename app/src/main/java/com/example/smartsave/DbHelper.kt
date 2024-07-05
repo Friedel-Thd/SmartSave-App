@@ -220,7 +220,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
                 parseDate(cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.UmsatzEntry.DATUM)))
             )
             umsatz.setId(cursor.getInt(cursor.getColumnIndexOrThrow(SmartSaveContract.UmsatzEntry.UMSATZ_ID)))
-
+            umsaetze.add(umsatz)
             //TODO Unterumsätze holen
         }
         cursor.close()
