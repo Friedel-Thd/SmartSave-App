@@ -20,6 +20,7 @@ import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
 import com.example.smartsave.helpers.UmsatzDiffDateListItem
 import com.example.smartsave.helpers.UmsatzDiffListItem
+import java.util.Date
 
 class UmsaetzeDiffActivity : SmartSaveActivity() {
     @Preview
@@ -75,14 +76,14 @@ class UmsaetzeDiffActivity : SmartSaveActivity() {
 }
 
 fun getUmsatz(): Umsatz {
-    val umsatz = Umsatz("umsatz", 34.55)
+    val umsatz = Umsatz("umsatz", 34.55, Date(10,10,10))
 
-    val einzelumsatz1 = Einzelumsatz("Döner", 5.0)
+    val einzelumsatz1 = Einzelumsatz("Döner", 5.0,Date(10,10,10))
     einzelumsatz1.setKategorie(Kategorie("Essen"))
     umsatz.setKategorie(Kategorie("Gym"))
     umsatz.addEinzelumsatz(einzelumsatz1)
 
-    val einzelumsatz2 = Einzelumsatz("Döner", 5.0)
+    val einzelumsatz2 = Einzelumsatz("Döner", 5.0,Date(10,10,10))
     einzelumsatz2.setKategorie(Kategorie("Essen"))
     umsatz.addEinzelumsatz(einzelumsatz2)
 

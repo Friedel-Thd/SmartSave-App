@@ -6,6 +6,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
@@ -100,7 +101,7 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
                     }
                 },
                 title = { Text("Neue Kategorie anlegen") },
-                text = { LabelledInputField(label = "Name", value = textKategorie) {textKategorie = it} }
+                text = { LabelledInputField(label = "Name", value = textKategorie, KeyboardOptions()) {textKategorie = it} }
             )
         }
 

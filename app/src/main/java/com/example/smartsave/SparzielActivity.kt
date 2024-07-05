@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,10 +42,10 @@ class SparzielActivity : SmartSaveActivity() {
             modifier = Modifier.verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            LabelledInputField(label = "Name", value = textName) {textName = it}
+            LabelledInputField(label = "Name", value = textName, KeyboardOptions()) {textName = it}
 
             //TODO Input auf zahlen beschränken
-            LabelledInputField(label = "Betrag", value = textBetrag) { textBetrag = it }
+            LabelledInputField(label = "Betrag", value = textBetrag, KeyboardOptions()) { textBetrag = it }
 
             //TODO Von String zu einem Date Format ändern?
             LabelledDatePickerButton(label = "Auszahlungszeitraum",

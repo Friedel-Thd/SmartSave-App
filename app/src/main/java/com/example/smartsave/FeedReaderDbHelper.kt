@@ -72,7 +72,7 @@ class FeedReaderDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         db.insert(FeedReaderContract.FeedEntry.TABLE_NAME, null, values)
 
     }
-    fun getBankkonto() : Konto {
+    fun getBankkonto() {
         val konto : Konto
         val db = readableDatabase
         val query = "SELECT * FROM ${FeedReaderContract.FeedEntry.TABLE_NAME} WHERE ${FeedReaderContract.FeedEntry.KONTOART} = 'Bankkonto'"
@@ -82,8 +82,7 @@ class FeedReaderDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
             val BLZ = cursor.getInt(cursor.getColumnIndexOrThrow(BLZ))
             val BIC = cursor.getInt(cursor.getColumnIndexOrThrow(BIC))
             val IBAN = cursor.getString(cursor.getColumnIndexOrThrow(IBAN))
-            val blz =
-            val blz
+           // val blz
         }
 
 

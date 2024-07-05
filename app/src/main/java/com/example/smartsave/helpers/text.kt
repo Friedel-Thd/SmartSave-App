@@ -3,6 +3,7 @@ package com.example.smartsave.helpers
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -17,7 +18,7 @@ import androidx.compose.ui.unit.sp
 val standardTextStyle = TextStyle(fontSize = 20.sp)
 
 @Composable
-fun LabelledInputField(label: String, value: String, onValueChange: (String) -> Unit) = Row(
+fun LabelledInputField(label: String, value: String, keyboardOptions: KeyboardOptions, onValueChange: (String) -> Unit) = Row(
     modifier = Modifier.fillMaxWidth(),
     verticalAlignment = Alignment.CenterVertically
 ) {
@@ -27,7 +28,8 @@ fun LabelledInputField(label: String, value: String, onValueChange: (String) -> 
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
         onValueChange = onValueChange,
-        textStyle = standardTextStyle
+        textStyle = standardTextStyle,
+        keyboardOptions = keyboardOptions
     )
 }
 

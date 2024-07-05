@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,10 +42,10 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
         {
 
 
-            LabelledInputField(label = "Bezeichung", value ="" ) {
+            LabelledInputField(label = "Bezeichung", value ="", KeyboardOptions() ) {
 
             }
-            LabelledInputField(label = "Betrag", value ="" ) {
+            LabelledInputField(label = "Betrag", value ="", KeyboardOptions() ) {
 
             }
             LabelledDatePickerButton(label = "Datum",

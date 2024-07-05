@@ -49,7 +49,7 @@ class SparzielAnsichtActivity: SmartSaveActivity() {
 
             for (einzahlung in einzahlungsListe) {
                 SparzielEinzahlungListItem(einzahlung, Modifier)
-                summe += einzahlung.value
+                summe += einzahlung.betrag
             }
 
             SparzielAnsichtListItem("Summe", "$summe€", Modifier)

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -45,6 +46,7 @@ import com.example.smartsave.helpers.LabelledInputField
 import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
 import java.time.LocalDate
+import java.util.Date
 import kotlin.math.roundToInt
 
 private const val MAX_MONTHS = 12
@@ -71,7 +73,7 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
                 .fillMaxWidth()
                 .fillMaxHeight()
         ) {
-            LabelledInputField(label = "Filter", value = "") {
+            LabelledInputField(label = "Filter", value = "", KeyboardOptions()) {
 
             }
             Column(
@@ -174,17 +176,17 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
 
 
     fun getUmsaetze(): List<Umsatz> {
-        val umsatz1 = Umsatz("umsatz1", 534.55)
-        val umsatz2 = Umsatz("umsatz2", 34.55)
-        val umsatz3 = Umsatz("umsatz3", 4.55)
-        val umsatz4 = Umsatz("umsatz4", 888.55)
+        val umsatz1 = Umsatz("umsatz1", 534.55, Date(10,10,10))
+        val umsatz2 = Umsatz("umsatz2", 34.55,Date(10,10,10))
+        val umsatz3 = Umsatz("umsatz3", 4.55,Date(10,10,10))
+        val umsatz4 = Umsatz("umsatz4", 888.55,Date(10,10,10))
 
-        val einzelumsatz1 = Einzelumsatz("Döner", 5.0)
+        val einzelumsatz1 = Einzelumsatz("Döner", 5.0,Date(10,10,10))
         einzelumsatz1.setKategorie(Kategorie("Essen"))
         umsatz2.setKategorie(Kategorie("Gym"))
         umsatz2.addEinzelumsatz(einzelumsatz1)
 
-        val einzelumsatz2 = Einzelumsatz("Döner", 5.0)
+        val einzelumsatz2 = Einzelumsatz("Döner", 5.0,Date(10,10,10))
         einzelumsatz2.setKategorie(Kategorie("Essen"))
         umsatz2.addEinzelumsatz(einzelumsatz2)
 
