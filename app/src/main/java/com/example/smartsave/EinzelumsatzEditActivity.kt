@@ -42,13 +42,13 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
         {
 
 
-            LabelledInputField(label = "Bezeichung", value ="", KeyboardOptions() ) {
+            LabelledInputField(label = "Bezeichung*", value ="", KeyboardOptions() ) {
 
             }
-            LabelledInputField(label = "Betrag", value ="", KeyboardOptions() ) {
+            LabelledInputField(label = "Betrag*", value ="", KeyboardOptions() ) {
 
             }
-            LabelledDatePickerButton(label = "Datum",
+            LabelledDatePickerButton(label = "Datum*",
                 selectedDate = selectedDate,
                 onDateSelected = { date -> selectedDate = date },
                 false

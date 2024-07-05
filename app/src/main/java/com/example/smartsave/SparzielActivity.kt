@@ -3,9 +3,12 @@ package com.example.smartsave
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,6 +38,7 @@ class SparzielActivity : SmartSaveActivity() {
         var textName by remember { mutableStateOf("") }
         var selectedDate by remember { mutableStateOf("") }
         var textBetrag by remember { mutableStateOf("") }
+        var isError by remember { mutableStateOf(false) }
         var kontolist = getKontolist()
         var monatsRate = 0.0
 
@@ -42,38 +46,62 @@ class SparzielActivity : SmartSaveActivity() {
             modifier = Modifier.verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            LabelledInputField(label = "Name", value = textName, KeyboardOptions()) {textName = it}
+            LabelledInputField(label = "Name*", value = textName, KeyboardOptions()) {
+                textName = it
+                isError = it.isEmpty()
+            }
 
             //TODO Input auf zahlen beschränken
-            LabelledInputField(label = "Betrag", value = textBetrag, KeyboardOptions()) { textBetrag = it }
+            LabelledInputField(label = "Betrag*", value = textBetrag, KeyboardOptions()) {
+                textBetrag = it
+                isError = it.isEmpty()
+            }
 
             //TODO Von String zu einem Date Format ändern?
-            LabelledDatePickerButton(label = "Auszahlungszeitraum",
+            LabelledDatePickerButton(label = "Auszahlungszeitraum*",
                 selectedDate = selectedDate,
-                onDateSelected = { date -> selectedDate = date },
+                onDateSelected = {
+                    date -> selectedDate = date
+                    isError = date.isEmpty()
+
+                                 },
                 true
 
             )
 
             //TODO Bei leerer Kontoliste auf Layout #4a Weiterleiten
-            LabelledDropdownMenu("Auszahlungskonto", kontolist)
-            LabelledDropdownMenu("Zielkonto", kontolist)
+            LabelledDropdownMenu("Auszahlungskonto*", kontolist)
+            LabelledDropdownMenu("Zielkonto*", kontolist)
 
             //TODO Monatliche Rate aus Betrag und Auszahlungszeitraum berechnen
             monatsRate = calcMonatsRate(selectedDate, textBetrag)
             CenteredText(text = "Monatliche Rate: ")
             CenteredText(text = "$monatsRate€")
+            if (isError){
+                Text(
+                    text = "Bitte alle Pflichtfelder ausfüllen!",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
 
         }
+
 
         AlignedButton(alignment = Alignment.BottomStart, text = "Abbrechen") {finish()}
         AlignedButton(alignment = Alignment.BottomEnd, text = "Weiter") {
+            isError = textBetrag.isEmpty() || textName.isEmpty() || selectedDate.isEmpty()
+            if(!isError){
+                val intent = Intent(this@SparzielActivity, SparzielAnAufActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
             //TODO Spaziel Anlegen/Auflösen (Layout #5)
             //TODO Sparziel Objekt mitgeben
-            val intent = Intent(this@SparzielActivity, SparzielAnAufActivity::class.java)
-            startActivity(intent)
-            finish()
+
         }
+
     }
 
     fun getKontolist(): List<Konto> {
