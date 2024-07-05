@@ -91,7 +91,7 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
                         showDialogAnlegen = false
                         //TODO Kein namen doppelt zulassen
                         val newKategorie = Kategorie(textKategorie)
-                        addKategorieToDatabase(newKategorie)
+                        db.insertKategorie(newKategorie)
                         val newkategorienListe = kategorienListe.toMutableList()
                         newkategorienListe.add(newKategorie)
                         kategorienListeState.value = newkategorienListe
@@ -119,7 +119,7 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
                         //TODO Kategorie inklusive allen zuweisungen löschen
                         //TODO Nicht Zugewiesen nicht löschbar machen
                         if (selectedKategorie != null) {
-                            removeKategorieFromDatabase(selectedKategorie!!)
+                            db.removeKategorie(selectedKategorie!!)
                             val newkategorienListe = kategorienListe.toMutableList()
                             newkategorienListe.remove(selectedKategorie)
                             kategorienListeState.value = newkategorienListe
@@ -137,7 +137,7 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
                         Text("Abbrechen")
                     }
                 },
-                title = { Text("Kategorie $selectedKategorie ist bereits zugeordnet.") },
+                title = { Text("Kategorie ${selectedKategorie?.name} ist bereits zugeordnet.") },
                 text = { Text("Trotzdem löschen?") }
             )
         }
@@ -151,7 +151,7 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
                         //TODO Kategorie inklusive allen zuweisungen löschen (DB)
                         //TODO Nicht Zugewiesen nicht löschbar machen
                         if (selectedKategorie != null) {
-                            removeKategorieFromDatabase(selectedKategorie!!)
+                            db.removeKategorie(selectedKategorie!!)
                             val newkategorienListe = kategorienListe.toMutableList()
                             newkategorienListe.remove(selectedKategorie)
                             kategorienListeState.value = newkategorienListe
@@ -172,12 +172,6 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
                 title = { Text("Kategorie Löschen?") }
             )
         }
-    }
-    fun addKategorieToDatabase(kategorie: Kategorie) {
-        db.insertKategorie(kategorie)
-    }
-    fun removeKategorieFromDatabase(kategorie: Kategorie) {
-        db.removeKategorie(kategorie)
     }
 }
 

@@ -214,7 +214,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         val db = readableDatabase
         val query = "SELECT * FROM ${SmartSaveContract.KategorieEntry.TABLE_NAME}"
         val cursor = db.rawQuery(query, null)
-        while (cursor.moveToFirst()) {
+        while (cursor.moveToNext()) {
             val kat = Kategorie(
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KategorieEntry.NAME))
             )
