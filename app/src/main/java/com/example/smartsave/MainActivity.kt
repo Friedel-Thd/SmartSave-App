@@ -43,8 +43,8 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         bankkontoState.value = db.getBankkonto()
-        kreditkontenListeState.value = getKreditKontenListe()
-        sparzielListeState.value = getSparzielListe()
+        kreditkontenListeState.value = db.getKreditKontenListe()
+        sparzielListeState.value = db.getSparzielListe()
 
         super.onCreate(savedInstanceState)
     }
@@ -55,8 +55,12 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
         sparzielListeState.value = getSparzielListe()
         super.onResume()
     }
-
-    //TODO Wahrscheinlich aktualisieren der States in onResume()
+    override fun onResume() {
+        bankkontoState.value = db.getBankkonto()
+        kreditkontenListeState.value = db.getKreditKontenListe()
+        sparzielListeState.value = db.getSparzielListe()
+        super.onResume()
+    }
 
     @Preview
     @Composable
@@ -187,26 +191,4 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
             }
         }
     }
-}
-
-fun getKreditKontenListe(): List<Konto> {
-    //TODO Get alle angelegten KreditKartenKonten
-   // val konto1 = Konto("Konto1", 500.0)
-   // val konto2 = Konto("Konto2", 500.0)
-   // val konto3 = Konto("Konto3", 500.0)
-    //val kontoliste = mutableListOf(konto1, konto2, konto3)
-    val kontoliste: MutableList<Konto> = mutableListOf()
-
-    return kontoliste
-}
-
-fun getSparzielListe(): List<Sparziel> {
-    //TODO Get alle angelegten KreditKartenKonten
-    val sparziel1 = Sparziel("Auto",10.0,Date(1000,10,10),10.0,Konto(10,"10","10","10","10","10"),Konto(20,"10","10","20","20","20"))
-    val sparziel2 = Sparziel("PC",10.0,Date(1000,10,10),10.0,Konto(10,"10","10","10","10","10"),Konto(20,"10","10","20","20","20"))
-    val sparziel3 = Sparziel("Urlaub",10.0,Date(1000,10,10),10.0,Konto(10,"10","10","10","10","10"),Konto(20,"10","10","20","20","20"))
-    val sparzielliste = mutableListOf(sparziel1, sparziel2, sparziel3, sparziel1, sparziel2, sparziel3, sparziel1, sparziel2, sparziel3,sparziel1, sparziel2, sparziel3)
-    //val sparzielliste: MutableList<Konto> = mutableListOf()
-
-    return sparzielliste
 }

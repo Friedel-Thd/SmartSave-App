@@ -1,6 +1,8 @@
 package com.example.smartsave
 
+import DbHelper
 import android.content.Intent
+import android.os.Bundle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.height
@@ -20,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.smartsave.dataClasses.Konto
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.EinzelumsatzListItem
 import com.example.smartsave.helpers.LabelledDropdownMenu
@@ -31,6 +34,14 @@ import com.example.smartsave.helpers.UmsatzDiffDateListItem
 import com.example.smartsave.helpers.UmsatzDiffListItem
 
 class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
+    private val kontenListeState = mutableStateOf<List<Konto>>(emptyList())
+    var db = DbHelper(this)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        //TODO get alle konten (außer sparkonten evtl)
+        kontenListeState.value = db.getKreditKontenListe()
+        super.onCreate(savedInstanceState)
+    }
     @Preview
     @Composable
     fun PreviewLayout() = GenerateContent()
@@ -42,6 +53,8 @@ class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
         //TODO je nach aufruf einzelumsätze eines umsatzes bzw. einzelumsätze ohne zugewiesenen umsatz glaub ich so mäßisch
         var einzelumsatzListe = umsatz.getEinzelumsatzListe()
 
+        val kontenListe by remember { kontenListeState }
+
 
         MainColumn(
             modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -49,7 +62,7 @@ class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
         ) {
 
             for (einzelumsatz in einzelumsatzListe) {
-                EinzelumsatzListItem(einzelumsatz, modifier = Modifier, LocalContext.current)
+                EinzelumsatzListItem(einzelumsatz, modifier = Modifier, LocalContext.current, kontenListe)
             }
 
         }

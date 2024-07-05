@@ -52,7 +52,6 @@ import com.example.smartsave.R
 import com.example.smartsave.UmsaetzeDiffActivity
 import com.example.smartsave.dataClasses.Umsatz
 import com.example.smartsave.UmsatzAuswahlZuordnungActivity
-import com.example.smartsave.getKreditKontenListe
 import java.util.Calendar
 
 
@@ -140,7 +139,7 @@ fun UmsatzDiffListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifier
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifier, context:Context) {
+fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifier, context:Context, kontenListe: List<Konto>) {
     var showDialogAnlegen by remember { mutableStateOf(false) }
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -194,7 +193,7 @@ fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifi
             },
             title = { Text("Neue Kategorie anlegen") },
             text = {
-                LabelledDropdownMenu(label = "Konto", options = getKreditKontenListe() )
+                LabelledDropdownMenu(label = "Konto", options = kontenListe )
             }
         )
     }

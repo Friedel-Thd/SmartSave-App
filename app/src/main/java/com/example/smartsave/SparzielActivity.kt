@@ -1,6 +1,8 @@
 package com.example.smartsave
 
+import DbHelper
 import android.content.Intent
+import android.os.Bundle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.padding
@@ -27,8 +29,21 @@ import com.example.smartsave.helpers.LabelledInputField
 import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
 import com.example.smartsave.helpers.LabelledDatePickerButton
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class SparzielActivity : SmartSaveActivity() {
+    private val kontoListState = mutableStateOf(listOf<Konto>())
+    var db = DbHelper(this)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        kontoListState.value = db.getAllKonten()
+
+        super.onCreate(savedInstanceState)
+    }
 
     @Preview
     @Composable
@@ -40,7 +55,7 @@ class SparzielActivity : SmartSaveActivity() {
         var selectedDate by remember { mutableStateOf("") }
         var textBetrag by remember { mutableStateOf("") }
         var isError by remember { mutableStateOf(false) }
-        var kontolist = getKontolist()
+        var kontolist by remember { kontoListState }
         var monatsRate = 0.0
 
         MainColumn(
@@ -57,14 +72,21 @@ class SparzielActivity : SmartSaveActivity() {
                 selectedDate = selectedDate,
                 onDateSelected = {
                     date -> selectedDate = date
+                    isError = date.isEmpty()
+
                                  },
                 true
 
             )
 
-            //TODO Bei leerer Kontoliste auf Layout #4a Weiterleiten
+            //TODO Bei leerer Kontoliste auf Layout #4a Weiterleiten ( Popup alter mäßisch aber erst bei click auf die menues)
             LabelledDropdownMenu("Auszahlungskonto*", kontolist)
             LabelledDropdownMenu("Zielkonto*", kontolist)
+            if (kontolist.isEmpty()) {
+                val intent = Intent(this@SparzielActivity, SparzielActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
 
             //TODO Monatliche Rate aus Betrag und Auszahlungszeitraum berechnen
             monatsRate = calcMonatsRate(selectedDate, textBetrag)
@@ -81,35 +103,40 @@ class SparzielActivity : SmartSaveActivity() {
 
         }
 
-
+        //TODO Beschränkungen hinzugügen: Auszahlungskonto != Zielkonto und Zielkonto muss Kontotyp Sparkonto sein
         AlignedButton(alignment = Alignment.BottomStart, text = "Abbrechen") {finish()}
         AlignedButton(alignment = Alignment.BottomEnd, text = "Weiter") {
             isError = textBetrag.isEmpty() || textName.isEmpty() || selectedDate.isEmpty()
             if(!isError){
+                //TODO Spaziel Anlegen/Auflösen (Layout #5)
+                //TODO Sparziel Objekt mitgeben (noch nicht in datenbank schreiben mäßisch)
                 val intent = Intent(this@SparzielActivity, SparzielAnAufActivity::class.java)
                 startActivity(intent)
                 finish()
             }
-            //TODO Spaziel Anlegen/Auflösen (Layout #5)
-            //TODO Sparziel Objekt mitgeben
 
         }
 
     }
 
-    fun getKontolist(): List<Konto> {
-        //TODO get liste mit allen angelegten Konten
-        var konto1 = Konto( 500, "10","10","23","23","23")
-     //   var konto2 = Konto(name = "Konto 2", 500.0)
-      //  var konto3 = Konto(name = "Konto 3", 500.0)
-       // var konto4 = Konto(name = "Konto 4", 500.0)
-        var kontoliste = listOf(konto1)
+    private fun calcMonatsRate(selectedDate: String, textBetrag: String): Double {
+        if (selectedDate.isEmpty() || textBetrag.isEmpty()) return 0.0
 
-        return kontoliste
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val date = dateFormat.parse(selectedDate)
+        val today = Calendar.getInstance().time
+
+        val monatsDiff = ((date.time - today.time) / (1000L * 60 * 60 * 24 * 30)).toInt()
+
+        val betrag = textBetrag.toDoubleOrNull() ?: return 0.0
+
+        val result = if (monatsDiff > 0) {
+            betrag / monatsDiff
+        } else {
+            betrag
+        }
+
+        return BigDecimal(result).setScale(2, RoundingMode.HALF_EVEN).toDouble()
     }
 
-    fun calcMonatsRate(selectedDate: String, textBetrag: String): Double {
-        //TODO Berechne Monatsrate
-        return 10.0
-    }
 }

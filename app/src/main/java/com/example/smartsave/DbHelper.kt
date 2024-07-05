@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
 import android.util.Log
 import com.example.smartsave.dataClasses.Konto
+import com.example.smartsave.dataClasses.Sparziel
 import com.example.smartsave.dataClasses.Umsatz
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -224,6 +225,111 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         }
         cursor.close()
         return umsaetze
+    }
+
+    fun getKreditKontenListe(): List<Konto> {
+        val kreditKontenListe: MutableList<Konto> = mutableListOf()
+        val db = readableDatabase
+        val query = "SELECT * FROM ${SmartSaveContract.KontoEntry.TABLE_NAME} WHERE ${SmartSaveContract.KontoEntry.KONTOART} = 'Kreditkartenkonto'"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext()) {
+            val konto = Konto(
+                cursor.getInt(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTONUMMER)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BLZ)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BIC)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.IBAN)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BEMERKUNG)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTOART))
+            )
+            konto.umsatzLst = loadUmsaetzeForKonto(konto.kontonr)
+            kreditKontenListe.add(konto)
+        }
+
+        cursor.close()
+        return kreditKontenListe
+    }
+
+    fun getAllKonten(): List<Konto> {
+        val kontoListe: MutableList<Konto> = mutableListOf()
+        val db = readableDatabase
+        val query = "SELECT * FROM ${SmartSaveContract.KontoEntry.TABLE_NAME}"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext()) {
+            val konto = Konto(
+                cursor.getInt(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTONUMMER)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BLZ)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BIC)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.IBAN)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BEMERKUNG)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTOART))
+            )
+            konto.umsatzLst = loadUmsaetzeForKonto(konto.kontonr)
+            kontoListe.add(konto)
+        }
+
+        cursor.close()
+        return kontoListe
+    }
+
+    fun getSparzielListe(): List<Sparziel> {
+        val sparzielListe: MutableList<Sparziel> = mutableListOf()
+        val db = readableDatabase
+        val query = "SELECT * FROM ${SmartSaveContract.SparzielEntry.TABLE_NAME}"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext()) {
+            val sparzielID = cursor.getInt(cursor.getColumnIndexOrThrow(SmartSaveContract.SparzielEntry.SPARZIEL_ID))
+            val name = cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.SparzielEntry.NAME))
+            val betrag = cursor.getDouble(cursor.getColumnIndexOrThrow(SmartSaveContract.SparzielEntry.BETRAG))
+            val zieldatum = parseDate(cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.SparzielEntry.ZIELDATUM)))
+            val monatsrate = cursor.getDouble(cursor.getColumnIndexOrThrow(SmartSaveContract.SparzielEntry.MONATSRATE))
+
+            val kontenQuery = "SELECT * FROM ${SmartSaveContract.SparzielZuweisungEntry.TABLE_NAME} WHERE ${SmartSaveContract.SparzielZuweisungEntry.KONTONUMMER} = $sparzielID"
+            val kontenCursor = db.rawQuery(kontenQuery, null)
+            var zielkonto: Konto? = null
+            var auszahlkonto: Konto? = null
+
+            if (kontenCursor.moveToFirst()) {
+                val zielkontoNr = kontenCursor.getInt(kontenCursor.getColumnIndexOrThrow(SmartSaveContract.SparzielZuweisungEntry.ZIELKONTO))
+                val auszahlkontoNr = kontenCursor.getInt(kontenCursor.getColumnIndexOrThrow(SmartSaveContract.SparzielZuweisungEntry.AUSZAHLKONTO))
+
+                zielkonto = getKontoByKontonummer(zielkontoNr)
+                auszahlkonto = getKontoByKontonummer(auszahlkontoNr)
+            }
+            kontenCursor.close()
+
+            if (zielkonto != null && auszahlkonto != null) {
+                val sparziel = Sparziel(name, betrag, zieldatum, monatsrate, zielkonto, auszahlkonto)
+                sparzielListe.add(sparziel)
+            }
+        }
+
+        cursor.close()
+        return sparzielListe
+    }
+
+    private fun getKontoByKontonummer(kontonummer: Int): Konto? {
+        val db = readableDatabase
+        val query = "SELECT * FROM ${SmartSaveContract.KontoEntry.TABLE_NAME} WHERE ${SmartSaveContract.KontoEntry.KONTONUMMER} = $kontonummer"
+        val cursor = db.rawQuery(query, null)
+        var konto: Konto? = null
+
+        if (cursor.moveToFirst()) {
+            konto = Konto(
+                cursor.getInt(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTONUMMER)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BLZ)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BIC)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.IBAN)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BEMERKUNG)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTOART))
+            )
+            konto.umsatzLst = loadUmsaetzeForKonto(konto.kontonr)
+        }
+
+        cursor.close()
+        return konto
     }
 
     fun parseDate(datumString: String): Date {
