@@ -30,8 +30,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.smartsave.dataClasses.Kategorie
+import com.example.smartsave.dataClasses.Month
 import com.example.smartsave.helpers.AlignedButton
-import com.example.smartsave.helpers.CenteredText
 import com.example.smartsave.helpers.IconListItem
 import com.example.smartsave.helpers.ListItem
 import com.example.smartsave.helpers.MainColumn
@@ -53,7 +54,7 @@ class KontoansichtActivity : SmartSaveActivity() {
     @Composable
     override fun BoxScope.GenerateLayout() {
         // Datum
-        val currentMonth = LocalDate.now().let {Month(it.year, it.monthValue)}
+        val currentMonth = LocalDate.now().let { Month(it.year, it.monthValue) }
         // getBudget des monats
         val budget = getBudget(currentMonth)
         // getKategorien

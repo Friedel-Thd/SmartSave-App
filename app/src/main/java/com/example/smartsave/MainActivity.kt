@@ -23,6 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.smartsave.dataClasses.Konto
+import com.example.smartsave.dataClasses.Sparziel
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.IconListItem
 import com.example.smartsave.helpers.ListItem

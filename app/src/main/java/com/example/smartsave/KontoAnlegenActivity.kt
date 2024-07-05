@@ -1,7 +1,6 @@
 package com.example.smartsave
 
 import FeedReaderDbHelper
-import android.os.Bundle
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
@@ -24,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.smartsave.dataClasses.Konto
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.LabelledInputField
 import com.example.smartsave.helpers.MainColumn
@@ -94,7 +94,7 @@ class KontoAnlegenActivity : SmartSaveActivity() {
             var newTextBLZ = textBLZ.toInt()
             var newTextBIC = textBIC.toInt()
 
-            var konto = Konto("Konto1",100.0,newtextKontoNr,newTextBLZ,newTextBIC,textIBAN,textBemerkung,selectedOption)
+            var konto = Konto("Konto1",newtextKontoNr,newTextBLZ,newTextBIC,textIBAN,textBemerkung,selectedOption)
             db.insertKonto(konto)
             Log.d("Entry", "Entry so mesisch")
             finish()

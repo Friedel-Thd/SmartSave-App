@@ -6,20 +6,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.smartsave.dataClasses.Konto
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
 import com.example.smartsave.helpers.StandardText
-import com.example.smartsave.helpers.standardTextStyle
 
 
 class SparzielAnAufActivity: SmartSaveActivity() {
@@ -68,11 +64,11 @@ class SparzielAnAufActivity: SmartSaveActivity() {
     }
 }
 @Composable
-fun getAuszahlkonto() : Konto{
+fun getAuszahlkonto() : Konto {
     return Konto("konto1",5000.0,23,23,23,"23","2","3")
 }
 @Composable
-fun getZielkonto() : Konto{
+fun getZielkonto() : Konto {
     return Konto("konto1",5000.0,23,23,23,"23","2","3")
 }
 @Composable

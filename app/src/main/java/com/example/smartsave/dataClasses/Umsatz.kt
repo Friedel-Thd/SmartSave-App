@@ -1,6 +1,6 @@
-package com.example.smartsave
+package com.example.smartsave.dataClasses
 import java.io.Serializable
- data class Umsatz (val name: String, val value: Double): Serializable {
+ data class Umsatz (val verwendungsZweck: String, val value: Double): Serializable {
    private var kategorie = Kategorie("Nicht Zugewiesen")
    private var einzelumsatzListe: List<Einzelumsatz> = listOf()
   fun isAssigned(): Boolean {
