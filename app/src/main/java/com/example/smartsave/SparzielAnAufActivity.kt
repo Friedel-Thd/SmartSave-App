@@ -41,12 +41,12 @@ class SparzielAnAufActivity: SmartSaveActivity() {
             StandardText("Bitte richten Sie folgenden Dauerauftrag/Terminüberweisung ein:")
             Row (modifier = Modifier.fillMaxWidth(),  horizontalArrangement = Arrangement.SpaceBetween){
                 StandardText("Auszahlkonto")
-                StandardText(auszahlkonto.kontotnr.toString())
+                StandardText(auszahlkonto.kontonr.toString())
 
             }
             Row (modifier = Modifier.fillMaxWidth(),  horizontalArrangement = Arrangement.SpaceBetween){
                 StandardText("Zielkonto")
-                StandardText(zielkonto.kontotnr.toString())
+                StandardText(zielkonto.kontonr.toString())
             }
             Row (modifier = Modifier.fillMaxWidth(),  horizontalArrangement = Arrangement.SpaceBetween){
                 StandardText("Betrag")
@@ -65,11 +65,11 @@ class SparzielAnAufActivity: SmartSaveActivity() {
 }
 @Composable
 fun getAuszahlkonto() : Konto {
-    return Konto(5000,23,23,"23","23","2")
+    return Konto(5000,"23","23","23","23","2")
 }
 @Composable
 fun getZielkonto() : Konto {
-    return Konto(5000,23,23,"23","23","2")
+    return Konto(5000,"23","23","23","23","2")
 }
 @Composable
 fun getRate() : Double{

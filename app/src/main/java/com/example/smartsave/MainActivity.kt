@@ -1,5 +1,6 @@
 package com.example.smartsave
 
+import DbHelper
 import android.content.Intent
 import android.os.Bundle
 import androidx.compose.foundation.clickable
@@ -38,9 +39,10 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
     private val bankkontoState = mutableStateOf<Konto?>(null)
     private val kreditkontenListeState = mutableStateOf<List<Konto>>(emptyList())
     private val sparzielListeState = mutableStateOf<List<Sparziel>>(emptyList())
+    var db = DbHelper(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        bankkontoState.value = getBankkonto()
+        bankkontoState.value = db.getBankkonto()
         kreditkontenListeState.value = getKreditKontenListe()
         sparzielListeState.value = getSparzielListe()
 
@@ -77,6 +79,7 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                                 scope.launch {
                                     //TODO (Bankkonto != null) mitgeben -> Wenn bankkonto existiert darf kein neues erstellt werden
                                     val intent = Intent(this@MainActivity, KontoAnlegenActivity::class.java)
+                                    intent.putExtra("BankkontoExists", (bankkonto != null))
                                     drawerState.close()
                                     startActivity(intent)
                                 }
@@ -145,7 +148,7 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                         modifier = Modifier.clickable {
                             //TODO SparzielID mitgeben
                             val intent = Intent(this@MainActivity, SparzielAnsichtActivity::class.java)
-                            intent.putExtra("Sparziel", sparziel);
+                            intent.putExtra("Sparziel", sparziel)
                             startActivity(intent)
                         },
                         iconId = R.drawable.piggy_bank,
@@ -179,12 +182,6 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
     }
 }
 
-fun getBankkonto(): Konto? {
-    //TODO Get Angelegtes Bankkonto
-  //  return Konto("Hauptkonto", 500.0)
-    return null
-}
-
 fun getKreditKontenListe(): List<Konto> {
     //TODO Get alle angelegten KreditKartenKonten
    // val konto1 = Konto("Konto1", 500.0)
@@ -198,9 +195,9 @@ fun getKreditKontenListe(): List<Konto> {
 
 fun getSparzielListe(): List<Sparziel> {
     //TODO Get alle angelegten KreditKartenKonten
-    val sparziel1 = Sparziel("Auto",10.0,Date(1000,10,10),10.0,Konto(10,10,10,"10","10","10"),Konto(20,20,20,"20","20","20"))
-    val sparziel2 = Sparziel("PC",10.0,Date(1000,10,10),10.0,Konto(10,10,10,"10","10","10"),Konto(20,20,20,"20","20","20"))
-    val sparziel3 = Sparziel("Urlaub",10.0,Date(1000,10,10),10.0,Konto(10,10,10,"10","10","10"),Konto(20,20,20,"20","20","20"))
+    val sparziel1 = Sparziel("Auto",10.0,Date(1000,10,10),10.0,Konto(10,"10","10","10","10","10"),Konto(20,"10","10","20","20","20"))
+    val sparziel2 = Sparziel("PC",10.0,Date(1000,10,10),10.0,Konto(10,"10","10","10","10","10"),Konto(20,"10","10","20","20","20"))
+    val sparziel3 = Sparziel("Urlaub",10.0,Date(1000,10,10),10.0,Konto(10,"10","10","10","10","10"),Konto(20,"10","10","20","20","20"))
     val sparzielliste = mutableListOf(sparziel1, sparziel2, sparziel3, sparziel1, sparziel2, sparziel3, sparziel1, sparziel2, sparziel3,sparziel1, sparziel2, sparziel3)
     //val sparzielliste: MutableList<Konto> = mutableListOf()
 

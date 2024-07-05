@@ -249,7 +249,7 @@ fun LabelledDropdownMenu(label: String, options: List<Konto>) {
         ) {
             TextField(
                 readOnly = true,
-                value = selectedOptionText.kontotnr.toString(),
+                value = selectedOptionText.kontonr.toString(),
                 onValueChange = { },
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(
@@ -267,7 +267,7 @@ fun LabelledDropdownMenu(label: String, options: List<Konto>) {
             ) {
                 options.forEach { selectionOption ->
                     DropdownMenuItem(
-                        text = { Text(text = selectionOption.kontotnr.toString()) },
+                        text = { Text(text = selectionOption.kontonr.toString()) },
                         onClick = {
                             selectedOptionText = selectionOption
                             expanded = false

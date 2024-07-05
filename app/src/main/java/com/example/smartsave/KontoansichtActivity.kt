@@ -1,5 +1,6 @@
 package com.example.smartsave
 
+import DbHelper
 import android.content.Intent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
@@ -46,6 +47,7 @@ private const val MAX_MONTHS = 12
 
 
 class KontoansichtActivity : SmartSaveActivity() {
+    var db = DbHelper(this)
 
     @Preview
     @Composable
@@ -64,7 +66,7 @@ class KontoansichtActivity : SmartSaveActivity() {
 
         var months by remember { mutableIntStateOf(1) }
 
-        var bankkonto = getBankkonto()
+        var bankkonto = db.getBankkonto()
 
 
         MainColumn(

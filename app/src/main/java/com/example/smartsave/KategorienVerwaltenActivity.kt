@@ -86,6 +86,7 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
                 confirmButton = {
                     TextButton(onClick = {
                         showDialogAnlegen = false
+                        //TODO Kein namen doppelt zulassen
                         val newKategorie = Kategorie(textKategorie)
                         addKategorieToDatabase(newKategorie)
                         val newkategorienListe = kategorienListe.toMutableList()
@@ -112,6 +113,7 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
                     TextButton(onClick = {
                         showDialogAssignedLoeschen = false
                         //TODO Kategorie inklusive allen zuweisungen löschen
+                        //TODO Nicht Zugewiesen nicht löschbar machen
                         if (selectedKategorie != null) {
                             removeKategorieFromDatabase(selectedKategorie!!)
                             val newkategorienListe = kategorienListe.toMutableList()
@@ -131,7 +133,7 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
                         Text("Abbrechen")
                     }
                 },
-                title = { Text("Kategorie ist bereits zugeordnet.") },
+                title = { Text("Kategorie $selectedKategorie ist bereits zugeordnet.") },
                 text = { Text("Trotzdem löschen?") }
             )
         }
@@ -143,6 +145,7 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
                     TextButton(onClick = {
                         showDialogLoeschen = false
                         //TODO Kategorie inklusive allen zuweisungen löschen (DB)
+                        //TODO Nicht Zugewiesen nicht löschbar machen
                         if (selectedKategorie != null) {
                             removeKategorieFromDatabase(selectedKategorie!!)
                             val newkategorienListe = kategorienListe.toMutableList()

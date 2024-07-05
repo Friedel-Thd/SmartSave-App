@@ -1,6 +1,6 @@
 package com.example.smartsave
 
-import FeedReaderDbHelper
+import DbHelper
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
@@ -26,6 +26,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.smartsave.dataClasses.Konto
+import com.example.smartsave.dataClasses.Sparziel
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.LabelledInputField
 import com.example.smartsave.helpers.MainColumn
@@ -34,7 +35,7 @@ import com.example.smartsave.helpers.StandardText
 
 class KontoAnlegenActivity : SmartSaveActivity() {
 
-    var db = FeedReaderDbHelper(this)
+    var db = DbHelper(this)
     @Preview
     @Composable
     fun PreviewLayout() = GenerateContent()
@@ -46,6 +47,10 @@ class KontoAnlegenActivity : SmartSaveActivity() {
         var textBIC by remember { mutableStateOf("") }
         var textIBAN by remember { mutableStateOf("") }
         var textBemerkung by remember { mutableStateOf("") }
+
+        val bundle = intent.extras
+        val bankkontoExists = bundle!!.getBoolean("BankkontoExists")
+
 
         val radioOptions = listOf("Bankkonto", "Sparkonto", "Kreditkartenkonto")
         val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[1] ) }
@@ -70,15 +75,19 @@ class KontoAnlegenActivity : SmartSaveActivity() {
                             .selectable(
                                 selected = (text == selectedOption),
                                 onClick = {
-                                    onOptionSelected(text)
+                                    if (text != "Bankkonto" || !bankkontoExists) {
+                                        onOptionSelected(text)
+                                    }
                                 }
                             )
                             .padding(horizontal = 30.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
+                            enabled = if(text == "Bankkonto") { !bankkontoExists } else true,
                             selected = (text == selectedOption),
-                            onClick = { onOptionSelected(text) }
+                            onClick = {
+                                onOptionSelected(text) }
                         )
                         StandardText(
                             text = text,
@@ -91,12 +100,10 @@ class KontoAnlegenActivity : SmartSaveActivity() {
 
         AlignedButton(alignment = Alignment.BottomStart, text = "Abbrechen") {finish()}
         AlignedButton(alignment = Alignment.BottomEnd, text = "Speichern") {
-            //TODO Kontodaten speichern
+            //TODO Kontonummer darf nicht doppelt sein, vllt auch abfrage in datenbank oder so
             var newtextKontoNr = textKontoNr.toInt()
-            var newTextBLZ = textBLZ.toInt()
-            var newTextBIC = textBIC.toInt()
 
-            var konto = Konto(newtextKontoNr,newTextBLZ,newTextBIC,textIBAN,textBemerkung,selectedOption)
+            var konto = Konto(newtextKontoNr,textBLZ,textBIC,textIBAN,textBemerkung,selectedOption)
             db.insertKonto(konto)
             Log.d("Entry", "Entry so mesisch")
             finish()
