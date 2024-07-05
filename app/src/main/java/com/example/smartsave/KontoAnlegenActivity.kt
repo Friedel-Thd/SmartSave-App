@@ -33,9 +33,6 @@ import com.example.smartsave.helpers.StandardText
 class KontoAnlegenActivity : SmartSaveActivity() {
 
     var db = FeedReaderDbHelper(this)
-
-
-
     @Preview
     @Composable
     fun PreviewLayout() = GenerateContent()
