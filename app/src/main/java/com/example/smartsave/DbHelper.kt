@@ -4,6 +4,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
 import android.util.Log
+import com.example.smartsave.dataClasses.Kategorie
 import com.example.smartsave.dataClasses.Konto
 import com.example.smartsave.dataClasses.Sparziel
 import com.example.smartsave.dataClasses.Umsatz
@@ -207,6 +208,38 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         cursor.close()
         return konto
     }
+
+    fun getKategorienListe(): List<Kategorie> {
+        val katList = mutableListOf<Kategorie>()
+        val db = readableDatabase
+        val query = "SELECT * FROM ${SmartSaveContract.KategorieEntry.TABLE_NAME}"
+        val cursor = db.rawQuery(query, null)
+        while (cursor.moveToFirst()) {
+            val kat = Kategorie(
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KategorieEntry.NAME))
+            )
+            katList.add(kat)
+        }
+        cursor.close()
+        return katList
+    }
+
+    fun insertKategorie(kat: Kategorie){
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(SmartSaveContract.KategorieEntry.NAME, kat.name)
+        }
+        db.insert(SmartSaveContract.KategorieEntry.TABLE_NAME, null, values)
+    }
+    fun removeKategorie(kat: Kategorie) {
+        val db = writableDatabase
+        db.delete(
+            SmartSaveContract.KategorieEntry.TABLE_NAME,
+            "${SmartSaveContract.KategorieEntry.NAME} = ?",
+            arrayOf(kat.name)
+        )
+    }
+
 
     private fun loadUmsaetzeForKonto(kontonummer: Int): List<Umsatz> {
         val umsaetze = mutableListOf<Umsatz>()

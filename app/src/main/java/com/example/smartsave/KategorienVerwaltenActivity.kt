@@ -1,5 +1,6 @@
 package com.example.smartsave
 
+import DbHelper
 import android.os.Bundle
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -29,9 +30,10 @@ import com.example.smartsave.helpers.SmartSaveActivity
 
 class KategorienVerwaltenActivity : SmartSaveActivity() {
     private val kategorienListeState = mutableStateOf<List<Kategorie>>(emptyList())
+    var db = DbHelper(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         //TODO getKat (DB)
-        kategorienListeState.value = getKat()
+        kategorienListeState.value = db.getKategorienListe()
         super.onCreate(savedInstanceState)
     }
 
@@ -95,6 +97,7 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
                         kategorienListeState.value = newkategorienListe
                     }) {
                         Text("OK")
+
                     }
                 },
                 dismissButton = {
@@ -170,12 +173,14 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
             )
         }
     }
+    fun addKategorieToDatabase(kategorie: Kategorie) {
+        db.insertKategorie(kategorie)
+    }
+    fun removeKategorieFromDatabase(kategorie: Kategorie) {
+        db.removeKategorie(kategorie)
+    }
 }
 
-fun addKategorieToDatabase(kategorie: Kategorie) {
-    //TODO Add Logic
-}
 
-fun removeKategorieFromDatabase(kategorie: Kategorie) {
-    //TODO Add Logic
-}
+
+
