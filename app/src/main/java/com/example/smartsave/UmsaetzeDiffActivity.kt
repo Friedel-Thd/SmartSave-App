@@ -59,7 +59,7 @@ class UmsaetzeDiffActivity : SmartSaveActivity() {
                 .width(70.dp)
         ) {
             //TODO #9
-            val intent = Intent(this@UmsaetzeDiffActivity, SparzielActivity::class.java)
+            val intent = Intent(this@UmsaetzeDiffActivity, EinzelumsatzEditActivity::class.java)
             startActivity(intent)
         }
 

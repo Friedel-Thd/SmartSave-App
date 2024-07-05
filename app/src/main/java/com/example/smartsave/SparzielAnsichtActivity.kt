@@ -62,9 +62,10 @@ class SparzielAnsichtActivity: SmartSaveActivity() {
 
         AlignedButton(alignment = Alignment.BottomStart, text = "Zurück") {finish()}
 
-        Row(
-
-        ) {
+        AlignedButton(alignment = Alignment.BottomEnd, text = "Auszahlen") {
+            val intent = Intent(this@SparzielAnsichtActivity, SparzielAnAufActivity::class.java)
+            startActivity(intent)
+            finish()
         }
     }
 }

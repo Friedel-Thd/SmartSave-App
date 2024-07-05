@@ -62,7 +62,7 @@ class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
                 .width(70.dp)
         ) {
             //TODO #9
-            val intent = Intent(this@EinzelumsatzVerwaltenActivity, SparzielActivity::class.java)
+            val intent = Intent(this@EinzelumsatzVerwaltenActivity, EinzelumsatzEditActivity::class.java)
             startActivity(intent)
         }
 
