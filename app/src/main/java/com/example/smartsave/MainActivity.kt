@@ -81,7 +81,6 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                             text = "Konto anlegen",
                             modifier = Modifier.clickable {
                                 scope.launch {
-                                    //TODO (Bankkonto != null) mitgeben -> Wenn bankkonto existiert darf kein neues erstellt werden
                                     val intent = Intent(this@MainActivity, KontoAnlegenActivity::class.java)
                                     intent.putExtra("BankkontoExists", (bankkonto != null))
                                     drawerState.close()
@@ -145,18 +144,15 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                 }
 
                 for (sparziel in sparzielListe) {
-                    val progress = sparziel.getProgress()
-                    //TODO SparzielListItem darstellung (Sparziel oder Sparziel mitgeben und % ausrechnen)
                     SparzielListItem(
                         text = sparziel.name,
                         modifier = Modifier.clickable {
-                            //TODO SparzielID mitgeben
                             val intent = Intent(this@MainActivity, SparzielAnsichtActivity::class.java)
                             intent.putExtra("Sparziel", sparziel)
                             startActivity(intent)
                         },
                         iconId = R.drawable.piggy_bank,
-                        progress = progress
+                        progress = sparziel.calculateProgress()
                     )
                 }
             }

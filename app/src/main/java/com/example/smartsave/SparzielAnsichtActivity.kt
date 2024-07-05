@@ -31,13 +31,9 @@ class SparzielAnsichtActivity: SmartSaveActivity() {
 
     @Composable
     override fun BoxScope.GenerateLayout() {
-        var textName by remember { mutableStateOf("") }
-
-        //TODO Vllt Sparziel als ID übergeben? und dann aus datenbank info holen
         val bundle = intent.extras
         val sparziel: Sparziel = bundle!!.getSerializable("Sparziel") as Sparziel
         var summe = 0.0
-
         val einzahlungsListe: List<Umsatz> = sparziel.getEinzahlungsliste()
 
         MainColumn(
@@ -45,20 +41,19 @@ class SparzielAnsichtActivity: SmartSaveActivity() {
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
 
-            SparzielAnsichtListItem(sparziel.name, "${sparziel.getProgress()}%", Modifier)
-
+            SparzielAnsichtListItem(sparziel.name, "${sparziel.calculateProgress()}%", Modifier)
             for (einzahlung in einzahlungsListe) {
                 SparzielEinzahlungListItem(einzahlung, Modifier)
                 summe += einzahlung.betrag
             }
-
             SparzielAnsichtListItem("Summe", "$summe€", Modifier)
         }
 
         AlignedButton(alignment = Alignment.BottomStart, text = "Zurück") {finish()}
-
         AlignedButton(alignment = Alignment.BottomEnd, text = "Auszahlen") {
             val intent = Intent(this@SparzielAnsichtActivity, SparzielAnAufActivity::class.java)
+            intent.putExtra("Sparziel", sparziel)
+            intent.putExtra("mode", "auflösen")
             startActivity(intent)
             finish()
         }

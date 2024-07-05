@@ -102,7 +102,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
         object SparzielZuweisungEntry : BaseColumns {
             const val TABLE_NAME = "sparzielzuweisung"
-            const val KONTONUMMER = "kontonr"
+            const val SPARZIEL_ID = "sparzielID"
             const val ZIELKONTO = "zielkonto"
             const val AUSZAHLKONTO = "auszahlkonto"
         }
@@ -162,10 +162,12 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
     private val SQL_CREATE_SPARZIELZUWEISUNG_ENTRIES =
         "CREATE TABLE ${SmartSaveContract.SparzielZuweisungEntry.TABLE_NAME} (" +
-                "${SmartSaveContract.SparzielZuweisungEntry.KONTONUMMER} INTEGER," +
+                "${SmartSaveContract.SparzielZuweisungEntry.SPARZIEL_ID} INTEGER," +
                 "${SmartSaveContract.SparzielZuweisungEntry.ZIELKONTO} INTEGER," +
                 "${SmartSaveContract.SparzielZuweisungEntry.AUSZAHLKONTO} INTEGER," +
-                "FOREIGN KEY(${SmartSaveContract.SparzielZuweisungEntry.KONTONUMMER}) REFERENCES ${SmartSaveContract.KontoEntry.TABLE_NAME}(${SmartSaveContract.KontoEntry.KONTONUMMER}))"
+                "FOREIGN KEY(${SmartSaveContract.SparzielZuweisungEntry.SPARZIEL_ID}) REFERENCES ${SmartSaveContract.SparzielEntry.TABLE_NAME}(${SmartSaveContract.SparzielEntry.SPARZIEL_ID})," +
+                "FOREIGN KEY(${SmartSaveContract.SparzielZuweisungEntry.ZIELKONTO}) REFERENCES ${SmartSaveContract.KontoEntry.TABLE_NAME}(${SmartSaveContract.KontoEntry.KONTONUMMER})," +
+                "FOREIGN KEY(${SmartSaveContract.SparzielZuweisungEntry.AUSZAHLKONTO}) REFERENCES ${SmartSaveContract.KontoEntry.TABLE_NAME}(${SmartSaveContract.KontoEntry.KONTONUMMER}))"
 
     private val SQL_DELETE_KONTO_ENTRIES = "DROP TABLE IF EXISTS ${SmartSaveContract.KontoEntry.TABLE_NAME}"
     private val SQL_DELETE_UMSATZ_ENTRIES = "DROP TABLE IF EXISTS ${SmartSaveContract.UmsatzEntry.TABLE_NAME}"
@@ -319,7 +321,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
             val zieldatum = parseDate(cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.SparzielEntry.ZIELDATUM)))
             val monatsrate = cursor.getDouble(cursor.getColumnIndexOrThrow(SmartSaveContract.SparzielEntry.MONATSRATE))
 
-            val kontenQuery = "SELECT * FROM ${SmartSaveContract.SparzielZuweisungEntry.TABLE_NAME} WHERE ${SmartSaveContract.SparzielZuweisungEntry.KONTONUMMER} = $sparzielID"
+            val kontenQuery = "SELECT * FROM ${SmartSaveContract.SparzielZuweisungEntry.TABLE_NAME} WHERE ${SmartSaveContract.SparzielZuweisungEntry.SPARZIEL_ID} = $sparzielID"
             val kontenCursor = db.rawQuery(kontenQuery, null)
             var zielkonto: Konto? = null
             var auszahlkonto: Konto? = null
@@ -335,6 +337,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
             if (zielkonto != null && auszahlkonto != null) {
                 val sparziel = Sparziel(name, betrag, zieldatum, monatsrate, zielkonto, auszahlkonto)
+                sparziel.id = sparzielID
                 sparzielListe.add(sparziel)
             }
         }
@@ -365,9 +368,36 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         return konto
     }
 
+    fun insertSparziel(sparziel: Sparziel) {
+        val db = writableDatabase
+
+        val values = ContentValues().apply {
+            put(SmartSaveContract.SparzielEntry.NAME, sparziel.name)
+            put(SmartSaveContract.SparzielEntry.BETRAG, sparziel.betrag)
+            put(SmartSaveContract.SparzielEntry.ZIELDATUM, SimpleDateFormat("dd/MM/yyyy").format(sparziel.zieldatum))
+            put(SmartSaveContract.SparzielEntry.MONATSRATE, sparziel.monatsrate)
+        }
+        val sparzielId = db.insert(SmartSaveContract.SparzielEntry.TABLE_NAME, null, values)
+
+        val zuweisungValues = ContentValues().apply {
+            put(SmartSaveContract.SparzielZuweisungEntry.SPARZIEL_ID, sparzielId)
+            put(SmartSaveContract.SparzielZuweisungEntry.ZIELKONTO, sparziel.zielKonto.kontonr)
+            put(SmartSaveContract.SparzielZuweisungEntry.AUSZAHLKONTO, sparziel.auszahlungsKonto.kontonr)
+        }
+        db.insert(SmartSaveContract.SparzielZuweisungEntry.TABLE_NAME, null, zuweisungValues)
+    }
+
+    fun deleteSparziel(sparzielId: Int) {
+        val db = writableDatabase
+        val selection = "${SmartSaveContract.SparzielEntry.SPARZIEL_ID} = ?"
+        val selectionArgs = arrayOf(sparzielId.toString())
+        db.delete(SmartSaveContract.SparzielEntry.TABLE_NAME, selection, selectionArgs)
+        db.delete(SmartSaveContract.SparzielZuweisungEntry.TABLE_NAME, selection, selectionArgs)
+    }
+
     fun parseDate(datumString: String): Date {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd")
-        return dateFormat.parse(datumString) ?: Date() // Falls parsen fehlschlägt, gib ein Standarddatum zurück
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy")
+        return dateFormat.parse(datumString) ?: Date()
     }
 
 }

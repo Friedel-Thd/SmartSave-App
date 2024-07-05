@@ -58,7 +58,6 @@ class SparzielActivity : SmartSaveActivity() {
         var selectedDate by remember { mutableStateOf("") }
         var textBetrag by remember { mutableStateOf("") }
         var isError by remember { mutableStateOf(false) }
-        var nameExistsError by remember { mutableStateOf(false) }
         var kontolist by remember { kontoListState }
         val sparzielListe by remember { sparzielListeState }
         var ausgangKonto by remember { mutableStateOf<Konto?>(null) }
@@ -70,12 +69,6 @@ class SparzielActivity : SmartSaveActivity() {
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             LabelledInputField(label = "Name*", value = textName, KeyboardOptions()) {
-                nameExistsError = false
-                for (sparziel in sparzielListe) {
-                    if(textName == sparziel.name) {
-                        nameExistsError = true
-                    }
-                }
                 textName = it
             }
             LabelledInputField(label = "Betrag*", value = textBetrag, KeyboardOptions(keyboardType = KeyboardType.Number)) { textBetrag = it }
@@ -105,7 +98,7 @@ class SparzielActivity : SmartSaveActivity() {
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }
-            if (nameExistsError){
+            if(sparzielListe.any { it.name == textName }){
                 Text(
                     text = "Sparziel mit diesem Namen existiert bereits!",
                     color = MaterialTheme.colorScheme.error,
@@ -121,11 +114,9 @@ class SparzielActivity : SmartSaveActivity() {
         AlignedButton(alignment = Alignment.BottomEnd, text = "Weiter") {
             isError = textBetrag.isEmpty() || textName.isEmpty() || selectedDate.isEmpty() || zielKonto == null || ausgangKonto == null
             if(!isError){
-                //TODO Spaziel Anlegen/Auflösen (Layout #5)
-                //TODO Sparziel Objekt mitgeben (noch nicht in datenbank schreiben mäßisch)
                 val intent = Intent(this@SparzielActivity, SparzielAnAufActivity::class.java)
                 val tempSparziel = Sparziel(textName, textBetrag.toDouble(), SimpleDateFormat("dd/MM/yyyy").parse(selectedDate)!!, monatsRate, zielKonto!!, ausgangKonto!!)
-                intent.putExtra("tempSparziel", tempSparziel)
+                intent.putExtra("Sparziel", tempSparziel)
                 intent.putExtra("mode", "anlegen")
                 startActivity(intent)
                 finish()

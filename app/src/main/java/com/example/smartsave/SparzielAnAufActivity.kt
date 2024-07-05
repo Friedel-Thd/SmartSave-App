@@ -1,5 +1,6 @@
 package com.example.smartsave
 
+import DbHelper
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
@@ -11,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.smartsave.dataClasses.Konto
 import com.example.smartsave.dataClasses.Sparziel
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.MainColumn
@@ -20,6 +20,7 @@ import com.example.smartsave.helpers.StandardText
 
 
 class SparzielAnAufActivity: SmartSaveActivity() {
+    var db = DbHelper(this)
 
     @Preview
     @Composable
@@ -28,7 +29,7 @@ class SparzielAnAufActivity: SmartSaveActivity() {
     @Composable
     override fun BoxScope.GenerateLayout() {
         val bundle = intent.extras
-        val tempSparziel = bundle!!.getSerializable("tempSparziel") as Sparziel
+        val tempSparziel = bundle!!.getSerializable("Sparziel") as Sparziel
         val mode = bundle.getString("mode")
 
 
@@ -58,15 +59,24 @@ class SparzielAnAufActivity: SmartSaveActivity() {
         //TODO Darstellung Drucken/QR-Code und so mäßig
 
         AlignedButton(alignment = Alignment.BottomStart, text = "Abbrechen") {finish()}
-        AlignedButton(alignment = Alignment.BottomEnd, text = "Anlegen/Auflösen") {
-            if(mode == "anlegen") {
-                //TODO Sparziel in datenbank speichern
-
-            } else if(mode == "auflösen") {
-                //TODO Sparziel aus Datenbank entfernen
-
-            } else {
-                throw error("Kein gültiger mode!")
+        AlignedButton(
+            alignment = Alignment.BottomEnd,
+            text = when (mode) {
+                "anlegen" -> "Anlegen"
+                "auflösen" -> "Auflösen"
+                else -> "Error"
+            }
+        ) {
+            when (mode) {
+                "anlegen" -> {
+                    db.insertSparziel(tempSparziel)
+                    finish()
+                }
+                "auflösen" -> {
+                    db.deleteSparziel(tempSparziel.id)
+                    finish()
+                }
+                else -> throw IllegalStateException("Kein gültiger mode!")
             }
         }
     }
