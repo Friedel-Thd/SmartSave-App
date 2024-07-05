@@ -48,13 +48,6 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
 
         super.onCreate(savedInstanceState)
     }
-
-    override fun onResume() {
-        bankkontoState.value = db.getBankkonto()
-        kreditkontenListeState.value = getKreditKontenListe()
-        sparzielListeState.value = getSparzielListe()
-        super.onResume()
-    }
     override fun onResume() {
         bankkontoState.value = db.getBankkonto()
         kreditkontenListeState.value = db.getKreditKontenListe()
