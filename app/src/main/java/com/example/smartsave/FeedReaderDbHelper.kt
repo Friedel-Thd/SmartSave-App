@@ -49,9 +49,8 @@ class FeedReaderDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
 
     private val SQL_CREATE_ENTRIES =
         "CREATE TABLE ${FeedReaderContract.FeedEntry.TABLE_NAME} (" +
-                "${BaseColumns._ID} INTEGER PRIMARY KEY," +
+                "${FeedReaderContract.FeedEntry.KONTONUMMER} INTEGER PRIMARY KEY," +
                 "${FeedReaderContract.FeedEntry.KONTOSTAND} TEXT," +
-                "${FeedReaderContract.FeedEntry.KONTONUMMER} TEXT," +
                 "${FeedReaderContract.FeedEntry.BLZ} TEXT," +
                 "${FeedReaderContract.FeedEntry.BIC} TEXT," +
                 "${FeedReaderContract.FeedEntry.IBAN} TEXT," +

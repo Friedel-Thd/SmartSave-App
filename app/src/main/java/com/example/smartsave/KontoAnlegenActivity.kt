@@ -94,7 +94,7 @@ class KontoAnlegenActivity : SmartSaveActivity() {
             var newTextBLZ = textBLZ.toInt()
             var newTextBIC = textBIC.toInt()
 
-            var konto = Konto("Konto1",newtextKontoNr,newTextBLZ,newTextBIC,textIBAN,textBemerkung,selectedOption)
+            var konto = Konto(newtextKontoNr,newTextBLZ,newTextBIC,textIBAN,textBemerkung,selectedOption)
             db.insertKonto(konto)
             Log.d("Entry", "Entry so mesisch")
             finish()

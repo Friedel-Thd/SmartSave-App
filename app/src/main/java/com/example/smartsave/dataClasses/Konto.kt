@@ -9,6 +9,18 @@ data class Konto(
     val IBAN: String,
     val bemerkung: String,
     val Kontoart: String,
-    var umsatzLst: List<Umsatz>
+
 )
-    : Serializable
+    : Serializable{
+    var umsatzLst: List<Umsatz> = listOf()
+    var kontostand = 0.0
+    fun getKnr(): Int{
+        return kontotnr
+    }
+    fun setKontostand(kontostand: Double){
+        this.kontostand = kontostand
+    }
+    fun getKontostand(): Double{
+        return kontostand
+    }
+    }

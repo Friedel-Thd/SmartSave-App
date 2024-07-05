@@ -32,6 +32,7 @@ import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
 import com.example.smartsave.helpers.SparzielListItem
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
     private val bankkontoState = mutableStateOf<Konto?>(null)
@@ -197,9 +198,9 @@ fun getKreditKontenListe(): List<Konto> {
 
 fun getSparzielListe(): List<Sparziel> {
     //TODO Get alle angelegten KreditKartenKonten
-    val sparziel1 = Sparziel("Auto")
-    val sparziel2 = Sparziel("PC")
-    val sparziel3 = Sparziel("Urlaub")
+    val sparziel1 = Sparziel("Auto",10.0,Date(1000,10,10),10.0,Konto(10,10,10,"10","10","10"),Konto(20,20,20,"20","20","20"))
+    val sparziel2 = Sparziel("PC",10.0,Date(1000,10,10),10.0,Konto(10,10,10,"10","10","10"),Konto(20,20,20,"20","20","20"))
+    val sparziel3 = Sparziel("Urlaub",10.0,Date(1000,10,10),10.0,Konto(10,10,10,"10","10","10"),Konto(20,20,20,"20","20","20"))
     val sparzielliste = mutableListOf(sparziel1, sparziel2, sparziel3, sparziel1, sparziel2, sparziel3, sparziel1, sparziel2, sparziel3,sparziel1, sparziel2, sparziel3)
     //val sparzielliste: MutableList<Konto> = mutableListOf()
 

@@ -1,8 +1,11 @@
 package com.example.smartsave.dataClasses
 import java.io.Serializable
- data class Umsatz (val verwendungsZweck: String, val value: Double): Serializable {
+import java.util.Date
+
+data class Umsatz (val verwendungsZweck: String, val betrag: Double, val datum : Date): Serializable {
    private var kategorie = Kategorie("Nicht Zugewiesen")
    private var einzelumsatzListe: List<Einzelumsatz> = listOf()
+    private var id = 0
   fun isAssigned(): Boolean {
    //TODO return false if umsatz.kategorie is "nicht zugewiesen" else return true
    return (kategorie.name != "Nicht Zugewiesen")
@@ -33,4 +36,10 @@ import java.io.Serializable
    }
    return returnValue
   }
+    fun setId(id:Int){
+        this.id = id
+    }
+    fun getId(): Int{
+        return id
+    }
  }

@@ -119,8 +119,8 @@ fun UmsatzDiffDateListItem(umsatz: Umsatz, modifier: Modifier = Modifier) {
             modifier = modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ){
-            Text(text = umsatz.name, modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
-            Text(text = "${umsatz.value}€", modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
+            Text(text = umsatz.verwendungsZweck, modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
+            Text(text = "${umsatz.betrag}€", modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
         }
     }
     ListDivider()
@@ -132,8 +132,8 @@ fun UmsatzDiffListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifier
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ){
-        Text(text = einzelumsatz.name, modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
-        Text(text = "${einzelumsatz.value.toString()}€", modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
+        Text(text = einzelumsatz.verwendungsZweck, modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
+        Text(text = "${einzelumsatz.betrag.toString()}€", modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
     }
     ListDivider()
 }
@@ -168,8 +168,8 @@ fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifi
             tint = Color.Unspecified
         )
 
-        Text(text = einzelumsatz.name, modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
-        Text(text = "${einzelumsatz.value.toString()}€", modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
+        Text(text = einzelumsatz.verwendungsZweck, modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
+        Text(text = "${einzelumsatz.betrag.toString()}€", modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
     }
     ListDivider()
     if (showDialogAnlegen) {
@@ -208,8 +208,8 @@ fun SparzielEinzahlungListItem(einzahlung: Umsatz, modifier: Modifier = Modifier
             modifier = modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ){
-            Text(text = einzahlung.name, modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
-            Text(text = "${einzahlung.value}€", modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
+            Text(text = einzahlung.verwendungsZweck, modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
+            Text(text = "${einzahlung.betrag}€", modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
         }
     }
     ListDivider()
@@ -249,7 +249,7 @@ fun LabelledDropdownMenu(label: String, options: List<Konto>) {
         ) {
             TextField(
                 readOnly = true,
-                value = selectedOptionText.name,
+                value = selectedOptionText.kontotnr.toString(),
                 onValueChange = { },
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(
@@ -267,7 +267,7 @@ fun LabelledDropdownMenu(label: String, options: List<Konto>) {
             ) {
                 options.forEach { selectionOption ->
                     DropdownMenuItem(
-                        text = { Text(text = selectionOption.name) },
+                        text = { Text(text = selectionOption.kontotnr.toString()) },
                         onClick = {
                             selectedOptionText = selectionOption
                             expanded = false
@@ -433,7 +433,7 @@ fun LabelledDropdownMenuUmsatz(
                 }
 
             }
-            Text(text = "${umsatz.value}€")
+            Text(text = "${umsatz.betrag}€")
 
 
         }
@@ -445,7 +445,7 @@ fun LabelledDropdownMenuUmsatz(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = umsatz.name,
+                text = umsatz.betrag.toString(),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(start = 20.dp)
             )
