@@ -155,17 +155,17 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
 
 fun getBankkonto(): Konto? {
     //TODO Get Angelegtes Bankkonto
-    return Konto("Hauptkonto", 500.0)
-    //return null
+  //  return Konto("Hauptkonto", 500.0)
+    return null
 }
 
 fun getKreditKontenListe(): List<Konto> {
     //TODO Get alle angelegten KreditKartenKonten
-    val konto1 = Konto("Konto1", 500.0)
-    val konto2 = Konto("Konto2", 500.0)
-    val konto3 = Konto("Konto3", 500.0)
-    val kontoliste = mutableListOf(konto1, konto2, konto3)
-    //val kontoliste: MutableList<Konto> = mutableListOf()
+   // val konto1 = Konto("Konto1", 500.0)
+   // val konto2 = Konto("Konto2", 500.0)
+   // val konto3 = Konto("Konto3", 500.0)
+    //val kontoliste = mutableListOf(konto1, konto2, konto3)
+    val kontoliste: MutableList<Konto> = mutableListOf()
 
     return kontoliste
 }

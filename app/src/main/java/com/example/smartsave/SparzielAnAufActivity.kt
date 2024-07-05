@@ -69,11 +69,11 @@ class SparzielAnAufActivity: SmartSaveActivity() {
 }
 @Composable
 fun getAuszahlkonto() : Konto{
-    return Konto("konto1",5000.0)
+    return Konto("konto1",5000.0,23,23,23,"23","2","3")
 }
 @Composable
 fun getZielkonto() : Konto{
-    return Konto("konto2",5000.0)
+    return Konto("konto1",5000.0,23,23,23,"23","2","3")
 }
 @Composable
 fun getRate() : Double{

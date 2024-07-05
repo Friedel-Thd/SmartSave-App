@@ -33,24 +33,36 @@ class FeedReaderDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         // Table contents are grouped together in an anonymous object.
         object FeedEntry : BaseColumns {
             const val TABLE_NAME = "entry"
-            const val COLUMN_NAME_TITLE = "title"
-            const val COLUMN_NAME_SUBTITLE = "subtitle"
+            const val KONTONUMMER = "Kontonummer"
+            const val BLZ = "BLZ"
+            const val BIC = "BIC"
+            const val IBAN = "IBAN"
+            const val BEMERKUNG = "Bemerkung"
+            const val KONTOART = "Kontoart"
         }
     }
 
     private val SQL_CREATE_ENTRIES =
         "CREATE TABLE ${FeedReaderContract.FeedEntry.TABLE_NAME} (" +
                 "${BaseColumns._ID} INTEGER PRIMARY KEY," +
-                "${FeedReaderContract.FeedEntry.COLUMN_NAME_TITLE} TEXT," +
-                "${FeedReaderContract.FeedEntry.COLUMN_NAME_SUBTITLE} TEXT)"
+                "${FeedReaderContract.FeedEntry.KONTONUMMER} TEXT," +
+                "${FeedReaderContract.FeedEntry.BLZ} TEXT," +
+                "${FeedReaderContract.FeedEntry.BIC} TEXT," +
+                "${FeedReaderContract.FeedEntry.IBAN} TEXT," +
+                "${FeedReaderContract.FeedEntry.BEMERKUNG} TEXT," +
+                "${FeedReaderContract.FeedEntry.KONTOART} TEXT)"
 
     private val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${FeedReaderContract.FeedEntry.TABLE_NAME}"
 
     fun insertKonto(konto:Konto){
         val db = writableDatabase
         val values = ContentValues().apply {
-            put(FeedReaderContract.FeedEntry.COLUMN_NAME_TITLE, konto.name)
-            put(FeedReaderContract.FeedEntry.COLUMN_NAME_SUBTITLE, "subtitle")
+            put(FeedReaderContract.FeedEntry.KONTONUMMER, konto.kontotnr)
+            put(FeedReaderContract.FeedEntry.BLZ, konto.BLZ)
+            put(FeedReaderContract.FeedEntry.BIC, konto.BIC)
+            put(FeedReaderContract.FeedEntry.IBAN, konto.IBAN)
+            put(FeedReaderContract.FeedEntry.BEMERKUNG, konto.bemerkung)
+            put(FeedReaderContract.FeedEntry.KONTOART,konto.Kontoart)
         }
         db.insert(FeedReaderContract.FeedEntry.TABLE_NAME, null, values)
 

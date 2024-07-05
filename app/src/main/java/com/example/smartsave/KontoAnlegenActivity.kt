@@ -93,7 +93,11 @@ class KontoAnlegenActivity : SmartSaveActivity() {
         AlignedButton(alignment = Alignment.BottomStart, text = "Abbrechen") {finish()}
         AlignedButton(alignment = Alignment.BottomEnd, text = "Speichern") {
             //TODO Kontodaten speichern
-            var konto = Konto(textKontoNr,500.0)
+            var newtextKontoNr = textKontoNr.toInt()
+            var newTextBLZ = textBLZ.toInt()
+            var newTextBIC = textBIC.toInt()
+
+            var konto = Konto("Konto1",100.0,newtextKontoNr,newTextBLZ,newTextBIC,textIBAN,textBemerkung,selectedOption)
             db.insertKonto(konto)
             Log.d("Entry", "Entry so mesisch")
             finish()

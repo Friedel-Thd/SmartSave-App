@@ -90,11 +90,11 @@ class SparzielActivity : SmartSaveActivity() {
 
     fun getKontolist(): List<Konto> {
         //TODO get liste mit allen angelegten Konten
-        var konto1 = Konto(name = "Konto 1", 500.0)
-        var konto2 = Konto(name = "Konto 2", 500.0)
-        var konto3 = Konto(name = "Konto 3", 500.0)
-        var konto4 = Konto(name = "Konto 4", 500.0)
-        var kontoliste = listOf(konto1, konto2, konto3, konto4)
+        var konto1 = Konto(name = "Konto 1", 500.0, 23,23,23,"23","23","23")
+     //   var konto2 = Konto(name = "Konto 2", 500.0)
+      //  var konto3 = Konto(name = "Konto 3", 500.0)
+       // var konto4 = Konto(name = "Konto 4", 500.0)
+        var kontoliste = listOf(konto1)
 
         return kontoliste
     }
