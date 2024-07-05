@@ -44,6 +44,7 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
     override fun BoxScope.GenerateLayout() {
         val kategorienListe by remember { kategorienListeState }
         var selectedKategorie by remember { mutableStateOf<Kategorie?>(null) }
+        var isError by remember { mutableStateOf(false) }
 
         var textKategorie by remember { mutableStateOf("") }
 

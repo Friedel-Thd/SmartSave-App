@@ -62,22 +62,10 @@ class KontoAnlegenActivity : SmartSaveActivity() {
             modifier = Modifier.verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            LabelledInputField(label = "Konto Nr.*", value = textKontoNr, KeyboardOptions(keyboardType = KeyboardType.Number)) {
-                textKontoNr = it
-                isError = it.isEmpty()
-            }
-            LabelledInputField(label = "BLZ*", value = textBLZ,KeyboardOptions(keyboardType = KeyboardType.Number)) {
-                textBLZ = it
-                isError = it.isEmpty()
-            }
-            LabelledInputField(label = "BIC*", value = textBIC, KeyboardOptions()) {
-                textBIC = it
-                isError = it.isEmpty()
-            }
-            LabelledInputField(label = "IBAN*", value = textIBAN, KeyboardOptions()) {
-                textIBAN = it
-                isError = it.isEmpty()
-            }
+            LabelledInputField(label = "Konto Nr.*", value = textKontoNr, KeyboardOptions(keyboardType = KeyboardType.Number)) { textKontoNr = it }
+            LabelledInputField(label = "BLZ*", value = textBLZ,KeyboardOptions(keyboardType = KeyboardType.Number)) { textBLZ = it }
+            LabelledInputField(label = "BIC*", value = textBIC, KeyboardOptions()) { textBIC = it }
+            LabelledInputField(label = "IBAN*", value = textIBAN, KeyboardOptions()) { textIBAN = it }
             LabelledInputField(label = "Bemerkung", value = textBemerkung, KeyboardOptions()) { textBemerkung = it }
             if (isError){
                 Text(
@@ -124,16 +112,14 @@ class KontoAnlegenActivity : SmartSaveActivity() {
         AlignedButton(alignment = Alignment.BottomStart, text = "Abbrechen") {finish()}
         AlignedButton(alignment = Alignment.BottomEnd, text = "Speichern") {
             //TODO Kontonummer darf nicht doppelt sein, vllt auch abfrage in datenbank oder so
-            var newtextKontoNr = textKontoNr.toInt()
+
             isError = textKontoNr.isEmpty()|| textBIC.isEmpty() || textBLZ.isEmpty() || textIBAN.isEmpty()
             if(!isError){
                 var newtextKontoNr = textKontoNr.toInt()
-
-
-            var konto = Konto(newtextKontoNr,textBLZ,textBIC,textIBAN,textBemerkung,selectedOption)
-            db.insertKonto(konto)
-            Log.d("Entry", "Entry so mesisch")
-            finish()
+                var konto = Konto(newtextKontoNr,textBLZ,textBIC,textIBAN,textBemerkung,selectedOption)
+                db.insertKonto(konto)
+                Log.d("Entry", "Entry so mesisch")
+                finish()
                 }
             }
     }

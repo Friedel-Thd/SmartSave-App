@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.smartsave.dataClasses.Konto
@@ -46,24 +47,16 @@ class SparzielActivity : SmartSaveActivity() {
             modifier = Modifier.verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            LabelledInputField(label = "Name*", value = textName, KeyboardOptions()) {
-                textName = it
-                isError = it.isEmpty()
-            }
+            LabelledInputField(label = "Name*", value = textName, KeyboardOptions()) { textName = it }
 
             //TODO Input auf zahlen beschränken
-            LabelledInputField(label = "Betrag*", value = textBetrag, KeyboardOptions()) {
-                textBetrag = it
-                isError = it.isEmpty()
-            }
+            LabelledInputField(label = "Betrag*", value = textBetrag, KeyboardOptions(keyboardType = KeyboardType.Number)) { textBetrag = it }
 
             //TODO Von String zu einem Date Format ändern?
             LabelledDatePickerButton(label = "Auszahlungszeitraum*",
                 selectedDate = selectedDate,
                 onDateSelected = {
                     date -> selectedDate = date
-                    isError = date.isEmpty()
-
                                  },
                 true
 
