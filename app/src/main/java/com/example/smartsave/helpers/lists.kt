@@ -492,7 +492,7 @@ fun LabelledDropdownMenuUmsatz(
 
 
             ElevatedButton(
-                enabled = if(!umsatz.isAssigned()) false else true,
+                enabled = !umsatz.isAssigned(),
                 onClick = {
                 //TODO Layout #8 NUR WENN UMSATZ KEINE KATEGORIE ZUGEWIESEN HAT bzw. "NICHT ZUGEWIESEN"
                 // Übergabeparameter aktueller Umsatz mäßisch
