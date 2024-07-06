@@ -85,7 +85,7 @@ class KontoansichtActivity : SmartSaveActivity() {
         ) {
 
             IconListItem(
-                text = bankkonto!!.kontostand.toString(),
+                text = bankkonto.kontostand.toString(),
                 modifier = Modifier.clickable {
                     val intent = Intent(this@KontoansichtActivity, KontoansichtUmsaetzeActivity::class.java)
                     intent.putExtra("Konto", bankkonto)
@@ -104,7 +104,7 @@ class KontoansichtActivity : SmartSaveActivity() {
                 .height(150.dp)
             ) {
                 inset(horizontal = 100f, vertical = 100f) {
-                    val gesamtausgaben = bankkonto!!.getAusgaben(LocalDate.now().let { selectedDate })
+                    val gesamtausgaben = bankkonto.getAusgaben(LocalDate.now().let { selectedDate })
                     val safeGesamtausgaben = if (gesamtausgaben == 0.0) 1.0 else gesamtausgaben
 
                     drawRect(color = Color.White, size = Size(size.width, size.height))
@@ -113,7 +113,7 @@ class KontoansichtActivity : SmartSaveActivity() {
                     for ((index, kategorie) in kategorienListe.withIndex()) {
                         if(kategorie.name != "Nicht zugeordnet") {
 
-                            val umsatzKategorie = bankkonto!!.getAusgabenByKategorie(selectedDate, kategorie)
+                            val umsatzKategorie = bankkonto.getAusgabenByKategorie(selectedDate, kategorie)
                             val percentageSize = (umsatzKategorie / safeGesamtausgaben)
                             val width = size.width * percentageSize.toFloat()
 
@@ -138,17 +138,21 @@ class KontoansichtActivity : SmartSaveActivity() {
                     .weight(1f, true),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                var nichtZugeordnetBetrag = 0.0
 
                 for ((index, kategorie) in kategorienListe.withIndex()) {
+                    val umsatzKategorie = bankkonto.getAusgabenByKategorie(selectedDate, kategorie)
                     if(kategorie.name != "Nicht zugeordnet") {
                         CategoryDisplay(
                             color = colorGen(index),
-                            text = kategorie.name
+                            text = kategorie.name,
+                            betrag = umsatzKategorie
                         )
+                    } else {
+                        nichtZugeordnetBetrag = umsatzKategorie
                     }
                 }
-
-                CategoryDisplay(color = Color.White, text = "Nicht zugeordnet")
+                CategoryDisplay(color = Color.White, text = "Nicht zugeordnet", betrag = nichtZugeordnetBetrag)
             }
 
             Column(modifier = Modifier.fillMaxWidth()) {

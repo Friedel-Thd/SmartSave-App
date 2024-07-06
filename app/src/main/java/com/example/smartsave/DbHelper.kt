@@ -434,7 +434,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         return sparzielListe
     }
 
-    private fun getKontoByKontonummer(kontonummer: Int): Konto? {
+    fun getKontoByKontonummer(kontonummer: Int): Konto? {
         val db = readableDatabase
         val query = "SELECT * FROM ${SmartSaveContract.KontoEntry.TABLE_NAME} WHERE ${SmartSaveContract.KontoEntry.KONTONUMMER} = $kontonummer"
         val cursor = db.rawQuery(query, null)
@@ -535,7 +535,9 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
             Triple("Testumsatz 7", -75.0, "10/10/2023"),
             Triple("Testumsatz 8", -125.0, "25/11/2023"),
             Triple("Testumsatz 9", 175.0, "08/12/2023"),
-            Triple("Testumsatz 10", -225.0, "30/01/2024")
+            Triple("Testumsatz 10", -225.0, "30/01/2024"),
+            Triple("Tester", -200.0, "30/01/2024"),
+            Triple("Tester", -225.0, "30/01/2024")
         )
 
         val random = java.util.Random()
