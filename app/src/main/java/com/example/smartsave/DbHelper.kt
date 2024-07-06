@@ -8,7 +8,6 @@ import com.example.smartsave.dataClasses.Kategorie
 import com.example.smartsave.dataClasses.Konto
 import com.example.smartsave.dataClasses.Sparziel
 import com.example.smartsave.dataClasses.Umsatz
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -207,6 +206,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTOART))
             )
             konto.umsatzList = loadUmsaetzeForKonto(konto.kontonr)
+            konto.kontostand = konto.calcKontostand()
         }
         cursor.close()
         return konto
@@ -248,7 +248,6 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         val umsaetze = mutableListOf<Umsatz>()
         val db = readableDatabase
 
-        // Abfrage für Umsätze
         val query = "SELECT * FROM ${SmartSaveContract.UmsatzEntry.TABLE_NAME} WHERE ${SmartSaveContract.UmsatzEntry.KONTONUMMER} = ?"
         val cursor = db.rawQuery(query, arrayOf(kontonummer.toString()))
 
@@ -260,14 +259,12 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
             )
             umsatz.id = cursor.getInt(cursor.getColumnIndexOrThrow(SmartSaveContract.UmsatzEntry.UMSATZ_ID))
 
-            // Kategoriezuweisung abfragen
             val kategorieIdQuery = "SELECT ${SmartSaveContract.KategorieZuweisungEntry.KATEGORIE_ID} FROM ${SmartSaveContract.KategorieZuweisungEntry.TABLE_NAME} WHERE ${SmartSaveContract.KategorieZuweisungEntry.UMSATZ_ID} = ?"
             val kategorieIdCursor = db.rawQuery(kategorieIdQuery, arrayOf(umsatz.id.toString()))
 
             if (kategorieIdCursor.moveToFirst()) {
                 val kategorieId = kategorieIdCursor.getInt(kategorieIdCursor.getColumnIndexOrThrow(SmartSaveContract.KategorieZuweisungEntry.KATEGORIE_ID))
 
-                // Kategorie abfragen
                 val kategorieQuery = "SELECT * FROM ${SmartSaveContract.KategorieEntry.TABLE_NAME} WHERE ${SmartSaveContract.KategorieEntry.KATEGORIE_ID} = ?"
                 val kategorieCursor = db.rawQuery(kategorieQuery, arrayOf(kategorieId.toString()))
 
@@ -304,6 +301,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTOART))
             )
             konto.umsatzList = loadUmsaetzeForKonto(konto.kontonr)
+            konto.kontostand = konto.calcKontostand()
             kreditKontenListe.add(konto)
         }
 
@@ -327,6 +325,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTOART))
             )
             konto.umsatzList = loadUmsaetzeForKonto(konto.kontonr)
+            konto.kontostand = konto.calcKontostand()
             kontoListe.add(konto)
         }
 
@@ -387,6 +386,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BEMERKUNG)),
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTOART))
             )
+            konto.kontostand = konto.calcKontostand()
             konto.umsatzList = loadUmsaetzeForKonto(konto.kontonr)
         }
 
@@ -400,7 +400,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         val values = ContentValues().apply {
             put(SmartSaveContract.SparzielEntry.NAME, sparziel.name)
             put(SmartSaveContract.SparzielEntry.BETRAG, sparziel.betrag)
-            put(SmartSaveContract.SparzielEntry.ZIELDATUM, SimpleDateFormat("dd/MM/yyyy").format(sparziel.zieldatum))
+            put(SmartSaveContract.SparzielEntry.ZIELDATUM, sparziel.zieldatum.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             put(SmartSaveContract.SparzielEntry.MONATSRATE, sparziel.monatsrate)
         }
         val sparzielId = db.insert(SmartSaveContract.SparzielEntry.TABLE_NAME, null, values)
@@ -434,23 +434,23 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         dbHelper.insertKonto(konto)
 
         // Kategorien einfügen
-        val kategorien = listOf("Lebensmittel", "Auto", "Miete", "Unterhaltung", "Reisen", "Bildung")
+        val kategorien = listOf("Nicht zugeordnet", "Lebensmittel", "Auto", "Miete", "Unterhaltung", "Reisen", "Bildung")
         kategorien.forEach { kategorie ->
             dbHelper.insertKategorie(Kategorie(kategorie))
         }
 
         // Umsätze einfügen
         val umsaetze = listOf(
-            Triple("Testumsatz 1", 100.0, "01/02/2024"),
-            Triple("Testumsatz 2", 150.0, "15/03/2024"),
-            Triple("Testumsatz 3", 200.0, "28/04/2024"),
-            Triple("Testumsatz 4", 250.0, "12/05/2024"),
-            Triple("Testumsatz 5", 300.0, "05/06/2024"),
+            Triple("Testumsatz 1", 3000.0, "01/02/2024"),
+            Triple("Testumsatz 2", -150.0, "15/03/2024"),
+            Triple("Testumsatz 3", -200.0, "28/04/2024"),
+            Triple("Testumsatz 4", -250.0, "12/05/2024"),
+            Triple("Testumsatz 5", -300.0, "05/06/2024"),
             Triple("Testumsatz 6", 50.0, "20/09/2023"),
-            Triple("Testumsatz 7", 75.0, "10/10/2023"),
-            Triple("Testumsatz 8", 125.0, "25/11/2023"),
+            Triple("Testumsatz 7", -75.0, "10/10/2023"),
+            Triple("Testumsatz 8", -125.0, "25/11/2023"),
             Triple("Testumsatz 9", 175.0, "08/12/2023"),
-            Triple("Testumsatz 10", 225.0, "30/01/2024")
+            Triple("Testumsatz 10", -225.0, "30/01/2024")
         )
 
         val random = java.util.Random()
@@ -486,11 +486,11 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
         // Einzelumsätze einfügen
         val einzelumsaetze = listOf(
-            Triple("Test Einzelumsatz 1", 50.0, "02/01/2024"),
-            Triple("Test Einzelumsatz 2", 75.0, "14/02/2024"),
-            Triple("Test Einzelumsatz 3", 100.0, "27/03/2024"),
-            Triple("Test Einzelumsatz 4", 125.0, "10/04/2024"),
-            Triple("Test Einzelumsatz 5", 150.0, "23/05/2024")
+            Triple("Test Einzelumsatz 1", -50.0, "02/01/2024"),
+            Triple("Test Einzelumsatz 2", -75.0, "14/02/2024"),
+            Triple("Test Einzelumsatz 3", -100.0, "27/03/2024"),
+            Triple("Test Einzelumsatz 4", -125.0, "10/04/2024"),
+            Triple("Test Einzelumsatz 5", -150.0, "23/05/2024")
         )
 
         einzelumsaetze.forEachIndexed { index, (verwendungszweck, betrag, datum) ->

@@ -30,8 +30,9 @@ class UmsatzAuswahlZuordnungActivity : SmartSaveActivity() {
 
     @Composable
     override fun BoxScope.GenerateLayout(){
-
+    /* TODO Machene halt nech
         var umsatzListe = getUmsaetze()
+
         MainColumn (modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp))
         {
             //TODO Loop über alle Umsätze aus Datenbank so mesisch
@@ -43,5 +44,7 @@ class UmsatzAuswahlZuordnungActivity : SmartSaveActivity() {
         AlignedButton(alignment = Alignment.BottomCenter, text = "Abbrechen", modifier = Modifier.height(70.dp)) {
             finish()
         }
+
+    */
     }
 }

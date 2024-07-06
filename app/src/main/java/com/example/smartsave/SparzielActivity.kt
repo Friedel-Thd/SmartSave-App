@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.smartsave.dataClasses.Konto
 import com.example.smartsave.dataClasses.Sparziel
+import com.example.smartsave.dataClasses.parseDate
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.CenteredText
 import com.example.smartsave.helpers.labelledDropdownMenu
@@ -116,8 +117,9 @@ class SparzielActivity : SmartSaveActivity() {
         AlignedButton(alignment = Alignment.BottomEnd, text = "Weiter") {
             isError = textBetrag.isEmpty() || textName.isEmpty() || selectedDate.isEmpty() || zielKonto == null || ausgangKonto == null
             if(!isError){
+
                 val intent = Intent(this@SparzielActivity, SparzielAnAufActivity::class.java)
-                val tempSparziel = Sparziel(textName, textBetrag.toDouble(),  LocalDate.parse(selectedDate, DateTimeFormatter.ofPattern("dd/MM/yyyy")), monatsRate, zielKonto!!, ausgangKonto!!)
+                val tempSparziel = Sparziel(textName, textBetrag.toDouble(),  parseDate(selectedDate), monatsRate, zielKonto!!, ausgangKonto!!)
                 intent.putExtra("Sparziel", tempSparziel)
                 intent.putExtra("mode", "anlegen")
                 startActivity(intent)

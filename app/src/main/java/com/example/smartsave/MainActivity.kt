@@ -33,7 +33,6 @@ import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
 import com.example.smartsave.helpers.SparzielListItem
 import kotlinx.coroutines.launch
-import java.util.Date
 
 class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
     private val bankkontoState = mutableStateOf<Konto?>(null)
@@ -141,6 +140,7 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                         modifier = Modifier.clickable {
                             //TODO KontoID mitgeben
                             val intent = Intent(this@MainActivity, KontoansichtUmsaetzeActivity::class.java)
+                            intent.putExtra("Konto", kreditkonto)
                             startActivity(intent)
                         },
                         iconId = R.drawable.arrow_forward

@@ -245,6 +245,8 @@ fun CategoryDisplay(color: Color, text: String) {
             )
         }
         StandardText(text = text)
+
+
     }
 }
 

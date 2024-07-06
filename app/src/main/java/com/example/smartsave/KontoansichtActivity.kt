@@ -41,7 +41,6 @@ import com.example.smartsave.helpers.IconListItem
 import com.example.smartsave.helpers.ListItem
 import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
-import com.example.smartsave.helpers.StandardText
 import java.time.LocalDate
 import kotlin.math.roundToInt
 
@@ -68,7 +67,7 @@ class KontoansichtActivity : SmartSaveActivity() {
     @Composable
     override fun BoxScope.GenerateLayout() {
         val currentMonth = LocalDate.now().let { Month(it.year, it.monthValue) }
-        var selectedDate by remember { mutableStateOf(currentMonth) }
+        var selectedDate by remember { mutableStateOf(currentMonth - 1) }
         val kategorienListe by remember { kategorienListeState }
         val bankkonto by remember { bankkontoState }
 
@@ -83,6 +82,7 @@ class KontoansichtActivity : SmartSaveActivity() {
                 text = bankkonto!!.kontostand.toString(),
                 modifier = Modifier.clickable {
                     val intent = Intent(this@KontoansichtActivity, KontoansichtUmsaetzeActivity::class.java)
+                    intent.putExtra("Konto", bankkonto)
                     startActivity(intent)
                 },
                 iconId = R.drawable.arrow_swap
@@ -92,12 +92,13 @@ class KontoansichtActivity : SmartSaveActivity() {
 
             //TODO Es gibt noch das problem, dass wenn mehrere kategorien mit dem selben namen existieren
             // diese umsätze in diesen kategorien doppelt gezählt werden mäßig
+            // sollte mit kategorien todos gefixxt werden
             Canvas(modifier = Modifier
                 .fillMaxWidth()
                 .height(150.dp)
             ) {
                 inset(horizontal = 100f, vertical = 100f) {
-                    val gesamtausgaben = bankkonto!!.getUmsatz(LocalDate.now().let { selectedDate })
+                    val gesamtausgaben = bankkonto!!.getAusgaben(LocalDate.now().let { selectedDate })
                     val safeGesamtausgaben = if (gesamtausgaben == 0.0) 1.0 else gesamtausgaben
 
                     drawRect(color = Color.White, size = Size(size.width, size.height))
@@ -106,7 +107,7 @@ class KontoansichtActivity : SmartSaveActivity() {
                     for ((index, kategorie) in kategorienListe.withIndex()) {
                         if(kategorie.name != "Nicht zugeordnet") {
 
-                            val umsatzKategorie = bankkonto!!.getUmsatzKategorie(selectedDate, kategorie)
+                            val umsatzKategorie = bankkonto!!.getAusgabenByKategorie(selectedDate, kategorie)
                             val percentageSize = (umsatzKategorie / safeGesamtausgaben)
                             val width = size.width * percentageSize.toFloat()
 
@@ -155,7 +156,7 @@ class KontoansichtActivity : SmartSaveActivity() {
                         selectedDate = currentMonth - months
                         },
                     valueRange = 0f..(MAX_MONTHS - 1f),
-                    steps = MAX_MONTHS - 2
+                    steps = MAX_MONTHS -2
                 )
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Text(

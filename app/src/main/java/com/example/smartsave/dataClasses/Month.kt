@@ -1,6 +1,13 @@
 package com.example.smartsave.dataClasses
 
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.time.format.DateTimeParseException
+import java.time.temporal.ChronoField
+
+
 data class Month(val year: Int, val month: Int) {
 
     init {
@@ -40,4 +47,17 @@ data class Month(val year: Int, val month: Int) {
 
     operator fun minus(months: Int) = this + -months
 
+}
+
+val supportedFormats = arrayOf("dd/MM/yyyy", "d/M/yyyy", "dd/M/yyyy", "d/MM/yyyy")
+
+fun parseDate(dateString: String): LocalDate {
+    for (format in supportedFormats) {
+        try {
+            return LocalDate.parse(dateString, DateTimeFormatter.ofPattern(format))
+        } catch (e: DateTimeParseException) {
+
+        }
+    }
+    throw DateTimeParseException("Could not parse date", dateString, 0)
 }

@@ -1,5 +1,7 @@
 package com.example.smartsave
 
+import DbHelper
+import android.os.Bundle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -19,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.smartsave.dataClasses.Kategorie
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.LabelledDatePickerButton
 import com.example.smartsave.helpers.LabelledDropdownMenuKategory
@@ -28,6 +31,14 @@ import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
 
 class EinzelumsatzEditActivity : SmartSaveActivity() {
+    var db = DbHelper(this)
+    private val kategorienListeState = mutableStateOf<List<Kategorie>>(emptyList())
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        kategorienListeState.value = db.getKategorienListe()
+
+        super.onCreate(savedInstanceState)
+    }
     @Preview
     @Composable
     fun PreviewLayout() = GenerateContent()
@@ -37,7 +48,7 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
         var selectedDate by remember { mutableStateOf("") }
         var textBezeichung by remember { mutableStateOf("") }
         var textBetrag by remember { mutableStateOf("") }
-        var katList = getKat()
+        val kategorienListe by remember { kategorienListeState }
         var isError by remember { mutableStateOf(false) }
 
         MainColumn (
@@ -52,7 +63,7 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
                 onDateSelected = { date -> selectedDate = date },
                 false
             )
-            LabelledDropdownMenuKategory(label = "Kategorie", options = katList)
+            LabelledDropdownMenuKategory(label = "Kategorie", options = kategorienListe)
 
             if(isError) {
                 Text(

@@ -1,5 +1,7 @@
 package com.example.smartsave
 
+import DbHelper
+import android.os.Bundle
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
@@ -14,21 +16,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -36,24 +34,29 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.smartsave.dataClasses.Einzelumsatz
 import com.example.smartsave.dataClasses.Kategorie
+import com.example.smartsave.dataClasses.Konto
 import com.example.smartsave.dataClasses.Month
-import com.example.smartsave.dataClasses.Umsatz
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.LabelledDropdownMenuUmsatz
 import com.example.smartsave.helpers.LabelledInputField
 import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
 import java.time.LocalDate
-import java.util.Date
 import kotlin.math.roundToInt
 
 private const val MAX_MONTHS = 12
 
 
 class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
+    var db = DbHelper(this)
+    private val kategorienListeState = mutableStateOf<List<Kategorie>>(emptyList())
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        kategorienListeState.value = db.getKategorienListe()
+
+        super.onCreate(savedInstanceState)
+    }
     @Preview
     @Composable
     fun PreviewLayout() = GenerateContent()
@@ -61,10 +64,12 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
     @Composable
     override fun BoxScope.GenerateLayout() {
 
+        val bundle = intent.extras
+        val konto: Konto = bundle!!.getSerializable("Konto") as Konto
+        val kategorienListe by remember { kategorienListeState }
+
         var months by remember { mutableIntStateOf(1) }
         val currentMonth = LocalDate.now().let { Month(it.year, it.monthValue) }
-        var umsatzlist = getUmsaetze()
-        var katList = getKat()
         var scrollstate = rememberScrollState()
 
 
@@ -118,7 +123,7 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
                     horizontalArrangement = Arrangement.SpaceBetween
                 )
                 {
-                    for ( kategorie in katList) {
+                    for ( kategorie in kategorienListe) {
                         Button(modifier = Modifier.padding(horizontal = 5.dp),
                             onClick = {
                             //TODO set kategory filter für umsätze
@@ -141,9 +146,9 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
                     verticalArrangement = Arrangement.spacedBy(12.dp)
 
                 ) {
-                    for ((index, umsatz) in umsatzlist.withIndex()) Row() {
+                    for ((index, umsatz) in konto.umsatzList.withIndex()) Row() {
                         //TODO ausgewählten umsatz bzw. umsatzID mitgeben
-                        LabelledDropdownMenuUmsatz(label = "Datum1", options = katList, umsatz, LocalContext.current)
+                        LabelledDropdownMenuUmsatz(label = "Datum1", options = kategorienListe, umsatz, LocalContext.current)
                     }
                 }
             }
@@ -174,83 +179,3 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
 
 }
 
-
-    fun getUmsaetze(): List<Umsatz> {
-        val umsatz1 = Umsatz("umsatz1", 534.55, LocalDate.of(10,10,10))
-        val umsatz2 = Umsatz("umsatz2", 34.55,LocalDate.of(10,10,10))
-        val umsatz3 = Umsatz("umsatz3", 4.55,LocalDate.of(10,10,10))
-        val umsatz4 = Umsatz("umsatz4", 888.55,LocalDate.of(10,10,10))
-
-        val einzelumsatz1 = Einzelumsatz("Döner", 5.0,LocalDate.of(10,10,10))
-        einzelumsatz1.kategorie = (Kategorie("Essen"))
-        umsatz2.kategorie = Kategorie("Gym")
-        umsatz2.addEinzelumsatz(einzelumsatz1)
-
-        val einzelumsatz2 = Einzelumsatz("Döner", 5.0,LocalDate.of(10,10,10))
-        einzelumsatz2.kategorie = (Kategorie("Essen"))
-        umsatz2.addEinzelumsatz(einzelumsatz2)
-
-    val test = umsatz2.hasAssignedEinzelumsatz()
-
-        val umsatzliste = listOf(umsatz1, umsatz2, umsatz3, umsatz4)
-        return umsatzliste
-
-    }
-
-    fun getKat(): List<Kategorie> {
-        val kat1 = Kategorie("Auto")
-        val kat2 = Kategorie("Essen")
-        val kat3 = Kategorie("COC")
-        val kat5 = Kategorie("Nicht Zugewiesen")
-        val kat6 = Kategorie("Gym")
-        val kat7 = Kategorie("Gym")
-        val kat8 = Kategorie("Gym")
-        val kat9 = Kategorie("Gym")
-        val kat10 = Kategorie("Gym")
-
-
-        val katList = listOf(kat5, kat2, kat3, kat1, kat6, kat7, kat8, kat9, kat10)
-        return katList
-    }
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AlertDialogHandler(
-    onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit,
-    dialogTitle: String,
-    dialogText: String,
-    icon: ImageVector,
-) {
-    AlertDialog(
-        icon = {
-            Icon(icon, contentDescription = "Example Icon")
-        },
-        title = {
-            Text(text = dialogTitle)
-        },
-        text = {
-            Text(text = dialogText)
-        },
-        onDismissRequest = {
-            onDismissRequest()
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirmation()
-                }
-            ) {
-                Text("Confirm")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismissRequest()
-                }
-            ) {
-                Text("Dismiss")
-            }
-        }
-    )
-}

@@ -1,9 +1,7 @@
 package com.example.smartsave.dataClasses
 
-import android.util.Log
 import java.io.Serializable
 import java.time.LocalDate
-import java.util.Calendar
 
 
 data class Konto(
@@ -17,7 +15,7 @@ data class Konto(
     var umsatzList: List<Umsatz> = listOf()
     var kontostand = 0.0
 
-    fun getUmsatzKategorie(month: Month, kategorie: Kategorie): Double {
+    fun getAusgabenByKategorie(month: Month, kategorie: Kategorie): Double {
         var umsatzSumme = 0.0
         var selectedDate = LocalDate.of(month.year, month.month, 1)
 
@@ -32,32 +30,41 @@ data class Konto(
             Log.d("Ifkat", "${(umsatz.kategorie.name == kategorie.name)}")
             */
 
-            if (umsatz.datum.isAfter(selectedDate) && (umsatz.kategorie.name == kategorie.name)) {
+            if (umsatz.datum.isAfter(selectedDate) && (umsatz.kategorie.name == kategorie.name) && umsatz.betrag < 0) {
 
                 if(umsatz.hasAssignedEinzelumsatz()) {
                     for (einzelumsatz in umsatz.einzelumsatzListe) {
                         if (einzelumsatz.datum.isAfter(selectedDate) && (einzelumsatz.kategorie.name == kategorie.name)) {
-                            umsatzSumme += einzelumsatz.betrag
+                            umsatzSumme += -einzelumsatz.betrag
                         }
                     }
                 } else {
-                    umsatzSumme += umsatz.betrag
+                    umsatzSumme += -umsatz.betrag
                 }
             }
         }
         return umsatzSumme
     }
 
-    fun getUmsatz(month: Month): Double {
+    fun getAusgaben(month: Month): Double {
         var umsatzSumme = 0.0
         var selectedDate = LocalDate.of(month.year, month.month, 1)
 
         for (umsatz in umsatzList) {
-            if (umsatz.datum.isAfter(selectedDate)) {
-                umsatzSumme += umsatz.betrag
+            if (umsatz.datum.isAfter(selectedDate) && umsatz.betrag < 0) {
+                umsatzSumme += -umsatz.betrag
             }
         }
         return umsatzSumme
+    }
+
+    fun calcKontostand(): Double {
+        var kontostandSumme = 0.0
+
+        for (umsatz in umsatzList) {
+            kontostandSumme += umsatz.betrag
+        }
+        return kontostandSumme
     }
 
 }
