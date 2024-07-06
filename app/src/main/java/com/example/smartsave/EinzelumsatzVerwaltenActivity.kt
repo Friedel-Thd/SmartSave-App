@@ -42,7 +42,7 @@ class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
         //TODO get umsatz per mitegebener Id oder so maybe mäßisch oder direkt mitgeben
         var umsatz = getUmsatz()
         //TODO je nach aufruf einzelumsätze eines umsatzes bzw. einzelumsätze ohne zugewiesenen umsatz glaub ich so mäßisch
-        var einzelumsatzListe = umsatz.getEinzelumsatzListe()
+        var einzelumsatzListe = umsatz.einzelumsatzListe
 
         val kontenListe by remember { kontenListeState }
 

@@ -112,6 +112,11 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                                     startActivity(intent)
                                 }
                             })
+                        //TODO DELETE
+                        ListItem(text = "Testdaten anlegen",
+                            modifier = Modifier.clickable {
+                                db.insertTestData(db)
+                            })
                     }
                 }
             }
@@ -123,7 +128,6 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                     IconListItem(
                         text = bankkonto!!.kontostand.toString(),
                         modifier = Modifier.clickable {
-                            //TODO KontoID mitgeben
                             val intent = Intent(this@MainActivity, KontoansichtActivity::class.java)
                             startActivity(intent)
                         },

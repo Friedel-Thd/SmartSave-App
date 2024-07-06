@@ -1,14 +1,14 @@
 package com.example.smartsave.dataClasses
 
 import java.io.Serializable
-import java.util.Date
+import java.time.LocalDate
 
-data class Sparziel(val name: String, val betrag : Double, val zieldatum : Date, val monatsrate : Double, val zielKonto: Konto, val auszahlungsKonto : Konto) : Serializable {
+data class Sparziel(val name: String, val betrag: Double, val zieldatum: LocalDate, val monatsrate: Double, val zielKonto: Konto, val auszahlungsKonto: Konto) : Serializable {
     var id = 0
     fun getEinzahlungsliste(): List<Umsatz> {
         //TODO entfernen todo wenn der aal hier getestet ist
         var einzahlungsListe: List<Umsatz> = mutableListOf()
-        for (einzahlung in zielKonto.umsatzLst) {
+        for (einzahlung in zielKonto.umsatzList) {
             if (einzahlung.verwendungsZweck == this.name) {
                 val mutableList = einzahlungsListe.toMutableList()
                 mutableList.add(einzahlung)
@@ -20,7 +20,7 @@ data class Sparziel(val name: String, val betrag : Double, val zieldatum : Date,
 
     fun calculateProgress(): Int {
         var summe = 0.0
-        for (einzahlung in zielKonto.umsatzLst) {
+        for (einzahlung in zielKonto.umsatzList) {
             if (einzahlung.verwendungsZweck == this.name) {
                 summe += einzahlung.betrag
             }

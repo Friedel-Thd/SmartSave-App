@@ -33,6 +33,8 @@ import com.example.smartsave.helpers.LabelledDatePickerButton
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
 
@@ -115,7 +117,7 @@ class SparzielActivity : SmartSaveActivity() {
             isError = textBetrag.isEmpty() || textName.isEmpty() || selectedDate.isEmpty() || zielKonto == null || ausgangKonto == null
             if(!isError){
                 val intent = Intent(this@SparzielActivity, SparzielAnAufActivity::class.java)
-                val tempSparziel = Sparziel(textName, textBetrag.toDouble(), SimpleDateFormat("dd/MM/yyyy").parse(selectedDate)!!, monatsRate, zielKonto!!, ausgangKonto!!)
+                val tempSparziel = Sparziel(textName, textBetrag.toDouble(),  LocalDate.parse(selectedDate, DateTimeFormatter.ofPattern("dd/MM/yyyy")), monatsRate, zielKonto!!, ausgangKonto!!)
                 intent.putExtra("Sparziel", tempSparziel)
                 intent.putExtra("mode", "anlegen")
                 startActivity(intent)

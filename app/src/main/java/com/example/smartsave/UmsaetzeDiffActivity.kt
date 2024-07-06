@@ -20,6 +20,7 @@ import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
 import com.example.smartsave.helpers.UmsatzDiffDateListItem
 import com.example.smartsave.helpers.UmsatzDiffListItem
+import java.time.LocalDate
 import java.util.Date
 
 class UmsaetzeDiffActivity : SmartSaveActivity() {
@@ -38,7 +39,7 @@ class UmsaetzeDiffActivity : SmartSaveActivity() {
         ) {
             UmsatzDiffDateListItem(umsatz)
 
-            for (einzelumsatz in umsatz.getEinzelumsatzListe()) {
+            for (einzelumsatz in umsatz.einzelumsatzListe) {
                 UmsatzDiffListItem(einzelumsatz)
             }
 
@@ -76,15 +77,15 @@ class UmsaetzeDiffActivity : SmartSaveActivity() {
 }
 
 fun getUmsatz(): Umsatz {
-    val umsatz = Umsatz("umsatz", 34.55, Date(10,10,10))
+    val umsatz = Umsatz("umsatz", 34.55, LocalDate.of(10,10,10))
 
-    val einzelumsatz1 = Einzelumsatz("Döner", 5.0,Date(10,10,10))
-    einzelumsatz1.setKategorie(Kategorie("Essen"))
-    umsatz.setKategorie(Kategorie("Gym"))
+    val einzelumsatz1 = Einzelumsatz("Döner", 5.0,LocalDate.of(10,10,10))
+    einzelumsatz1.kategorie = (Kategorie("Essen"))
+    umsatz.kategorie = Kategorie("Gym")
     umsatz.addEinzelumsatz(einzelumsatz1)
 
-    val einzelumsatz2 = Einzelumsatz("Döner", 5.0,Date(10,10,10))
-    einzelumsatz2.setKategorie(Kategorie("Essen"))
+    val einzelumsatz2 = Einzelumsatz("Döner", 5.0,LocalDate.of(10,10,10))
+    einzelumsatz2.kategorie = (Kategorie("Essen"))
     umsatz.addEinzelumsatz(einzelumsatz2)
 
     return umsatz

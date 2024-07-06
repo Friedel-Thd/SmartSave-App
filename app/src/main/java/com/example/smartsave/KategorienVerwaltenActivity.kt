@@ -32,7 +32,6 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
     private val kategorienListeState = mutableStateOf<List<Kategorie>>(emptyList())
     var db = DbHelper(this)
     override fun onCreate(savedInstanceState: Bundle?) {
-        //TODO getKat (DB)
         kategorienListeState.value = db.getKategorienListe()
         super.onCreate(savedInstanceState)
     }

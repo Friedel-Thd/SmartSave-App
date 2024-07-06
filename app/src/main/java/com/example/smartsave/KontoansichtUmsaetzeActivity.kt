@@ -176,18 +176,18 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
 
 
     fun getUmsaetze(): List<Umsatz> {
-        val umsatz1 = Umsatz("umsatz1", 534.55, Date(10,10,10))
-        val umsatz2 = Umsatz("umsatz2", 34.55,Date(10,10,10))
-        val umsatz3 = Umsatz("umsatz3", 4.55,Date(10,10,10))
-        val umsatz4 = Umsatz("umsatz4", 888.55,Date(10,10,10))
+        val umsatz1 = Umsatz("umsatz1", 534.55, LocalDate.of(10,10,10))
+        val umsatz2 = Umsatz("umsatz2", 34.55,LocalDate.of(10,10,10))
+        val umsatz3 = Umsatz("umsatz3", 4.55,LocalDate.of(10,10,10))
+        val umsatz4 = Umsatz("umsatz4", 888.55,LocalDate.of(10,10,10))
 
-        val einzelumsatz1 = Einzelumsatz("Döner", 5.0,Date(10,10,10))
-        einzelumsatz1.setKategorie(Kategorie("Essen"))
-        umsatz2.setKategorie(Kategorie("Gym"))
+        val einzelumsatz1 = Einzelumsatz("Döner", 5.0,LocalDate.of(10,10,10))
+        einzelumsatz1.kategorie = (Kategorie("Essen"))
+        umsatz2.kategorie = Kategorie("Gym")
         umsatz2.addEinzelumsatz(einzelumsatz1)
 
-        val einzelumsatz2 = Einzelumsatz("Döner", 5.0,Date(10,10,10))
-        einzelumsatz2.setKategorie(Kategorie("Essen"))
+        val einzelumsatz2 = Einzelumsatz("Döner", 5.0,LocalDate.of(10,10,10))
+        einzelumsatz2.kategorie = (Kategorie("Essen"))
         umsatz2.addEinzelumsatz(einzelumsatz2)
 
     val test = umsatz2.hasAssignedEinzelumsatz()

@@ -2,6 +2,7 @@ package com.example.smartsave.helpers
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -225,7 +226,27 @@ fun ListItem(text: String, modifier: Modifier = Modifier) {
 @Composable
 fun ListDivider() = HorizontalDivider(thickness = 2.dp, color = Color.Black)
 
-
+@Composable
+fun CategoryDisplay(color: Color, text: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Canvas(
+            modifier = Modifier
+                .padding(end = 30.dp)
+                .size(16.dp)
+        ) {
+            drawRect(
+                color = color,
+                size = size
+            )
+        }
+        StandardText(text = text)
+    }
+}
 
 //TODO Layout Anpassen
 @OptIn(ExperimentalMaterial3Api::class)
@@ -477,14 +498,14 @@ fun LabelledDropdownMenuUmsatz(
                   Button(onClick = {openAlertDialog = false }) {
                       //TODO Wenn der Umsatz unterumsätze besitzt -> Alle zugewiesenen unterumsätze der ausgewählten Kategorie zuweisen
                       if(umsatz.hasAssignedEinzelumsatz()) {
-                          umsatz.setKategorie(selectedOptionKategorie)
-                          for (einzelumsatz in umsatz.getEinzelumsatzListe()) {
-                              einzelumsatz.setKategorie(selectedOptionKategorie)
+                          umsatz.kategorie = selectedOptionKategorie
+                          for (einzelumsatz in umsatz.einzelumsatzListe) {
+                              einzelumsatz.kategorie = (selectedOptionKategorie)
                           }
                       } else {
                           //TODO Kategorie für alle Umsätze mit dem gleichen Verwendungszweck übernehmen
                           // Konto -> Umsatzliste -> Alle mit gleichem Verwendungszweck wie ausgewählte überweisung -> setKategorie
-                          umsatz.setKategorie(selectedOptionKategorie)
+                          umsatz.kategorie = selectedOptionKategorie
                       }
 
                     Text("Ja")

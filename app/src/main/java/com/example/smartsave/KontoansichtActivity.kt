@@ -2,6 +2,8 @@ package com.example.smartsave
 
 import DbHelper
 import android.content.Intent
+import android.os.Bundle
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -10,8 +12,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Slider
@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -32,8 +33,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.smartsave.dataClasses.Kategorie
+import com.example.smartsave.dataClasses.Konto
 import com.example.smartsave.dataClasses.Month
 import com.example.smartsave.helpers.AlignedButton
+import com.example.smartsave.helpers.CategoryDisplay
 import com.example.smartsave.helpers.IconListItem
 import com.example.smartsave.helpers.ListItem
 import com.example.smartsave.helpers.MainColumn
@@ -48,6 +51,15 @@ private const val MAX_MONTHS = 12
 
 class KontoansichtActivity : SmartSaveActivity() {
     var db = DbHelper(this)
+    private val bankkontoState = mutableStateOf<Konto?>(null)
+    private val kategorienListeState = mutableStateOf<List<Kategorie>>(emptyList())
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        bankkontoState.value = db.getBankkonto()
+        kategorienListeState.value = db.getKategorienListe()
+
+        super.onCreate(savedInstanceState)
+    }
 
     @Preview
     @Composable
@@ -55,70 +67,60 @@ class KontoansichtActivity : SmartSaveActivity() {
 
     @Composable
     override fun BoxScope.GenerateLayout() {
-        // Datum
         val currentMonth = LocalDate.now().let { Month(it.year, it.monthValue) }
-        // getBudget des monats
-        val budget = getBudget(currentMonth)
-        // getKategorien
-        val kategorienliste = getKategorienliste()
-        // gesamtausgaben
-        var gesamtausgaben = 0.0
+        var selectedDate by remember { mutableStateOf(currentMonth) }
+        val kategorienListe by remember { kategorienListeState }
+        val bankkonto by remember { bankkontoState }
 
         var months by remember { mutableIntStateOf(1) }
-
-        var bankkonto = db.getBankkonto()
-
 
         MainColumn(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
-
-            if(bankkonto != null) {
-                IconListItem(
-                    text = bankkonto.kontostand.toString(),
-                    modifier = Modifier.clickable {
-                        val intent = Intent(this@KontoansichtActivity, KontoansichtUmsaetzeActivity::class.java)
-                        startActivity(intent)
-                    },
-                    iconId = R.drawable.arrow_swap
-                )
-            }
+            IconListItem(
+                text = bankkonto!!.kontostand.toString(),
+                modifier = Modifier.clickable {
+                    val intent = Intent(this@KontoansichtActivity, KontoansichtUmsaetzeActivity::class.java)
+                    startActivity(intent)
+                },
+                iconId = R.drawable.arrow_swap
+            )
 
             ListItem(text = currentMonth.toString())
 
-
-            //TODO DRAW RECTANGLE FOR CATEGORIES
-            // INPUT -> Liste von Kategorien(Name, Betrag) -> Anteil an Ausgaben (Monat) -> Darstellung dann % mäßisch
-            // Dynamische Anzahl an Kategorien!
-            // Alle Umsätze & Kontostand
-            // Kontostand zu begin + alle einkünfte => Budget
-            // Ausgaben / Budget => Anteil in Prozent
+            //TODO Es gibt noch das problem, dass wenn mehrere kategorien mit dem selben namen existieren
+            // diese umsätze in diesen kategorien doppelt gezählt werden mäßig
             Canvas(modifier = Modifier
                 .fillMaxWidth()
                 .height(150.dp)
             ) {
                 inset(horizontal = 100f, vertical = 100f) {
-                    // draw nicht zugewiesenes Rect
+                    val gesamtausgaben = bankkonto!!.getUmsatz(LocalDate.now().let { selectedDate })
+                    val safeGesamtausgaben = if (gesamtausgaben == 0.0) 1.0 else gesamtausgaben
+
                     drawRect(color = Color.White, size = Size(size.width, size.height))
 
                     var x = 0f
-                    for ((index, kategorie) in kategorienliste.withIndex()) {
-                        //get anteil, draw rect mit entspr. größe
-                        val umsatzKategorie = getUmsatzKategorie(kategorie, currentMonth)
-                        gesamtausgaben += umsatzKategorie
-                        val percentageSize = calcPercentage(umsatzKategorie, budget)
+                    for ((index, kategorie) in kategorienListe.withIndex()) {
+                        if(kategorie.name != "Nicht zugeordnet") {
 
-                        val width = size.width * percentageSize.toFloat()
+                            val umsatzKategorie = bankkonto!!.getUmsatzKategorie(selectedDate, kategorie)
+                            val percentageSize = (umsatzKategorie / safeGesamtausgaben)
+                            val width = size.width * percentageSize.toFloat()
 
-                        // draw rect irgendwie mit dieser size richtig
-                        drawRect(
-                            color = colorGen(index),
-                            size = Size(width, size.height),
-                            topLeft = Offset(x, 0f)
-                        )
-                        x += width
+                            Log.d("KontoansichtActivity", "Kategorie: ${kategorie.name}, Umsatz: $umsatzKategorie, Percentage Size: $percentageSize, Width: $width")
+
+                            if(umsatzKategorie > 0.0) {
+                                drawRect(
+                                    color = colorGen(index),
+                                    size = Size(width, size.height),
+                                    topLeft = Offset(x, 0f)
+                                )
+                                x += width
+                            }
+                        }
                     }
                 }
             }
@@ -129,29 +131,16 @@ class KontoansichtActivity : SmartSaveActivity() {
                     .weight(1f, true),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                @Composable
-                fun CategoryDisplay(color: Color, text: String) = Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(40.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Canvas(modifier = Modifier
-                        .padding(end = 30.dp)
-                        .size(16.dp)
-                    ) {
-                        drawRect(
-                            color = color,
-                            size = size
+
+                for ((index, kategorie) in kategorienListe.withIndex()) {
+                    if(kategorie.name != "Nicht zugeordnet") {
+                        CategoryDisplay(
+                            color = colorGen(index),
+                            text = kategorie.name
                         )
                     }
-                    StandardText(text = text)
                 }
 
-                for ((index, kategorie) in kategorienliste.withIndex()) CategoryDisplay(
-                    color = colorGen(index),
-                    text = kategorie.name
-                )
                 CategoryDisplay(color = Color.White, text = "Nicht zugeordnet")
             }
 
@@ -161,7 +150,10 @@ class KontoansichtActivity : SmartSaveActivity() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(30.dp),
-                    onValueChange = { months = MAX_MONTHS - it.roundToInt() },
+                    onValueChange = {
+                        months = MAX_MONTHS - it.roundToInt()
+                        selectedDate = currentMonth - months
+                        },
                     valueRange = 0f..(MAX_MONTHS - 1f),
                     steps = MAX_MONTHS - 2
                 )
@@ -172,7 +164,7 @@ class KontoansichtActivity : SmartSaveActivity() {
                         modifier = Modifier.fillMaxWidth(1f / 3)
                     )
                     Text(
-                        text = "ab ${currentMonth - months}",
+                        text = "ab ${selectedDate}",
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.ExtraBold,
                         modifier = Modifier.fillMaxWidth(.5f)
@@ -189,29 +181,6 @@ class KontoansichtActivity : SmartSaveActivity() {
         AlignedButton(alignment = Alignment.BottomCenter, text = "Zurück") {finish()}
     }
 
-    private fun calcPercentage(umsatzKategorie: Double, budget: Double): Double {
-        //TODO Berechne Anteil des umsatzes einer Kategorie am Budget
-        return (umsatzKategorie / budget)
-    }
-
-    private fun getUmsatzKategorie(kategorie: Kategorie, month: Month): Double {
-        //TODO summa alle umsätze/ausgaben einer kategorie seit bestimmtem monat/jahr
-        return 150.0
-    }
-
-    private fun getKategorienliste() = buildList {
-        //TODO Implement datenbank kram
-        repeat(16) {
-            add(Kategorie("Kategorie $it"))
-        }
-    }
-
-    private fun getBudget(month: Month): Double {
-        //TODO Implement datenbank kram, hole summe aller ausgaben
-        return 3000.0
-    }
-
 }
-
 
 private fun colorGen(index: Int) = Color.hsv((index * 67.5f) % 360, 1f, 1f)
