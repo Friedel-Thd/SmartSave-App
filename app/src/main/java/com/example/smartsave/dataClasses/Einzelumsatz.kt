@@ -8,6 +8,7 @@ import java.util.Date
 data class Einzelumsatz (val verwendungsZweck: String, val betrag: Double, val datum: LocalDate): Serializable {
     var kategorie = Kategorie("Nicht zugeordnet")
     var id = 0
+    var hasParentUmsatz = false
     fun isAssigned(): Boolean {
         //TODO return false if umsatz.kategorie is "Nicht zugeordnet" else return true
         return (kategorie.name != "Nicht zugeordnet")

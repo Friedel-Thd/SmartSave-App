@@ -160,15 +160,28 @@ fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifi
             )
 
     ){
-        Icon(
-            imageVector = ImageVector.vectorResource(id = R.drawable.plus),
-            modifier = Modifier
-                .size(50.dp)
-                .align(Alignment.CenterVertically)
-                .padding(start = 20.dp),
-            contentDescription = "drawable icons",
-            tint = Color.Unspecified
-        )
+        if(einzelumsatz.hasParentUmsatz){
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.tick),
+                modifier = Modifier
+                    .size(50.dp)
+                    .align(Alignment.CenterVertically)
+                    .padding(start = 20.dp),
+                contentDescription = "drawable icons",
+                tint = Color.Unspecified
+            )
+        } else {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.x_taste),
+                modifier = Modifier
+                    .size(50.dp)
+                    .align(Alignment.CenterVertically)
+                    .padding(start = 20.dp),
+                contentDescription = "drawable icons",
+                tint = Color.Unspecified
+            )
+        }
+
 
         Text(text = einzelumsatz.verwendungsZweck, modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
         Text(text = "${einzelumsatz.betrag.toString()}€", modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))

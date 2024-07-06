@@ -3,6 +3,7 @@ package com.example.smartsave
 import DbHelper
 import android.content.Intent
 import android.os.Bundle
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.height
@@ -18,19 +19,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.smartsave.dataClasses.Einzelumsatz
 import com.example.smartsave.dataClasses.Konto
+import com.example.smartsave.dataClasses.Umsatz
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.EinzelumsatzListItem
 import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
+import com.example.smartsave.helpers.UmsatzDiffListItem
 
 class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
-    private val kontenListeState = mutableStateOf<List<Konto>>(emptyList())
+    private val einzelUmsatzListeState = mutableStateOf<List<Einzelumsatz>>(emptyList())
+    private val kontoListState = mutableStateOf<List<Konto>>(emptyList())
     var db = DbHelper(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         //TODO get alle konten (außer sparkonten evtl)
-        kontenListeState.value = db.getKreditKontenListe()
+        einzelUmsatzListeState.value = db.getEinzelumsatzListe()
         super.onCreate(savedInstanceState)
     }
     @Preview
@@ -40,21 +45,20 @@ class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
     @Composable
     override fun BoxScope.GenerateLayout() {
         //TODO get umsatz per mitegebener Id oder so maybe mäßisch oder direkt mitgeben
-        var umsatz = getUmsatz()
         //TODO je nach aufruf einzelumsätze eines umsatzes bzw. einzelumsätze ohne zugewiesenen umsatz glaub ich so mäßisch
-        var einzelumsatzListe = umsatz.einzelumsatzListe
 
-        val kontenListe by remember { kontenListeState }
 
+        val einzelumsatzListe by remember { einzelUmsatzListeState }
+        val kontoListe by remember { kontoListState }
 
         MainColumn(
             modifier = Modifier.verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-
-            for (einzelumsatz in einzelumsatzListe) {
-                EinzelumsatzListItem(einzelumsatz, modifier = Modifier, LocalContext.current, kontenListe)
+            for (einzelumsatz in einzelumsatzListe){
+                EinzelumsatzListItem(einzelumsatz = einzelumsatz, context = LocalContext.current, kontenListe = kontoListe)
             }
+
 
         }
 

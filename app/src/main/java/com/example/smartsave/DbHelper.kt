@@ -4,10 +4,12 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
 import android.util.Log
+import com.example.smartsave.dataClasses.Einzelumsatz
 import com.example.smartsave.dataClasses.Kategorie
 import com.example.smartsave.dataClasses.Konto
 import com.example.smartsave.dataClasses.Sparziel
 import com.example.smartsave.dataClasses.Umsatz
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -220,9 +222,11 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         while (cursor.moveToNext()) {
             val kat = Kategorie(
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KategorieEntry.NAME))
+
             )
             kat.id = cursor.getInt(cursor.getColumnIndexOrThrow(SmartSaveContract.KategorieEntry.KATEGORIE_ID))
             katList.add(kat)
+
         }
         cursor.close()
         return katList
@@ -243,12 +247,22 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
             arrayOf(kat.name)
         )
     }
+    fun insertEinzelumsatz(einzelumsatz: Einzelumsatz){
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(SmartSaveContract.EinzelumsatzEntry.BETRAG,einzelumsatz.betrag)
+            put(SmartSaveContract.EinzelumsatzEntry.DATUM, SimpleDateFormat("dd/MM/yyyy").format(einzelumsatz.datum))
+            put(SmartSaveContract.EinzelumsatzEntry.VERWENDUNGSZWECK, einzelumsatz.verwendungsZweck)
+        }
+        val sparzielId = db.insert(SmartSaveContract.EinzelumsatzEntry.TABLE_NAME, null, values)
+    }
 
 
     private fun loadUmsaetzeForKonto(kontonummer: Int): List<Umsatz> {
         val umsaetze = mutableListOf<Umsatz>()
         val db = readableDatabase
 
+        // Abfrage für Umsätze
         val query = "SELECT * FROM ${SmartSaveContract.UmsatzEntry.TABLE_NAME} WHERE ${SmartSaveContract.UmsatzEntry.KONTONUMMER} = ?"
         val cursor = db.rawQuery(query, arrayOf(kontonummer.toString()))
 
@@ -260,12 +274,14 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
             )
             umsatz.id = cursor.getInt(cursor.getColumnIndexOrThrow(SmartSaveContract.UmsatzEntry.UMSATZ_ID))
 
+            // Kategoriezuweisung abfragen
             val kategorieIdQuery = "SELECT ${SmartSaveContract.KategorieZuweisungEntry.KATEGORIE_ID} FROM ${SmartSaveContract.KategorieZuweisungEntry.TABLE_NAME} WHERE ${SmartSaveContract.KategorieZuweisungEntry.UMSATZ_ID} = ?"
             val kategorieIdCursor = db.rawQuery(kategorieIdQuery, arrayOf(umsatz.id.toString()))
 
             if (kategorieIdCursor.moveToFirst()) {
                 val kategorieId = kategorieIdCursor.getInt(kategorieIdCursor.getColumnIndexOrThrow(SmartSaveContract.KategorieZuweisungEntry.KATEGORIE_ID))
 
+                // Kategorie abfragen
                 val kategorieQuery = "SELECT * FROM ${SmartSaveContract.KategorieEntry.TABLE_NAME} WHERE ${SmartSaveContract.KategorieEntry.KATEGORIE_ID} = ?"
                 val kategorieCursor = db.rawQuery(kategorieQuery, arrayOf(kategorieId.toString()))
 
@@ -279,9 +295,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
                 kategorieCursor.close()
             }
             kategorieIdCursor.close()
-
-            //TODO get einzelumsatzliste
-
+            umsatz.einzelumsatzListe = loadEinzelumsaetzeForUmsatz(umsatz.id)
 
             umsaetze.add(umsatz)
         }
@@ -289,6 +303,26 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         return umsaetze
     }
 
+    private fun loadEinzelumsaetzeForUmsatz(umsatzId: Int): List<Einzelumsatz> {
+        val einzelumsaetze = mutableListOf<Einzelumsatz>()
+        val db = readableDatabase
+
+        // Abfrage für Einzelumsätze
+        val query = "SELECT * FROM ${SmartSaveContract.EinzelumsatzEntry.TABLE_NAME} WHERE ${SmartSaveContract.EinzelumsatzEntry.EINZELUMSATZ_ID} = ?"
+        val cursor = db.rawQuery(query, arrayOf(umsatzId.toString()))
+
+        while (cursor.moveToNext()) {
+            val einzelumsatz = Einzelumsatz(
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.EinzelumsatzEntry.VERWENDUNGSZWECK)),
+                cursor.getDouble(cursor.getColumnIndexOrThrow(SmartSaveContract.EinzelumsatzEntry.BETRAG)),
+                parseDate(cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.EinzelumsatzEntry.DATUM)))
+            )
+            einzelumsatz.id = cursor.getInt(cursor.getColumnIndexOrThrow(SmartSaveContract.EinzelumsatzEntry.EINZELUMSATZ_ID))
+            einzelumsaetze.add(einzelumsatz)
+        }
+        cursor.close()
+        return einzelumsaetze
+    }
     fun getKreditKontenListe(): List<Konto> {
         val kreditKontenListe: MutableList<Konto> = mutableListOf()
         val db = readableDatabase
@@ -336,6 +370,36 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         cursor.close()
         return kontoListe
     }
+    //Holt alle Umsätze, die nicht einer Kategorie zugeordnet sind
+    fun getEinzelumsatzListe(): List<Einzelumsatz> {
+        val einzelumsatzListe: MutableList<Einzelumsatz> = mutableListOf()
+        val db = readableDatabase
+        val query = "SELECT * FROM ${SmartSaveContract.EinzelumsatzEntry.TABLE_NAME}"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext()) {
+            val einzelumsatz = Einzelumsatz(
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.EinzelumsatzEntry.VERWENDUNGSZWECK)),
+                cursor.getDouble(cursor.getColumnIndexOrThrow(SmartSaveContract.EinzelumsatzEntry.BETRAG)),
+                parseDate(cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.EinzelumsatzEntry.DATUM)))
+            )
+            einzelumsatz.id = cursor.getInt(cursor.getColumnIndexOrThrow(SmartSaveContract.EinzelumsatzEntry.EINZELUMSATZ_ID))
+
+            // Überprüfen, ob der Einzelumsatz in der Einzelumsatzzuweisung-Tabelle existiert
+            val checkQuery = "SELECT * FROM ${SmartSaveContract.EinzelumsatzZuweisungEntry.TABLE_NAME} WHERE ${SmartSaveContract.EinzelumsatzEntry.EINZELUMSATZ_ID} = ${einzelumsatz.id}"
+            val checkCursor = db.rawQuery(checkQuery, null)
+
+            if (checkCursor.moveToFirst()) {
+                einzelumsatz.hasParentUmsatz = true
+            }
+
+            checkCursor.close()
+            einzelumsatzListe.add(einzelumsatz)
+        }
+        cursor.close()
+        return einzelumsatzListe
+    }
+
 
     fun getSparzielListe(): List<Sparziel> {
         val sparzielListe: MutableList<Sparziel> = mutableListOf()
@@ -426,7 +490,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         val values = ContentValues().apply {
             put(SmartSaveContract.SparzielEntry.NAME, sparziel.name)
             put(SmartSaveContract.SparzielEntry.BETRAG, sparziel.betrag)
-            put(SmartSaveContract.SparzielEntry.ZIELDATUM, sparziel.zieldatum.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            put(SmartSaveContract.SparzielEntry.ZIELDATUM, SimpleDateFormat("dd/MM/yyyy").format(sparziel.zieldatum))
             put(SmartSaveContract.SparzielEntry.MONATSRATE, sparziel.monatsrate)
         }
         val sparzielId = db.insert(SmartSaveContract.SparzielEntry.TABLE_NAME, null, values)
@@ -460,23 +524,23 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         dbHelper.insertKonto(konto)
 
         // Kategorien einfügen
-        val kategorien = listOf("Nicht zugeordnet", "Lebensmittel", "Auto", "Miete", "Unterhaltung", "Reisen", "Bildung")
+        val kategorien = listOf("Lebensmittel", "Auto", "Miete", "Unterhaltung", "Reisen", "Bildung")
         kategorien.forEach { kategorie ->
             dbHelper.insertKategorie(Kategorie(kategorie))
         }
 
         // Umsätze einfügen
         val umsaetze = listOf(
-            Triple("Testumsatz 1", 3000.0, "01/02/2024"),
-            Triple("Testumsatz 2", -150.0, "15/03/2024"),
-            Triple("Testumsatz 3", -200.0, "28/04/2024"),
-            Triple("Testumsatz 4", -250.0, "12/05/2024"),
-            Triple("Testumsatz 5", -300.0, "05/06/2024"),
+            Triple("Testumsatz 1", 100.0, "01/02/2024"),
+            Triple("Testumsatz 2", 150.0, "15/03/2024"),
+            Triple("Testumsatz 3", 200.0, "28/04/2024"),
+            Triple("Testumsatz 4", 250.0, "12/05/2024"),
+            Triple("Testumsatz 5", 300.0, "05/06/2024"),
             Triple("Testumsatz 6", 50.0, "20/09/2023"),
-            Triple("Testumsatz 7", -75.0, "10/10/2023"),
-            Triple("Testumsatz 8", -125.0, "25/11/2023"),
+            Triple("Testumsatz 7", 75.0, "10/10/2023"),
+            Triple("Testumsatz 8", 125.0, "25/11/2023"),
             Triple("Testumsatz 9", 175.0, "08/12/2023"),
-            Triple("Testumsatz 10", -225.0, "30/01/2024")
+            Triple("Testumsatz 10", 225.0, "30/01/2024")
         )
 
         val random = java.util.Random()
@@ -512,11 +576,11 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
         // Einzelumsätze einfügen
         val einzelumsaetze = listOf(
-            Triple("Test Einzelumsatz 1", -50.0, "02/01/2024"),
-            Triple("Test Einzelumsatz 2", -75.0, "14/02/2024"),
-            Triple("Test Einzelumsatz 3", -100.0, "27/03/2024"),
-            Triple("Test Einzelumsatz 4", -125.0, "10/04/2024"),
-            Triple("Test Einzelumsatz 5", -150.0, "23/05/2024")
+            Triple("Test Einzelumsatz 1", 50.0, "02/01/2024"),
+            Triple("Test Einzelumsatz 2", 75.0, "14/02/2024"),
+            Triple("Test Einzelumsatz 3", 100.0, "27/03/2024"),
+            Triple("Test Einzelumsatz 4", 125.0, "10/04/2024"),
+            Triple("Test Einzelumsatz 5", 150.0, "23/05/2024")
         )
 
         einzelumsaetze.forEachIndexed { index, (verwendungszweck, betrag, datum) ->

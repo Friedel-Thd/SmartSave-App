@@ -21,7 +21,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.smartsave.dataClasses.Einzelumsatz
 import com.example.smartsave.dataClasses.Kategorie
+import com.example.smartsave.dataClasses.parseDate
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.LabelledDatePickerButton
 import com.example.smartsave.helpers.LabelledDropdownMenuKategory
@@ -29,6 +31,9 @@ import com.example.smartsave.helpers.LabelledDropdownMenuUmsatz
 import com.example.smartsave.helpers.LabelledInputField
 import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.util.Locale
 
 class EinzelumsatzEditActivity : SmartSaveActivity() {
     var db = DbHelper(this)
@@ -42,6 +47,7 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
     @Preview
     @Composable
     fun PreviewLayout() = GenerateContent()
+
 
     @Composable
     override fun BoxScope.GenerateLayout(){
@@ -86,6 +92,9 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
 
             if(!isError){
                 //TODO Datenbank ding für einzelumsatz anlegen mesisch
+
+                db.insertEinzelumsatz(Einzelumsatz(textBezeichung,textBetrag.toDouble(), parseDate(selectedDate)))
+
                 finish()
             }
         }

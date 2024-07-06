@@ -30,7 +30,7 @@ import com.example.smartsave.helpers.SmartSaveActivity
 
 class KategorienVerwaltenActivity : SmartSaveActivity() {
     private val kategorienListeState = mutableStateOf<List<Kategorie>>(emptyList())
-    var db = DbHelper(this)
+   private var db = DbHelper(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         kategorienListeState.value = db.getKategorienListe()
         super.onCreate(savedInstanceState)
@@ -45,10 +45,7 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
     override fun BoxScope.GenerateLayout() {
         val kategorienListe by remember { kategorienListeState }
         var selectedKategorie by remember { mutableStateOf<Kategorie?>(null) }
-        var isError by remember { mutableStateOf(false) }
-
         var textKategorie by remember { mutableStateOf("") }
-
         var showDialogAnlegen by remember { mutableStateOf(false) }
         var showDialogLoeschen by remember { mutableStateOf(false) }
         var showDialogAssignedLoeschen by remember { mutableStateOf(false) }
