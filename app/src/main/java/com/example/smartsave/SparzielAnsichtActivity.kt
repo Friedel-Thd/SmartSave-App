@@ -39,8 +39,9 @@ class SparzielAnsichtActivity: SmartSaveActivity() {
 
             SparzielAnsichtListItem(sparziel.name, "${sparziel.calculateProgress()}%", Modifier)
             for (einzahlung in einzahlungsListe) {
+                //TODO darstellung -+
                 SparzielEinzahlungListItem(einzahlung, Modifier)
-                summe += einzahlung.betrag
+                summe += -einzahlung.betrag
             }
             SparzielAnsichtListItem("Summe", "$summe€", Modifier)
         }

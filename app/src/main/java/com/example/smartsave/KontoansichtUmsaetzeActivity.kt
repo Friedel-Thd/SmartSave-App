@@ -149,8 +149,7 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
                     verticalArrangement = Arrangement.spacedBy(12.dp)
 
                 ) {
-                    for ((index, umsatz) in konto.umsatzList.withIndex()) Row() {
-                        //TODO ausgewählten umsatz bzw. umsatzID mitgeben
+                    for (umsatz in konto.umsatzList) Row() {
                         LabelledDropdownMenuUmsatz(kategorienListe, umsatz, LocalContext.current)
                     }
                 }

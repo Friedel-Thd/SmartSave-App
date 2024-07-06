@@ -204,14 +204,16 @@ fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifi
 
 @Composable
 fun SparzielEinzahlungListItem(einzahlung: Umsatz, modifier: Modifier = Modifier) {
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
     Column( modifier = modifier.fillMaxWidth() ) {
-        Text(text = "Datum", modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
+        Text(text = einzahlung.datum.format(formatter), modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
         Row(
             modifier = modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ){
             Text(text = einzahlung.verwendungsZweck, modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
-            Text(text = "${einzahlung.betrag}€", modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
+            Text(text = "${-einzahlung.betrag}€", modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
         }
     }
     ListDivider()
@@ -444,7 +446,6 @@ fun LabelledDropdownMenuUmsatz(
                     }
 
                 ) {
-                    //TODO Vorausgewählte kategorie setzen mäßig
                     options.forEach { selectionOption ->
                         DropdownMenuItem(
                             text = { Text(text = selectionOption.name) },
@@ -478,7 +479,7 @@ fun LabelledDropdownMenuUmsatz(
 
 
             ElevatedButton(
-                enabled = !umsatz.isAssigned(),
+                enabled = if(!umsatz.isAssigned()) false else true,
                 onClick = {
                 //TODO Layout #8 NUR WENN UMSATZ KEINE KATEGORIE ZUGEWIESEN HAT bzw. "NICHT ZUGEWIESEN"
                 // Übergabeparameter aktueller Umsatz mäßisch
