@@ -1,5 +1,6 @@
 package com.example.smartsave
 
+import DbHelper
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
@@ -14,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.smartsave.dataClasses.Einzelumsatz
 import com.example.smartsave.dataClasses.Kategorie
+import com.example.smartsave.dataClasses.Sparziel
 import com.example.smartsave.dataClasses.Umsatz
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.MainColumn
@@ -24,14 +26,15 @@ import java.time.LocalDate
 import java.util.Date
 
 class UmsaetzeDiffActivity : SmartSaveActivity() {
+    var db = DbHelper(this)
     @Preview
     @Composable
     fun PreviewLayout() = GenerateContent()
 
     @Composable
     override fun BoxScope.GenerateLayout() {
-        //TODO get umsatz per mitegebener Id oder so maybe mäßisch oder direkt mitgeben
-        var umsatz = getUmsatz()
+        val bundle = intent.extras
+        val umsatz = bundle!!.getSerializable("Umsatz") as Umsatz
 
         MainColumn(
             modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -74,19 +77,4 @@ class UmsaetzeDiffActivity : SmartSaveActivity() {
         }
 
     }
-}
-
-fun getUmsatz(): Umsatz {
-    val umsatz = Umsatz("umsatz", 34.55, LocalDate.of(10,10,10))
-
-    val einzelumsatz1 = Einzelumsatz("Döner", 5.0,LocalDate.of(10,10,10))
-    einzelumsatz1.kategorie = (Kategorie("Essen"))
-    umsatz.kategorie = Kategorie("Gym")
-    umsatz.addEinzelumsatz(einzelumsatz1)
-
-    val einzelumsatz2 = Einzelumsatz("Döner", 5.0,LocalDate.of(10,10,10))
-    einzelumsatz2.kategorie = (Kategorie("Essen"))
-    umsatz.addEinzelumsatz(einzelumsatz2)
-
-    return umsatz
 }

@@ -115,8 +115,10 @@ fun SparzielAnsichtListItem(text1: String, text2: String, modifier: Modifier = M
 
 @Composable
 fun UmsatzDiffDateListItem(umsatz: Umsatz, modifier: Modifier = Modifier) {
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
     Column( modifier = modifier.fillMaxWidth() ) {
-        Text(text = "Datum", modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
+        Text(text = umsatz.datum.format(formatter), modifier = Modifier.padding(vertical = 8.dp), style = TextStyle(fontSize = 24.sp))
         Row(
             modifier = modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -244,7 +246,7 @@ fun ListItem(text: String, modifier: Modifier = Modifier) {
 fun ListDivider() = HorizontalDivider(thickness = 2.dp, color = Color.Black)
 
 @Composable
-fun CategoryDisplay(color: Color, text: String) {
+fun CategoryDisplay(color: Color, text: String, betrag: Double) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -261,7 +263,7 @@ fun CategoryDisplay(color: Color, text: String) {
                 size = size
             )
         }
-        StandardText(text = text)
+        StandardText(text = "$text ($betrag€)")
 
 
     }
@@ -407,9 +409,12 @@ fun LabelledDatePickerButton(label: String, selectedDate: String, onDateSelected
 }
 
 
+
+//TODO Für KontoansichtUmsaetzeActivity aber hab es mit extra Composable nicht hinbekommen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LabelledDropdownMenuUmsatz(
+    konto: Konto,
     options: List<Kategorie>,
     umsatz: Umsatz,
     context: Context
@@ -494,8 +499,7 @@ fun LabelledDropdownMenuUmsatz(
             ElevatedButton(
                 enabled = !umsatz.isAssigned(),
                 onClick = {
-                //TODO Layout #8 NUR WENN UMSATZ KEINE KATEGORIE ZUGEWIESEN HAT bzw. "NICHT ZUGEWIESEN"
-                // Übergabeparameter aktueller Umsatz mäßisch
+                // TODO Übergabeparameter aktueller Umsatz mäßisch
                 val intent = Intent(context, UmsaetzeDiffActivity::class.java)
                 context.startActivity(intent)
             }) {
@@ -516,42 +520,49 @@ fun LabelledDropdownMenuUmsatz(
                 confirmButton = {
                   Button(onClick = {
                       openAlertDialog = false
-                      //TODO Wenn der Umsatz unterumsätze besitzt -> Alle zugewiesenen unterumsätze der ausgewählten Kategorie zuweisen
-                      if(umsatz.hasAssignedEinzelumsatz()) {
-                          umsatz.kategorie = selectedOptionKategorie
-                          for (einzelumsatz in umsatz.einzelumsatzListe) {
-                              einzelumsatz.kategorie = (selectedOptionKategorie)
+
+                      //TODO Testen kategorie zuweisung mit verwendungszweck, einzelumsätzen
+
+                      //Kategorie für alle Umsätze mit gleichem Verwendungszweck inkl möglicher einzzelumsätze setzen
+                      for (um in konto.umsatzList) {
+                          if (um.verwendungsZweck == umsatz.verwendungsZweck) {
+                              um.kategorie = selectedOptionKategorie
+                              db.updateKategorieZuweisung(selectedOptionKategorie.id, um.id, false)
+                              if (um.hasEinzelumsatz()) {
+                                  for (eum in um.einzelumsatzListe) {
+                                      eum.kategorie = selectedOptionKategorie
+                                      db.updateKategorieZuweisung(selectedOptionKategorie.id, eum.id, true)
+                                  }
+                              }
                           }
-                      } else {
-                          //TODO Kategorie für alle Umsätze mit dem gleichen Verwendungszweck übernehmen
-                          // Konto -> Umsatzliste -> Alle mit gleichem Verwendungszweck wie ausgewählte überweisung -> setKategorie
-                          umsatz.kategorie = selectedOptionKategorie
                       }
+
+                      //TODO Hier aktualisieren
+
                   }) {
                     Text("Ja")
                 } },
                 dismissButton = {
                     TextButton(onClick = {
                         openAlertDialog = false
-                        if(!umsatz.hasAssignedEinzelumsatz()) {
 
-                            Log.d("Change Kategorie", "$selectedOptionKategorie, ${selectedOptionKategorie.id}")
-                            Log.d("Change Umsatz", "$umsatz, ${umsatz.id}")
-
-                            umsatz.kategorie = selectedOptionKategorie
-                            db.updateKategorieZuweisung(selectedOptionKategorie.id, umsatz.id, false)
+                        // Kategorie für ausgewählten Umsatz inkl möglicher einzelumsätze setzen
+                        umsatz.kategorie = selectedOptionKategorie
+                        db.updateKategorieZuweisung(selectedOptionKategorie.id, umsatz.id, false)
+                        if(umsatz.hasEinzelumsatz()) {
+                            for (einzelumsatz in umsatz.einzelumsatzListe) {
+                                einzelumsatz.kategorie = selectedOptionKategorie
+                                db.updateKategorieZuweisung(selectedOptionKategorie.id, einzelumsatz.id, true)
+                            }
                         }
+
+                        //TODO Hier aktualisieren
+
                     }) {
                         Text("Nein")
                     }
                 },
-                text = {
-                    if(umsatz.hasAssignedEinzelumsatz()) {
-                        Text("Die Kategorie aller zugewiesenen Einzelumsätze zu ${selectedOptionKategorie.name} ändern?")
-                    } else {
-                        Text("Kategorie für alle Umsätze mit diesem Verwendungszweck übernehmen?")
-                    }
-                }
+                text = { Text("Kategorie für alle Umsätze mit diesem Verwendungszweck übernehmen?") }
             )
         }
     }
