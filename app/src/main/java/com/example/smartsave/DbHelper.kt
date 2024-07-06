@@ -249,11 +249,12 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         val db = writableDatabase
         val values = ContentValues().apply {
             put(SmartSaveContract.EinzelumsatzEntry.BETRAG,einzelumsatz.betrag)
-            put(SmartSaveContract.EinzelumsatzEntry.DATUM, SimpleDateFormat("dd/MM/yyyy").format(einzelumsatz.datum))
+            put(SmartSaveContract.EinzelumsatzEntry.DATUM, einzelumsatz.datum.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
             put(SmartSaveContract.EinzelumsatzEntry.VERWENDUNGSZWECK, einzelumsatz.verwendungsZweck)
         }
         val sparzielId = db.insert(SmartSaveContract.EinzelumsatzEntry.TABLE_NAME, null, values)
     }
+
 
 
     private fun loadUmsaetzeForKonto(kontonummer: Int): List<Umsatz> {
@@ -394,6 +395,27 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         cursor.close()
         return einzelumsatzListe
     }
+    fun addEinzelumsatzToUmsatz(umsatzId: Int, einzelumsatz: Einzelumsatz) {
+        val db = writableDatabase
+
+        // Füge den Einzelumsatz zur Einzelumsatz-Tabelle hinzu
+        val einzelumsatzValues = ContentValues().apply {
+            put(SmartSaveContract.EinzelumsatzEntry.VERWENDUNGSZWECK, einzelumsatz.verwendungsZweck)
+            put(SmartSaveContract.EinzelumsatzEntry.BETRAG, einzelumsatz.betrag)
+            put(SmartSaveContract.EinzelumsatzEntry.DATUM, einzelumsatz.datum.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))  // Assuming date is stored as a string
+        }
+
+        val einzelumsatzId = db.insert(SmartSaveContract.EinzelumsatzEntry.TABLE_NAME, null, einzelumsatzValues)
+
+        // Füge die Beziehung in der EinzelumsatzZuweisung-Tabelle hinzu
+        val zuweisungValues = ContentValues().apply {
+            put(SmartSaveContract.EinzelumsatzZuweisungEntry.UMSATZ_ID, umsatzId)
+            put(SmartSaveContract.EinzelumsatzZuweisungEntry.EINZELUMSATZ_ID, einzelumsatzId)
+        }
+
+
+        db.insert(SmartSaveContract.EinzelumsatzZuweisungEntry.TABLE_NAME, null, zuweisungValues)
+    }
 
 
     fun getSparzielListe(): List<Sparziel> {
@@ -526,9 +548,9 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
         // Umsätze einfügen
         val umsaetze = listOf(
-            Triple("Testumsatz 1", 3000.0, "01/02/2024"),
+            Triple("Nicht zugeordnet", -3000.0, "01/02/2024"),
             Triple("Testumsatz 2", -150.0, "15/03/2024"),
-            Triple("Testumsatz 3", -200.0, "28/04/2024"),
+            Triple("Nicht zugeordnet", -200.0, "28/04/2024"),
             Triple("Testumsatz 4", -250.0, "12/05/2024"),
             Triple("Testumsatz 5", -300.0, "05/06/2024"),
             Triple("Testumsatz 6", 50.0, "20/09/2023"),
@@ -564,7 +586,8 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
             // Kategoriezuweisung einfügen
             val kategoriezuweisungValues = ContentValues().apply {
-                put(SmartSaveContract.KategorieZuweisungEntry.KATEGORIE_ID, kategorieId)
+                //TODO wieder zurück changen ID technische diese diese
+                put(SmartSaveContract.KategorieZuweisungEntry.KATEGORIE_ID, 1)
                 put(SmartSaveContract.KategorieZuweisungEntry.UMSATZ_ID, umsatzId)
                 put(SmartSaveContract.KategorieZuweisungEntry.IS_EINZELUMSATZ, 0)
             }

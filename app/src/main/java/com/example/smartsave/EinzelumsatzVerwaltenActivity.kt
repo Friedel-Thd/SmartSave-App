@@ -3,6 +3,7 @@ package com.example.smartsave
 import DbHelper
 import android.content.Intent
 import android.os.Bundle
+import android.os.PersistableBundle
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
@@ -37,6 +38,12 @@ class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
         //TODO get alle konten (außer sparkonten evtl)
         einzelUmsatzListeState.value = db.getEinzelumsatzListe()
         super.onCreate(savedInstanceState)
+    }
+
+    override fun onResume() {
+        einzelUmsatzListeState.value = db.getEinzelumsatzListe()
+        kontoListState.value = db.getAllKonten()
+        super.onResume()
     }
     @Preview
     @Composable
