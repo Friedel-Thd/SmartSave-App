@@ -221,6 +221,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
             val kat = Kategorie(
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KategorieEntry.NAME))
             )
+            kat.id = cursor.getInt(cursor.getColumnIndexOrThrow(SmartSaveContract.KategorieEntry.KATEGORIE_ID))
             katList.add(kat)
         }
         cursor.close()
@@ -278,6 +279,9 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
                 kategorieCursor.close()
             }
             kategorieIdCursor.close()
+
+            //TODO get einzelumsatzliste
+
 
             umsaetze.add(umsatz)
         }
@@ -392,6 +396,28 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
         cursor.close()
         return konto
+    }
+
+    fun updateKategorieZuweisung(kategorieId: Int, umsatzId: Int, isEinzelumsatz: Boolean) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(SmartSaveContract.KategorieZuweisungEntry.KATEGORIE_ID, kategorieId)
+            put(SmartSaveContract.KategorieZuweisungEntry.IS_EINZELUMSATZ, if (isEinzelumsatz) 1 else 0)
+        }
+        val selection = "${SmartSaveContract.KategorieZuweisungEntry.UMSATZ_ID} = ?"
+        val selectionArgs = arrayOf(umsatzId.toString())
+
+        Log.d("DbHelper", "Values: $values")
+        Log.d("DbHelper", "Selection: $selection")
+        Log.d("DbHelper", "SelectionArgs: ${selectionArgs.contentToString()}")
+
+        val count = db.update(
+            SmartSaveContract.KategorieZuweisungEntry.TABLE_NAME,
+            values,
+            selection,
+            selectionArgs
+        )
+        Log.d("DbHelper", "Updated $count rows")
     }
 
     fun insertSparziel(sparziel: Sparziel) {

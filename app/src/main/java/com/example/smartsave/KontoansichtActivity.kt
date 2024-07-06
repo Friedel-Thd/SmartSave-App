@@ -17,10 +17,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,14 +52,19 @@ private const val MAX_MONTHS = 12
 
 class KontoansichtActivity : SmartSaveActivity() {
     var db = DbHelper(this)
-    private val bankkontoState = mutableStateOf<Konto?>(null)
-    private val kategorienListeState = mutableStateOf<List<Kategorie>>(emptyList())
+    private lateinit var kategorienListe: List<Kategorie>
+    private lateinit var bankkonto: Konto
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        bankkontoState.value = db.getBankkonto()
-        kategorienListeState.value = db.getKategorienListe()
-
+        bankkonto = db.getBankkonto()!!
+        kategorienListe = db.getKategorienListe()
         super.onCreate(savedInstanceState)
+    }
+
+    override fun onResume() {
+        bankkonto = db.getBankkonto()!!
+        kategorienListe = db.getKategorienListe()
+        super.onResume()
     }
 
     @Preview
@@ -68,10 +75,9 @@ class KontoansichtActivity : SmartSaveActivity() {
     override fun BoxScope.GenerateLayout() {
         val currentMonth = LocalDate.now().let { Month(it.year, it.monthValue) }
         var selectedDate by remember { mutableStateOf(currentMonth - 1) }
-        val kategorienListe by remember { kategorienListeState }
-        val bankkonto by remember { bankkontoState }
 
         var months by remember { mutableIntStateOf(1) }
+
 
         MainColumn(
             modifier = Modifier.fillMaxWidth(),
@@ -179,7 +185,7 @@ class KontoansichtActivity : SmartSaveActivity() {
             }
         }
 
-        AlignedButton(alignment = Alignment.BottomCenter, text = "Zurück") {finish()}
+        AlignedButton(alignment = Alignment.BottomCenter, text = "Zurück") { finish()}
     }
 
 }

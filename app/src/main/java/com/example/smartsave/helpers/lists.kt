@@ -1,7 +1,9 @@
 package com.example.smartsave.helpers
+import DbHelper
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -53,8 +55,8 @@ import com.example.smartsave.R
 import com.example.smartsave.UmsaetzeDiffActivity
 import com.example.smartsave.dataClasses.Umsatz
 import com.example.smartsave.UmsatzAuswahlZuordnungActivity
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
-
 
 fun LazyListScope.listItem(text: String, modifier: Modifier = Modifier) = item { ListItem(text, modifier) }
 
@@ -393,34 +395,34 @@ fun LabelledDatePickerButton(label: String, selectedDate: String, onDateSelected
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LabelledDropdownMenuUmsatz(
-    label: String,
     options: List<Kategorie>,
     umsatz: Umsatz,
     context: Context
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedOptionKategorie by remember { mutableStateOf(options[0]) }
+    var selectedOptionKategorie by remember { mutableStateOf(umsatz.kategorie) }
     var openAlertDialog  by remember { mutableStateOf(false) }
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    val db = DbHelper(context)
+
     Column{
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
-            //horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = label,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(start = 20.dp, end = 50.dp)
+                text = umsatz.datum.format(formatter),
+                textAlign = TextAlign.Center
             )
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 modifier = Modifier
-                    .width(150.dp)
-                    .height(50.dp)
-                    .padding(end = 50.dp),
+                    .width(175.dp)
+                    .height(50.dp),
                 onExpandedChange = { expanded = !expanded }
             ) {
                 TextField(
@@ -442,6 +444,7 @@ fun LabelledDropdownMenuUmsatz(
                     }
 
                 ) {
+                    //TODO Vorausgewählte kategorie setzen mäßig
                     options.forEach { selectionOption ->
                         DropdownMenuItem(
                             text = { Text(text = selectionOption.name) },
@@ -468,14 +471,14 @@ fun LabelledDropdownMenuUmsatz(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = umsatz.betrag.toString(),
+                text = umsatz.verwendungsZweck,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(start = 20.dp)
             )
 
 
             ElevatedButton(
-                enabled = if(!umsatz.isAssigned()) true else false,
+                enabled = !umsatz.isAssigned(),
                 onClick = {
                 //TODO Layout #8 NUR WENN UMSATZ KEINE KATEGORIE ZUGEWIESEN HAT bzw. "NICHT ZUGEWIESEN"
                 // Übergabeparameter aktueller Umsatz mäßisch
@@ -497,7 +500,8 @@ fun LabelledDropdownMenuUmsatz(
             AlertDialog(
                 onDismissRequest = { openAlertDialog = false },
                 confirmButton = {
-                  Button(onClick = {openAlertDialog = false }) {
+                  Button(onClick = {
+                      openAlertDialog = false
                       //TODO Wenn der Umsatz unterumsätze besitzt -> Alle zugewiesenen unterumsätze der ausgewählten Kategorie zuweisen
                       if(umsatz.hasAssignedEinzelumsatz()) {
                           umsatz.kategorie = selectedOptionKategorie
@@ -509,12 +513,22 @@ fun LabelledDropdownMenuUmsatz(
                           // Konto -> Umsatzliste -> Alle mit gleichem Verwendungszweck wie ausgewählte überweisung -> setKategorie
                           umsatz.kategorie = selectedOptionKategorie
                       }
-
+                  }) {
                     Text("Ja")
                 } },
                 dismissButton = {
-                    TextButton(onClick = { openAlertDialog = false }) {
-                        Text("Abbrechen")
+                    TextButton(onClick = {
+                        openAlertDialog = false
+                        if(!umsatz.hasAssignedEinzelumsatz()) {
+
+                            Log.d("Change Kategorie", "$selectedOptionKategorie, ${selectedOptionKategorie.id}")
+                            Log.d("Change Umsatz", "$umsatz, ${umsatz.id}")
+
+                            umsatz.kategorie = selectedOptionKategorie
+                            db.updateKategorieZuweisung(selectedOptionKategorie.id, umsatz.id, false)
+                        }
+                    }) {
+                        Text("Nein")
                     }
                 },
                 text = {

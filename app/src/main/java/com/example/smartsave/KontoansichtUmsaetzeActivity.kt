@@ -57,13 +57,13 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
 
         super.onCreate(savedInstanceState)
     }
+
     @Preview
     @Composable
     fun PreviewLayout() = GenerateContent()
 
     @Composable
     override fun BoxScope.GenerateLayout() {
-
         val bundle = intent.extras
         val konto: Konto = bundle!!.getSerializable("Konto") as Konto
         val kategorienListe by remember { kategorienListeState }
@@ -78,6 +78,9 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
                 .fillMaxWidth()
                 .fillMaxHeight()
         ) {
+            //TODO Filtern mit filterinput und umsatz.verwendungszweck
+            //TODO Filtern mit kategoriefilter und umsatz.kategorie
+            //TODO Filtern mit zeit (es kracht)
             LabelledInputField(label = "Filter", value = "", KeyboardOptions()) {
 
             }
@@ -148,7 +151,7 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
                 ) {
                     for ((index, umsatz) in konto.umsatzList.withIndex()) Row() {
                         //TODO ausgewählten umsatz bzw. umsatzID mitgeben
-                        LabelledDropdownMenuUmsatz(label = "Datum1", options = kategorienListe, umsatz, LocalContext.current)
+                        LabelledDropdownMenuUmsatz(kategorienListe, umsatz, LocalContext.current)
                     }
                 }
             }
@@ -164,6 +167,8 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
         ) {
 
         }
+
+        //TODO Import funktion imitieren mäßig, testdaten (umsätze) in konto einfügen
         AlignedButton(
             alignment = Alignment.BottomEnd,
             iconId = R.drawable.plus,
@@ -173,7 +178,8 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
         ) {
 
         }
-        AlignedButton(alignment = Alignment.BottomCenter, text = "Zurück", modifier = Modifier.height(70.dp)) { finish()
+        AlignedButton(alignment = Alignment.BottomCenter, text = "Zurück", modifier = Modifier.height(70.dp)) {
+            finish()
         }
     }
 
