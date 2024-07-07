@@ -12,4 +12,5 @@ data class Einzelumsatz (val verwendungsZweck: String, val betrag: Double, val d
     fun isAssigned(): Boolean {
         return (kategorie.name != "Nicht zugeordnet")
     }
+
 }

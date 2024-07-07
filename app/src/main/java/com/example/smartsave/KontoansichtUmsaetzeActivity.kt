@@ -40,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -53,7 +52,6 @@ import com.example.smartsave.dataClasses.Konto
 import com.example.smartsave.dataClasses.Month
 import com.example.smartsave.dataClasses.Umsatz
 import com.example.smartsave.helpers.AlignedButton
-import com.example.smartsave.helpers.LabelledDropdownMenuUmsatz
 import com.example.smartsave.helpers.LabelledInputField
 import com.example.smartsave.helpers.ListDivider
 import com.example.smartsave.helpers.MainColumn
@@ -278,6 +276,7 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
                                             enabled = !umsatz.isAssigned(),
                                             onClick = {
                                                 // TODO Übergabeparameter aktueller Umsatz mäßisch
+                                                // TODO Fixxen??
                                                 val intent = Intent(this@KontoansichtUmsaetzeActivity, UmsaetzeDiffActivity::class.java)
                                                 intent.putExtra("Umsatz", umsatz)
                                                 startActivity(intent)

@@ -63,7 +63,11 @@ class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             for (einzelumsatz in einzelumsatzListe){
-                EinzelumsatzListItem(einzelumsatz = einzelumsatz, context = LocalContext.current, kontenListe = kontoListe)
+                //TODO psychosen shit mit update in geschachteltem composable
+                EinzelumsatzListItem(einzelumsatz = einzelumsatz, context = LocalContext.current, kontenListe = kontoListe,
+                    onUpdate = {
+                        einzelUmsatzListeState.value = db.getEinzelumsatzListe()
+                    })
             }
 
 

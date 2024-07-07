@@ -2,6 +2,7 @@ package com.example.smartsave
 
 import DbHelper
 import android.content.Intent
+import android.os.Bundle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.height
@@ -15,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.smartsave.dataClasses.Einzelumsatz
 import com.example.smartsave.dataClasses.Kategorie
+import com.example.smartsave.dataClasses.Konto
 import com.example.smartsave.dataClasses.Sparziel
 import com.example.smartsave.dataClasses.Umsatz
 import com.example.smartsave.helpers.AlignedButton
@@ -27,21 +29,34 @@ import java.util.Date
 
 class UmsaetzeDiffActivity : SmartSaveActivity() {
     var db = DbHelper(this)
+    private lateinit var umsatz: Umsatz
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        val bundle = intent.extras
+        umsatz = bundle!!.getSerializable("Umsatz") as Umsatz
+
+        super.onCreate(savedInstanceState)
+    }
+    override fun onResume() {
+        umsatz = db.getUmsatzByID(umsatz.id)!!
+
+        super.onResume()
+    }
+
     @Preview
     @Composable
     fun PreviewLayout() = GenerateContent()
 
     @Composable
     override fun BoxScope.GenerateLayout() {
-        val bundle = intent.extras
-        val umsatz = bundle!!.getSerializable("Umsatz") as Umsatz
 
         MainColumn(
             modifier = Modifier.verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-           // UmsatzDiffDateListItem(umsatz)
+           UmsatzDiffDateListItem(umsatz)
 
+            //TODO Umsatz updaten onresume
             for (einzelumsatz in umsatz.einzelumsatzListe) {
                 UmsatzDiffListItem(einzelumsatz)
             }

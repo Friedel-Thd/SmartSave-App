@@ -143,7 +143,7 @@ fun UmsatzDiffListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifier
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifier, context:Context, kontenListe: List<Konto>) {
+fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifier, context:Context, kontenListe: List<Konto>, onUpdate: () -> Unit) {
     var showDialogAnlegen by remember { mutableStateOf(false) }
     var selectedKonto by remember { mutableStateOf<Konto?>(null) }
     Row(
@@ -196,9 +196,10 @@ fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifi
                 TextButton(onClick = {
                     showDialogAnlegen = false
                     val intent = Intent(context, UmsatzAuswahlZuordnungActivity::class.java)
-                    intent.putExtra("Konto",selectedKonto)
+                    intent.putExtra("Konto", selectedKonto)
                     intent.putExtra("Einzelumsatz", einzelumsatz)
                     context.startActivity(intent)
+                    onUpdate()
 
                 }) {
                     //TODO Neue Kategorie anlegen
@@ -280,9 +281,7 @@ fun labelledDropdownMenu(label: String, options: List<Konto>): Konto {
     var selectedOptionText by remember { mutableStateOf(options[0]) }
 
     Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier = Modifier.padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {

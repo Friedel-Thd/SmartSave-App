@@ -30,21 +30,21 @@ import com.example.smartsave.helpers.UmsatzDiffDateListItem
 class UmsatzAuswahlZuordnungActivity : SmartSaveActivity() {
     val db = DbHelper(this)
     private val umsatzListeState = mutableStateOf<List<Umsatz>>(emptyList())
-    private lateinit var konto:Konto
+    private val kontoState = mutableStateOf<Konto?>(null)
     @Preview
     @Composable
     fun PreviewLayout() = GenerateContent()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        db.getKontoByKontonummer(konto.kontonr)
         val bundle = intent.extras
-        konto = bundle!!.getSerializable("Konto") as Konto
-
-
+        kontoState.value = bundle!!.getSerializable("Konto") as Konto
         super.onCreate(savedInstanceState)
     }
+
     override fun onResume() {
-        konto = db.getKontoByKontonummer(konto.kontonr)!!
+        kontoState.value = db.getKontoByKontonummer(kontoState.value!!.kontonr)
+        umsatzListeState.value = kontoState.value!!.umsatzList
+
         super.onResume()
     }
 
@@ -54,7 +54,6 @@ class UmsatzAuswahlZuordnungActivity : SmartSaveActivity() {
         val bundle = intent.extras
         val einzelumsatz = bundle!!.getSerializable("Einzelumsatz") as Einzelumsatz
         val umsatzListe by remember { umsatzListeState }
-        umsatzListeState.value = konto.umsatzList
         var restBetrag = 0.0
 
         MainColumn (modifier = Modifier
@@ -72,8 +71,12 @@ class UmsatzAuswahlZuordnungActivity : SmartSaveActivity() {
                     UmsatzDiffDateListItem(umsatz,modifier = Modifier.clickable {
                         //TODO wenn man auf umsatz klickt wird der einzelumsatz da in die liste inserted
 
-                        einzelumsatz.hasParentUmsatz = true
-                        db.addEinzelumsatzToUmsatz(umsatz.id,einzelumsatz)
+                        if( einzelumsatz.hasParentUmsatz ) {
+                            db.updateEinzelumsatzZuweisung(einzelumsatz, umsatz.id)
+                        } else {
+                            einzelumsatz.hasParentUmsatz = true
+                            db.addEinzelumsatzToUmsatz(umsatz.id,einzelumsatz)
+                        }
                         finish()
 
                     })

@@ -56,23 +56,24 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
         ) {
 
             for (kategorie in kategorienListe) {
-                ListItem(
-                    text = kategorie.name,
-                    modifier = Modifier.combinedClickable(
-                        onClick = {
+                if (kategorie.name != "Nicht zugeordnet") {
+                    ListItem(
+                        text = kategorie.name,
+                        modifier = Modifier.combinedClickable(
+                            onClick = {
 
-                        },
-                        onLongClick = {
-                            selectedKategorie = kategorie
-                            if (kategorie.isAssigned()) {
-                                showDialogAssignedLoeschen = true
+                            },
+                            onLongClick = {
+                                selectedKategorie = kategorie
+                                if (db.kategorieisAssigned(kategorie)) {
+                                    showDialogAssignedLoeschen = true
+                                } else {
+                                    showDialogLoeschen = true
+                                }
                             }
-                            else {
-                                showDialogLoeschen = true
-                            }
-                        }
+                        )
                     )
-                )
+                }
             }
         }
 
@@ -112,8 +113,6 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
                 confirmButton = {
                     TextButton(onClick = {
                         showDialogAssignedLoeschen = false
-                        //TODO Kategorie inklusive allen zuweisungen löschen
-                        //TODO Nicht Zugewiesen nicht löschbar machen
                         if (selectedKategorie != null) {
                             db.removeKategorie(selectedKategorie!!)
                             val newkategorienListe = kategorienListe.toMutableList()
@@ -144,8 +143,6 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
                 confirmButton = {
                     TextButton(onClick = {
                         showDialogLoeschen = false
-                        //TODO Kategorie inklusive allen zuweisungen löschen (DB)
-                        //TODO Nicht Zugewiesen nicht löschbar machen
                         if (selectedKategorie != null) {
                             db.removeKategorie(selectedKategorie!!)
                             val newkategorienListe = kategorienListe.toMutableList()
@@ -165,7 +162,7 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
                         Text("Abbrechen")
                     }
                 },
-                title = { Text("Kategorie Löschen?") }
+                title = { Text("Kategorie löschen?") }
             )
         }
     }
