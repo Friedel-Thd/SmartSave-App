@@ -30,8 +30,8 @@ import com.example.smartsave.helpers.UmsatzDiffDateListItem
 
 class UmsatzAuswahlZuordnungActivity : SmartSaveActivity() {
     val db = DbHelper(this)
-    private val umsatzListeState = mutableStateOf<List<Umsatz>>(emptyList())
-    private val kontoState = mutableStateOf<Konto?>(null)
+    private lateinit var umsatzListe : List<Umsatz>
+    private  lateinit var  konto :Konto
     @Preview
     @Composable
     fun PreviewLayout() = GenerateContent()
@@ -39,25 +39,19 @@ class UmsatzAuswahlZuordnungActivity : SmartSaveActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val bundle = intent.extras
-        kontoState.value = bundle!!.getSerializable("Konto") as Konto
-        kontoState.value = db.getKontoByKontonummer(kontoState.value!!.kontonr)
-        umsatzListeState.value = kontoState.value!!.umsatzList
+        konto = bundle!!.getSerializable("Konto") as Konto
+        konto = db.getKontoByKontonummer(konto.kontonr)!!
+        umsatzListe= konto.umsatzList
 
     }
 
-    override fun onResume() {
-        kontoState.value = db.getKontoByKontonummer(kontoState.value!!.kontonr)
-        umsatzListeState.value = kontoState.value!!.umsatzList
-        Log.d("Resume zuordnung","ON RESUME CALLED")
-        super.onResume()
-    }
 
     @Composable
     override fun BoxScope.GenerateLayout(){
     // TODO Machene halt nech
         val bundle = intent.extras
         val einzelumsatz = bundle!!.getSerializable("Einzelumsatz") as Einzelumsatz
-        val umsatzListe by remember { umsatzListeState }
+       // val umsatzListe by remember { umsatzListeState }
         var restBetrag = 0.0
 
         MainColumn (modifier = Modifier
