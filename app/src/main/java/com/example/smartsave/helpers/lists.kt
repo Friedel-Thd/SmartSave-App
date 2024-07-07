@@ -136,22 +136,30 @@ fun UmsatzDiffListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifier
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifier, context:Context, kontenListe: List<Konto>, onUpdate: () -> Unit) {
+fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifier, context:Context, kontenListe: List<Konto>, noKontoError: Boolean, onUpdate: () -> Unit) {
     var showDialogAnlegen by remember { mutableStateOf(false) }
     var selectedKonto by remember { mutableStateOf<Konto?>(null) }
+    var noKontoError by remember { mutableStateOf(false) }
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier
             .fillMaxWidth()
             .combinedClickable(
                 onClick = {
-                    showDialogAnlegen = true
+                    if (kontenListe.isEmpty()) noKontoError = true
+
+                    if(!noKontoError){
+                        showDialogAnlegen = true
+                    }
+
+
                 },
                 onLongClick = {
                     val intent = Intent(context, EinzelumsatzEditActivity::class.java)
                     intent.putExtra("einzelumsatz", einzelumsatz)
                     intent.putExtra("mode", "editieren")
                     context.startActivity(intent)
+                    noKontoError = false
                 },
             )
 
@@ -213,6 +221,7 @@ fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifi
             }
         )
     }
+    if(noKontoError) ErrorMsg(msg = "Noch kein Konto hinterlegt!")
 }
 
 @Composable

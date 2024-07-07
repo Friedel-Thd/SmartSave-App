@@ -10,6 +10,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,6 +29,7 @@ import com.example.smartsave.helpers.SmartSaveActivity
 class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
     private lateinit var einzelUmsatzListe : List<Einzelumsatz>
     private lateinit var  kontoList : List<Konto>
+
     var db = DbHelper(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,12 +53,13 @@ class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
 
     @Composable
     override fun BoxScope.GenerateLayout() {
+        var noKontoError by remember { mutableStateOf(false) }
         MainColumn(
             modifier = Modifier.verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             for (einzelumsatz in einzelUmsatzListe){
-                EinzelumsatzListItem(einzelumsatz = einzelumsatz, context = LocalContext.current, kontenListe = kontoList,
+                EinzelumsatzListItem(einzelumsatz = einzelumsatz, context = LocalContext.current, kontenListe = kontoList, noKontoError = noKontoError,
                     onUpdate = {
                         einzelUmsatzListe = db.getEinzelumsatzListe()
                     })
@@ -66,12 +72,14 @@ class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
                 .height(70.dp)
                 .width(70.dp)
         ) {
+            noKontoError = false
             val intent = Intent(this@EinzelumsatzVerwaltenActivity, EinzelumsatzEditActivity::class.java)
             intent.putExtra("mode", "anlegen")
             startActivity(intent)
         }
 
         AlignedButton(alignment = Alignment.BottomCenter, text = "Abbrechen", modifier = Modifier.height(70.dp)) {
+            noKontoError = false
             finish()
         }
 
