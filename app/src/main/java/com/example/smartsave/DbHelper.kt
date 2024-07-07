@@ -489,6 +489,29 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         cursor.close()
         return kreditKontenListe
     }
+    fun getBankUndKreditKontenListe(): List<Konto> {
+        val bankUndKreditKontenListe: MutableList<Konto> = mutableListOf()
+        val db = readableDatabase
+        val query = "SELECT * FROM ${SmartSaveContract.KontoEntry.TABLE_NAME} WHERE ${SmartSaveContract.KontoEntry.KONTOART} != 'Sparkonto'"
+        val cursor = db.rawQuery(query, null)
+
+        while (cursor.moveToNext()) {
+            val konto = Konto(
+                cursor.getInt(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTONUMMER)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BLZ)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BIC)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.IBAN)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BEMERKUNG)),
+                cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTOART))
+            )
+            konto.umsatzList = loadUmsaetzeForKonto(konto.kontonr)
+            konto.kontostand = konto.calcKontostand()
+            bankUndKreditKontenListe.add(konto)
+        }
+
+        cursor.close()
+        return bankUndKreditKontenListe
+    }
 
     fun getSparKontenListe(): List<Konto> {
         val sparKontenListe: MutableList<Konto> = mutableListOf()

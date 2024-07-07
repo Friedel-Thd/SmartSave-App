@@ -37,11 +37,14 @@ import java.util.Locale
 class SparzielActivity : SmartSaveActivity() {
     private val kontoListState = mutableStateOf(listOf<Konto>())
     private val sparzielListeState = mutableStateOf<List<Sparziel>>(emptyList())
+    private val sparKontoListeState = mutableStateOf<List<Konto>>(emptyList())
+
     var db = DbHelper(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        kontoListState.value = db.getAllKonten()
+        kontoListState.value = db.getBankUndKreditKontenListe()
         sparzielListeState.value = db.getSparzielListe()
+        sparKontoListeState.value = db.getSparKontenListe()
 
         super.onCreate(savedInstanceState)
     }
@@ -57,11 +60,13 @@ class SparzielActivity : SmartSaveActivity() {
         var textBetrag by remember { mutableStateOf("") }
         var isError by remember { mutableStateOf(false) }
         var kontolist by remember { kontoListState }
+        var sparkontolist by remember { sparKontoListeState }
         val sparzielListe by remember { sparzielListeState }
         var ausgangKonto by remember { mutableStateOf<Konto?>(null) }
         var zielKonto by remember { mutableStateOf<Konto?>(null) }
         var monatsRate = 0.0
         var negNumError  by remember { mutableStateOf(false) }
+        var matchingKontoError  by remember { mutableStateOf(false) }
 
 
         MainColumn(
@@ -81,7 +86,7 @@ class SparzielActivity : SmartSaveActivity() {
 
             //TODO Bei leerer Kontoliste auf Layout #4a Weiterleiten ( Popup alter mäßisch aber erst bei click auf die menues)
             ausgangKonto = labelledDropdownMenu("Auszahlungskonto*", kontolist)
-            zielKonto = labelledDropdownMenu("Zielkonto*", kontolist)
+            zielKonto = labelledDropdownMenu("Zielkonto*", sparkontolist)
             if (kontolist.isEmpty()) {
                 val intent = Intent(this@SparzielActivity, SparzielActivity::class.java)
                 startActivity(intent)
@@ -91,19 +96,21 @@ class SparzielActivity : SmartSaveActivity() {
             monatsRate = calcMonatsRate(selectedDate, textBetrag)
             CenteredText(text = "Monatliche Rate: ")
             CenteredText(text = "$monatsRate€")
-            if (isError) ErrorMsg(msg = "Bitte alle Pflichtfelder ausfüllen!")
+            if(isError) ErrorMsg(msg = "Bitte alle Pflichtfelder ausfüllen!")
             if(negNumError) ErrorMsg(msg = "Bitte einen gültigen Betrag angeben!")
+            if(matchingKontoError) ErrorMsg(msg = "Auszahl- und Zielkonto müssen unterschiedlich sein!")
             if(sparzielListe.any { it.name == textName }) ErrorMsg(msg = "Sparziel mit diesem Namen existiert bereits!")
 
         }
 
-        //TODO Beschränkungen hinzugügen: Auszahlungskonto != Zielkonto und Zielkonto muss Kontotyp Sparkonto sein
+        //TODO bei Zielkonto nur alle Sparkonten listen
         AlignedButton(alignment = Alignment.BottomStart, text = "Abbrechen") {finish()}
         AlignedButton(alignment = Alignment.BottomEnd, text = "Weiter") {
 
                 isError = textBetrag.isEmpty() || textName.isEmpty() || selectedDate.isEmpty() || zielKonto == null || ausgangKonto == null
                 if (textBetrag.isNotEmpty()) negNumError = textBetrag.toDouble()< 0
-                if(!isError && !negNumError){
+                if(!(ausgangKonto == null && zielKonto == null) && ausgangKonto == zielKonto) matchingKontoError = true
+                if(!isError && !negNumError && !matchingKontoError){
                     val intent = Intent(this@SparzielActivity, SparzielAnAufActivity::class.java)
                     val tempSparziel = Sparziel(textName, textBetrag.toDouble(),  parseDate(selectedDate), monatsRate, zielKonto!!, ausgangKonto!!)
                     intent.putExtra("Sparziel", tempSparziel)

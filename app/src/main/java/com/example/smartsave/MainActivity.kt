@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.example.smartsave.dataClasses.Konto
 import com.example.smartsave.dataClasses.Sparziel
 import com.example.smartsave.helpers.AlignedButton
+import com.example.smartsave.helpers.ErrorMsg
 import com.example.smartsave.helpers.IconListItem
 import com.example.smartsave.helpers.ListItem
 import com.example.smartsave.helpers.MainColumn
@@ -37,6 +39,7 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
     private val bankkontoState = mutableStateOf<Konto?>(null)
     private val kreditkontenListeState = mutableStateOf<List<Konto>>(emptyList())
     private val sparzielListeState = mutableStateOf<List<Sparziel>>(emptyList())
+    private val sparKontoListState = mutableStateOf<List<Konto>>(emptyList())
     var db = DbHelper(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +51,7 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
     }
     override fun onResume() {
         bankkontoState.value = db.getBankkonto()
+        sparKontoListState.value = db.getSparKontenListe()
         kreditkontenListeState.value = db.getKreditKontenListe()
         sparzielListeState.value = db.getSparzielListe()
         super.onResume()
@@ -65,6 +69,8 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
         val bankkonto by remember { bankkontoState }
         val kreditkontenListe by remember { kreditkontenListeState }
         val sparzielListe by remember { sparzielListeState }
+        val sparKontenListe by remember { sparKontoListState}
+        var emptyKontenError  by remember { mutableStateOf(false) }
 
         LaunchedEffect(Unit) {
             drawerState.close()
@@ -81,6 +87,7 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                                 scope.launch {
                                     val intent = Intent(this@MainActivity, KontoAnlegenActivity::class.java)
                                     intent.putExtra("BankkontoExists", (bankkonto != null))
+                                    intent.putExtra("KreditkartenkontoExists", (kreditkontenListe.isNotEmpty()))
                                     drawerState.close()
                                     startActivity(intent)
                                 }
@@ -156,17 +163,25 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                         iconId = R.drawable.piggy_bank,
                         progress = sparziel.calculateProgress()
                     )
+
                 }
+                if(emptyKontenError) ErrorMsg(msg = "Es müssen zuerst mindestens ein Bankkonto/Kreditkonto und ein Sparkonto angelegt werden, um ein Sparziel zu erstellen")
+
             }
+
 
             if (drawerState.isClosed && !drawerState.isAnimationRunning) {
                 AlignedButton(
                     alignment = Alignment.BottomStart,
                     modifier = Modifier.padding(bottom = standardPadBottom, start = standardPadH),
-                    iconId = R.drawable.piggy_bank
+                    iconId = R.drawable.piggy_bank,
+
                 ) {
-                    val intent = Intent(this@MainActivity, SparzielActivity::class.java)
-                    startActivity(intent)
+                    emptyKontenError = sparKontenListe.isEmpty() || (kreditkontenListe.isEmpty() || bankkonto == null)
+                    if(!emptyKontenError) {
+                        val intent = Intent(this@MainActivity, SparzielActivity::class.java)
+                        startActivity(intent)
+                    }
                 }
                 AlignedButton(
                     alignment = Alignment.BottomEnd,
@@ -175,6 +190,7 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                 ) {
                     scope.launch {
                         drawerState.apply {
+                            emptyKontenError = false
                             if (isClosed) open() else close()
                         }
                     }

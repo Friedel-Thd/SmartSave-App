@@ -1,5 +1,6 @@
 package com.example.smartsave
 
+import android.os.Bundle
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
@@ -28,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.smartsave.dataClasses.Konto
 import com.example.smartsave.helpers.AlignedButton
+import com.example.smartsave.helpers.ErrorMsg
 import com.example.smartsave.helpers.LabelledInputField
 import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
@@ -35,10 +37,16 @@ import com.example.smartsave.helpers.StandardText
 
 class KontoAnlegenActivity : SmartSaveActivity() {
 
+    private val kontenlisteState = mutableStateOf<List<Konto>>(emptyList())
     var db = DbHelper(this)
     @Preview
     @Composable
     fun PreviewLayout() = GenerateContent()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        kontenlisteState.value = db.getAllKonten()
+    }
 
     @Composable
     override fun BoxScope.GenerateLayout() {
@@ -48,22 +56,25 @@ class KontoAnlegenActivity : SmartSaveActivity() {
         var textIBAN by remember { mutableStateOf("") }
         var textBemerkung by remember { mutableStateOf("") }
         var isError by remember { mutableStateOf(false) }
+        var kontonrExistsError by remember { mutableStateOf(false) }
+        val kontenListe by remember {kontenlisteState}
         val bundle = intent.extras
         val bankkontoExists = bundle!!.getBoolean("BankkontoExists")
+        val kreditkartenkontoExists = bundle.getBoolean("KreditkartenkontoExists")
         val radioOptions = listOf("Bankkonto", "Sparkonto", "Kreditkartenkonto")
-        val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[1] ) }
+        val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[1]) }
 
         MainColumn(
             modifier = Modifier.verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             LabelledInputField(label = "Konto Nr.*", value = textKontoNr, KeyboardOptions(keyboardType = KeyboardType.Number)) { textKontoNr = it }
-            LabelledInputField(label = "BLZ*", value = textBLZ,KeyboardOptions(keyboardType = KeyboardType.Number)) { textBLZ = it }
+            LabelledInputField(label = "BLZ*", value = textBLZ, KeyboardOptions(keyboardType = KeyboardType.Number)) { textBLZ = it }
             LabelledInputField(label = "BIC*", value = textBIC, KeyboardOptions()) { textBIC = it }
             LabelledInputField(label = "IBAN*", value = textIBAN, KeyboardOptions()) { textIBAN = it }
             LabelledInputField(label = "Bemerkung", value = textBemerkung, KeyboardOptions()) { textBemerkung = it }
 
-            if (isError){
+            if (isError) {
                 Text(
                     text = "Bitte alle Pflichtfelder ausfüllen!",
                     color = MaterialTheme.colorScheme.error,
@@ -76,13 +87,18 @@ class KontoAnlegenActivity : SmartSaveActivity() {
 
             Column {
                 radioOptions.forEach { text ->
+                    val isOptionEnabled = when (text) {
+                        "Bankkonto" -> !bankkontoExists
+                        "Kreditkartenkonto" -> !kreditkartenkontoExists
+                        else -> true
+                    }
                     Row(
                         Modifier
                             .fillMaxWidth()
                             .selectable(
                                 selected = (text == selectedOption),
                                 onClick = {
-                                    if (text != "Bankkonto" || !bankkontoExists) {
+                                    if (isOptionEnabled) {
                                         onOptionSelected(text)
                                     }
                                 }
@@ -91,29 +107,38 @@ class KontoAnlegenActivity : SmartSaveActivity() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
-                            enabled = if(text == "Bankkonto") { !bankkontoExists } else true,
+                            enabled = isOptionEnabled,
                             selected = (text == selectedOption),
-                            onClick = { onOptionSelected(text) }
+                            onClick = {
+                                if (isOptionEnabled) {
+                                    onOptionSelected(text)
+                                }
+                            }
                         )
                         StandardText(
                             text = text,
                             modifier = Modifier.padding(start = 8.dp),
                         )
                     }
+
                 }
+                if(textKontoNr.isNotEmpty() && kontonrExistsError) ErrorMsg(msg = "Konto mit dieser Kontonummmer existiert bereits!")
             }
         }
 
-        AlignedButton(alignment = Alignment.BottomStart, text = "Abbrechen") {finish()}
+        AlignedButton(alignment = Alignment.BottomStart, text = "Abbrechen") { finish() }
         AlignedButton(alignment = Alignment.BottomEnd, text = "Speichern") {
-            //TODO Kontonummer darf nicht doppelt sein, vllt auch abfrage in datenbank oder so
-            isError = (textKontoNr.isEmpty()|| textBIC.isEmpty() || textBLZ.isEmpty() || textIBAN.isEmpty())
-            if(!isError){
-                var konto = Konto(textKontoNr.toInt(),textBLZ,textBIC,textIBAN,textBemerkung,selectedOption)
+            isError = (textKontoNr.isEmpty() || textBIC.isEmpty() || textBLZ.isEmpty() || textIBAN.isEmpty())
+            for (konto in kontenListe){
+                if (konto.kontonr == textKontoNr.toInt()) kontonrExistsError = true
+            }
+            if (!isError && !kontonrExistsError) {
+                val konto = Konto(textKontoNr.toInt(), textBLZ, textBIC, textIBAN, textBemerkung, selectedOption)
                 db.insertKonto(konto)
                 Log.d("Entry", "Entry so mesisch")
                 finish()
             }
         }
     }
+
 }

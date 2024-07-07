@@ -55,9 +55,9 @@ fun StandardText(text: String, modifier: Modifier = Modifier, styleOverride: Tex
 
 @Composable
 fun ErrorMsg (msg : String) =  Text(
-text = msg,
-color = MaterialTheme.colorScheme.error,
-style = MaterialTheme.typography.bodyLarge,
-modifier = Modifier.padding(top = 4.dp)
+    text = msg,
+    color = MaterialTheme.colorScheme.error,
+    style = MaterialTheme.typography.bodyLarge,
+    modifier = Modifier.padding(top = 4.dp)
 )
 
