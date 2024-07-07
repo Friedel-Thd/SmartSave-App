@@ -15,46 +15,33 @@ data class Konto(
     var umsatzList: List<Umsatz> = listOf()
     var kontostand = 0.0
 
+    //TODO Ausgaben richtig berechnen
     fun getAusgabenByKategorie(month: Month, kategorie: Kategorie): Double {
         var umsatzSumme = 0.0
-        var selectedDate = LocalDate.of(month.year, month.month, 1)
+        val selectedDate = LocalDate.of(month.year, month.month, 1)
 
         for (umsatz in umsatzList) {
-
-            /*
-            Log.d("umsatzdatum", "${umsatz.datum}")
-            Log.d("selectedDate", "$selectedDate")
-            Log.d("If", "${umsatz.datum.isAfter(selectedDate)}")
-            Log.d("umsatzkatname", "${umsatz.kategorie.name}")
-            Log.d("katname", "${kategorie.name}")
-            Log.d("Ifkat", "${(umsatz.kategorie.name == kategorie.name)}")
-            */
-
-            if (umsatz.datum.isAfter(selectedDate) && (umsatz.kategorie.name == kategorie.name) && umsatz.betrag < 0) {
-
-                if(umsatz.hasAssignedEinzelumsatz()) {
-                    for (einzelumsatz in umsatz.einzelumsatzListe) {
-                        if (einzelumsatz.datum.isAfter(selectedDate) && (einzelumsatz.kategorie.name == kategorie.name)) {
-                            umsatzSumme += -einzelumsatz.betrag
-                        }
+            if (umsatz.hasAssignedEinzelumsatz()) {
+                for (einzelumsatz in umsatz.einzelumsatzListe) {
+                    if (einzelumsatz.datum.isAfter(selectedDate) && einzelumsatz.kategorie.id == kategorie.id && einzelumsatz.betrag < 0) {
+                        umsatzSumme += -einzelumsatz.betrag
                     }
-                } else {
-                    umsatzSumme += -umsatz.betrag
+                }
+            } else if (umsatz.datum.isAfter(selectedDate) && umsatz.kategorie.id == kategorie.id && umsatz.betrag < 0) {
+                umsatzSumme += -umsatz.betrag
                 }
             }
-        }
+
         return umsatzSumme
     }
 
-    fun getAusgaben(month: Month): Double {
+    fun getAusgaben(month: Month, kategorienliste: List<Kategorie>): Double {
         var umsatzSumme = 0.0
-        var selectedDate = LocalDate.of(month.year, month.month, 1)
 
-        for (umsatz in umsatzList) {
-            if (umsatz.datum.isAfter(selectedDate) && umsatz.betrag < 0) {
-                umsatzSumme += -umsatz.betrag
-            }
+        for (kategorie in kategorienliste) {
+            umsatzSumme += this.getAusgabenByKategorie(month, kategorie)
         }
+
         return umsatzSumme
     }
 

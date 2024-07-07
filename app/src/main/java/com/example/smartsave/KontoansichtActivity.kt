@@ -104,7 +104,7 @@ class KontoansichtActivity : SmartSaveActivity() {
                 .height(150.dp)
             ) {
                 inset(horizontal = 100f, vertical = 100f) {
-                    val gesamtausgaben = bankkonto.getAusgaben(LocalDate.now().let { selectedDate })
+                    val gesamtausgaben = bankkonto.getAusgaben(LocalDate.now().let { selectedDate }, kategorienListe)
                     val safeGesamtausgaben = if (gesamtausgaben == 0.0) 1.0 else gesamtausgaben
 
                     drawRect(color = Color.White, size = Size(size.width, size.height))

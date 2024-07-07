@@ -325,7 +325,7 @@ fun labelledDropdownMenu(label: String, options: List<Konto>): Konto {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LabelledDropdownMenuKategory(label: String, options: List<Kategorie>) {
+fun LabelledDropdownMenuKategory(label: String, options: List<Kategorie>): Kategorie {
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf(options[0]) }
 
@@ -375,6 +375,7 @@ fun LabelledDropdownMenuKategory(label: String, options: List<Kategorie>) {
             }
         }
     }
+    return selectedOptionText
 }
 
 

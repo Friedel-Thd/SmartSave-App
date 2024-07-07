@@ -255,14 +255,12 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
         val einzelumsatzId = db.insert(SmartSaveContract.EinzelumsatzEntry.TABLE_NAME, null, values)
 
-        if (einzelumsatzId != -1L) {
-            val kategorieZuweisungValues = ContentValues().apply {
-                put(SmartSaveContract.KategorieZuweisungEntry.UMSATZ_ID, einzelumsatzId)
-                put(SmartSaveContract.KategorieZuweisungEntry.KATEGORIE_ID, einzelumsatz.kategorie.id)
-                put(SmartSaveContract.KategorieZuweisungEntry.IS_EINZELUMSATZ, 1)
-            }
-            db.insert(SmartSaveContract.KategorieZuweisungEntry.TABLE_NAME, null, kategorieZuweisungValues)
+        val kategorieZuweisungValues = ContentValues().apply {
+            put(SmartSaveContract.KategorieZuweisungEntry.UMSATZ_ID, einzelumsatzId)
+            put(SmartSaveContract.KategorieZuweisungEntry.KATEGORIE_ID, einzelumsatz.kategorie.id)
+            put(SmartSaveContract.KategorieZuweisungEntry.IS_EINZELUMSATZ, 1)
         }
+        db.insert(SmartSaveContract.KategorieZuweisungEntry.TABLE_NAME, null, kategorieZuweisungValues)
     }
 
 
@@ -473,6 +471,22 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
             }
 
             checkCursor.close()
+
+            // Kategorie für den Einzelumsatz abrufen
+            val kategorieQuery = "SELECT ${SmartSaveContract.KategorieEntry.TABLE_NAME}.* FROM ${SmartSaveContract.KategorieEntry.TABLE_NAME} " +
+                    "JOIN ${SmartSaveContract.KategorieZuweisungEntry.TABLE_NAME} ON ${SmartSaveContract.KategorieEntry.TABLE_NAME}.${SmartSaveContract.KategorieEntry.KATEGORIE_ID} = ${SmartSaveContract.KategorieZuweisungEntry.TABLE_NAME}.${SmartSaveContract.KategorieZuweisungEntry.KATEGORIE_ID} " +
+                    "WHERE ${SmartSaveContract.KategorieZuweisungEntry.UMSATZ_ID} = ${einzelumsatz.id} AND ${SmartSaveContract.KategorieZuweisungEntry.IS_EINZELUMSATZ} = 1"
+            val kategorieCursor = db.rawQuery(kategorieQuery, null)
+
+            if (kategorieCursor.moveToFirst()) {
+                val kategorie = Kategorie(
+                    kategorieCursor.getString(kategorieCursor.getColumnIndexOrThrow(SmartSaveContract.KategorieEntry.NAME))
+                )
+                kategorie.id = kategorieCursor.getInt(kategorieCursor.getColumnIndexOrThrow(SmartSaveContract.KategorieEntry.KATEGORIE_ID))
+                einzelumsatz.kategorie = kategorie
+            }
+
+            kategorieCursor.close()
             einzelumsatzListe.add(einzelumsatz)
         }
         cursor.close()
@@ -727,7 +741,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
             // Kategoriezuweisung einfügen
             val kategoriezuweisungValues = ContentValues().apply {
                 //TODO wieder zurück changen ID technische diese diese
-                put(SmartSaveContract.KategorieZuweisungEntry.KATEGORIE_ID, 1)
+                put(SmartSaveContract.KategorieZuweisungEntry.KATEGORIE_ID, kategorieId)
                 put(SmartSaveContract.KategorieZuweisungEntry.UMSATZ_ID, umsatzId)
                 put(SmartSaveContract.KategorieZuweisungEntry.IS_EINZELUMSATZ, 0)
             }

@@ -57,6 +57,7 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
         var textBetrag by remember { mutableStateOf("") }
         val kategorienListe by remember { kategorienListeState }
         var isError by remember { mutableStateOf(false) }
+        var selectedKategorie by remember { mutableStateOf<Kategorie?>(null) }
 
         MainColumn (
             modifier = Modifier,
@@ -70,7 +71,7 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
                 onDateSelected = { date -> selectedDate = date },
                 false
             )
-            LabelledDropdownMenuKategory(label = "Kategorie", options = kategorienListe)
+            selectedKategorie = LabelledDropdownMenuKategory(label = "Kategorie", options = kategorienListe)
 
             if(isError) {
                 Text(
@@ -93,8 +94,10 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
 
             if(!isError){
                 //TODO Datenbank ding für einzelumsatz anlegen mesisch
+                var einzelumsatz = Einzelumsatz(textBezeichung,textBetrag.toDouble(), parseDate(selectedDate))
+                einzelumsatz.kategorie = selectedKategorie!!
 
-                db.insertEinzelumsatz(Einzelumsatz(textBezeichung,textBetrag.toDouble(), parseDate(selectedDate)))
+                db.insertEinzelumsatz(einzelumsatz)
 
                 finish()
             }
