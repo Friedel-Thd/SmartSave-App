@@ -114,7 +114,6 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
                     TextButton(onClick = {
                         showDialogAssignedLoeschen = false
                         if (selectedKategorie != null) {
-                            //TODO löschen aller verknüpfungen
                             db.removeKategorie(selectedKategorie!!)
                             db.removeKategorieAssigns(selectedKategorie!!)
                             val newkategorienListe = kategorienListe.toMutableList()

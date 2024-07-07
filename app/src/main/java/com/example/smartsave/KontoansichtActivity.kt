@@ -95,10 +95,6 @@ class KontoansichtActivity : SmartSaveActivity() {
             )
 
             ListItem(text = currentMonth.toString())
-
-            //TODO Es gibt noch das problem, dass wenn mehrere kategorien mit dem selben namen existieren
-            // diese umsätze in diesen kategorien doppelt gezählt werden mäßig
-            // sollte mit kategorien todos gefixxt werden
             Canvas(modifier = Modifier
                 .fillMaxWidth()
                 .height(150.dp)

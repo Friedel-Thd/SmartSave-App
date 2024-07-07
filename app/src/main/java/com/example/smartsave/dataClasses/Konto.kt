@@ -15,7 +15,6 @@ data class Konto(
     var umsatzList: List<Umsatz> = listOf()
     var kontostand = 0.0
 
-    //TODO Ausgaben richtig berechnen
     fun getAusgabenByKategorie(month: Month, kategorie: Kategorie): Double {
         var umsatzSumme = 0.0
         val selectedDate = LocalDate.of(month.year, month.month, 1)

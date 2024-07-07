@@ -151,11 +151,11 @@ fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifi
         modifier = modifier.fillMaxWidth()
             .combinedClickable(
                 onClick = {
-                    //TODO onHolding #9 (einzelumsatz editieren)
+
                     showDialogAnlegen = true
                           },
                 onLongClick = {
-                    //TODO onClick #8 -> zeige zugehörigen umsatz
+
                     val intent = Intent(context, EinzelumsatzEditActivity::class.java)
                     context.startActivity(intent)
                               },
@@ -202,7 +202,6 @@ fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifi
                     onUpdate()
 
                 }) {
-                    //TODO Neue Kategorie anlegen
                     Text("OK")
 
                 }
@@ -273,7 +272,7 @@ fun CategoryDisplay(color: Color, text: String, betrag: Double) {
     }
 }
 
-//TODO Layout Anpassen
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun labelledDropdownMenu(label: String, options: List<Konto>): Konto {
@@ -380,7 +379,7 @@ fun LabelledDropdownMenuKategory(label: String, options: List<Kategorie>): Kateg
 
 
 
-//TODO Layout
+
 @Composable
 fun LabelledDatePickerButton(label: String, selectedDate: String, onDateSelected: (String) -> Unit, mindate: Boolean, maxdate: Boolean) {
     val context = LocalContext.current
@@ -416,7 +415,7 @@ fun LabelledDatePickerButton(label: String, selectedDate: String, onDateSelected
 
 
 
-//TODO Für KontoansichtUmsaetzeActivity aber hab es mit extra Composable nicht hinbekommen
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LabelledDropdownMenuUmsatz(
@@ -505,7 +504,6 @@ fun LabelledDropdownMenuUmsatz(
             ElevatedButton(
                 enabled = !umsatz.isAssigned(),
                 onClick = {
-                // TODO Übergabeparameter aktueller Umsatz mäßisch
                 val intent = Intent(context, UmsaetzeDiffActivity::class.java)
                 context.startActivity(intent)
             }) {
@@ -526,10 +524,6 @@ fun LabelledDropdownMenuUmsatz(
                 confirmButton = {
                   Button(onClick = {
                       openAlertDialog = false
-
-                      //TODO Testen kategorie zuweisung mit verwendungszweck, einzelumsätzen
-
-                      //Kategorie für alle Umsätze mit gleichem Verwendungszweck inkl möglicher einzzelumsätze setzen
                       for (um in konto.umsatzList) {
                           if (um.verwendungsZweck == umsatz.verwendungsZweck) {
                               um.kategorie = selectedOptionKategorie
@@ -542,9 +536,6 @@ fun LabelledDropdownMenuUmsatz(
                               }
                           }
                       }
-
-                      //TODO Hier aktualisieren
-
                   }) {
                     Text("Ja")
                 } },
@@ -561,9 +552,6 @@ fun LabelledDropdownMenuUmsatz(
                                 db.updateKategorieZuweisung(selectedOptionKategorie.id, einzelumsatz.id, true)
                             }
                         }
-
-                        //TODO Hier aktualisieren
-
                     }) {
                         Text("Nein")
                     }

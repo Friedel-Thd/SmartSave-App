@@ -26,6 +26,7 @@ import com.example.smartsave.dataClasses.Sparziel
 import com.example.smartsave.dataClasses.parseDate
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.CenteredText
+import com.example.smartsave.helpers.ErrorMsg
 import com.example.smartsave.helpers.labelledDropdownMenu
 import com.example.smartsave.helpers.LabelledInputField
 import com.example.smartsave.helpers.MainColumn
@@ -66,6 +67,8 @@ class SparzielActivity : SmartSaveActivity() {
         var ausgangKonto by remember { mutableStateOf<Konto?>(null) }
         var zielKonto by remember { mutableStateOf<Konto?>(null) }
         var monatsRate = 0.0
+        var negNumError  by remember { mutableStateOf(false) }
+
 
         MainColumn(
             modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -94,38 +97,27 @@ class SparzielActivity : SmartSaveActivity() {
             monatsRate = calcMonatsRate(selectedDate, textBetrag)
             CenteredText(text = "Monatliche Rate: ")
             CenteredText(text = "$monatsRate€")
-            if (isError){
-                Text(
-                    text = "Bitte alle Pflichtfelder ausfüllen!",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
-            if(sparzielListe.any { it.name == textName }){
-                Text(
-                    text = "Sparziel mit diesem Namen existiert bereits!",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
+            if (isError) ErrorMsg(msg = "Bitte alle Pflichtfelder ausfüllen!")
+            if(negNumError) ErrorMsg(msg = "Bitte einen gültigen Betrag angeben!")
+            if(sparzielListe.any { it.name == textName }) ErrorMsg(msg = "Sparziel mit diesem Namen existiert bereits!")
 
         }
 
         //TODO Beschränkungen hinzugügen: Auszahlungskonto != Zielkonto und Zielkonto muss Kontotyp Sparkonto sein
         AlignedButton(alignment = Alignment.BottomStart, text = "Abbrechen") {finish()}
         AlignedButton(alignment = Alignment.BottomEnd, text = "Weiter") {
-            isError = textBetrag.isEmpty() || textName.isEmpty() || selectedDate.isEmpty() || zielKonto == null || ausgangKonto == null
-            if(!isError){
 
-                val intent = Intent(this@SparzielActivity, SparzielAnAufActivity::class.java)
-                val tempSparziel = Sparziel(textName, textBetrag.toDouble(),  parseDate(selectedDate), monatsRate, zielKonto!!, ausgangKonto!!)
-                intent.putExtra("Sparziel", tempSparziel)
-                intent.putExtra("mode", "anlegen")
-                startActivity(intent)
-                finish()
-            }
+                isError = textBetrag.isEmpty() || textName.isEmpty() || selectedDate.isEmpty() || zielKonto == null || ausgangKonto == null
+                if (textBetrag.isNotEmpty()) negNumError = textBetrag.toDouble()< 0
+                if(!isError && !negNumError){
+                    val intent = Intent(this@SparzielActivity, SparzielAnAufActivity::class.java)
+                    val tempSparziel = Sparziel(textName, textBetrag.toDouble(),  parseDate(selectedDate), monatsRate, zielKonto!!, ausgangKonto!!)
+                    intent.putExtra("Sparziel", tempSparziel)
+                    intent.putExtra("mode", "anlegen")
+                    startActivity(intent)
+                    finish()
+                }
+
         }
     }
 

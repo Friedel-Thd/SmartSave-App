@@ -303,8 +303,6 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
                 confirmButton = {
                     Button(onClick = {
                         openAlertDialog = false
-
-                        //TODO Testen kategorie zuweisung mit verwendungszweck, einzelumsätzen
                         val umsatz = selectedUmsatz!!
                         val selectedOptionKategorie = selectedKategorie!!
 
@@ -364,8 +362,6 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
         ) {
 
         }
-
-        //TODO Import funktion imitieren mäßig, testdaten (umsätze) in konto einfügen
         AlignedButton(
             alignment = Alignment.BottomEnd,
             iconId = R.drawable.plus,

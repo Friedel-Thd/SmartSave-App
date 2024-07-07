@@ -48,7 +48,6 @@ class UmsatzAuswahlZuordnungActivity : SmartSaveActivity() {
 
     @Composable
     override fun BoxScope.GenerateLayout(){
-    // TODO Machene halt nech
         val bundle = intent.extras
         val einzelumsatz = bundle!!.getSerializable("Einzelumsatz") as Einzelumsatz
        // val umsatzListe by remember { umsatzListeState }
@@ -58,7 +57,6 @@ class UmsatzAuswahlZuordnungActivity : SmartSaveActivity() {
             .fillMaxWidth()
             .verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp))
         {
-            //TODO Loop über alle Umsätze aus Datenbank so mesisch
 
             for (umsatz in umsatzListe) {
                 restBetrag = umsatz.betrag
@@ -68,7 +66,6 @@ class UmsatzAuswahlZuordnungActivity : SmartSaveActivity() {
                 if(umsatz.betrag > 0 && einzelumsatz.betrag >0){
                     if (umsatz.kategorie.name == "Nicht zugeordnet" && einzelumsatz.betrag <= restBetrag){
                         UmsatzDiffDateListItem(umsatz,modifier = Modifier.clickable {
-                            //TODO wenn man auf umsatz klickt wird der einzelumsatz da in die liste inserted
 
                             if( einzelumsatz.hasParentUmsatz ) {
                                 db.updateEinzelumsatzZuweisung(einzelumsatz, umsatz.id)
@@ -84,7 +81,6 @@ class UmsatzAuswahlZuordnungActivity : SmartSaveActivity() {
                 } else if(umsatz.betrag < 0 && einzelumsatz.betrag <0) {
                     if (umsatz.kategorie.name == "Nicht zugeordnet" && einzelumsatz.betrag >= restBetrag){
                         UmsatzDiffDateListItem(umsatz,modifier = Modifier.clickable {
-                            //TODO wenn man auf umsatz klickt wird der einzelumsatz da in die liste inserted
 
                             if( einzelumsatz.hasParentUmsatz ) {
                                 db.updateEinzelumsatzZuweisung(einzelumsatz, umsatz.id)

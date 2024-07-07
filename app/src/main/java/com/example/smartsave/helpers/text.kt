@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -50,3 +51,13 @@ fun StandardText(text: String, modifier: Modifier = Modifier, styleOverride: Tex
     modifier = modifier,
     style = standardTextStyle.merge(styleOverride),
 )
+
+
+@Composable
+fun ErrorMsg (msg : String) =  Text(
+text = msg,
+color = MaterialTheme.colorScheme.error,
+style = MaterialTheme.typography.bodyLarge,
+modifier = Modifier.padding(top = 4.dp)
+)
+

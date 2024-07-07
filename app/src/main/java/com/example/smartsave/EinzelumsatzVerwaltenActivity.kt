@@ -38,7 +38,6 @@ class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //TODO get alle konten (außer sparkonten evtl)
         kontoList = db.getAllKonten()
         einzelUmsatzListe = db.getEinzelumsatzListe()
 
@@ -48,8 +47,6 @@ class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
         super.onResume()
         kontoList = db.getAllKonten()
         einzelUmsatzListe = db.getEinzelumsatzListe()
-
-
        // Log.d("Resume verwaltung","ON RESUME CALLED")
         setContent{GenerateContent()}
 
@@ -60,28 +57,17 @@ class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
 
     @Composable
     override fun BoxScope.GenerateLayout() {
-        //TODO get umsatz per mitegebener Id oder so maybe mäßisch oder direkt mitgeben
-        //TODO je nach aufruf einzelumsätze eines umsatzes bzw. einzelumsätze ohne zugewiesenen umsatz glaub ich so mäßisch
-
-
-        //val einzelumsatzListe by remember { einzelUmsatzListeState }
-                // val kontoListe by remember { kontoListState }
-
         MainColumn(
             modifier = Modifier.verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             for (einzelumsatz in einzelUmsatzListe){
-                //TODO psychosen shit mit update in geschachteltem composable
                 EinzelumsatzListItem(einzelumsatz = einzelumsatz, context = LocalContext.current, kontenListe = kontoList,
                     onUpdate = {
                         einzelUmsatzListe = db.getEinzelumsatzListe()
                     })
             }
-
-
         }
-
         AlignedButton(
             alignment = Alignment.BottomEnd,
             iconId = R.drawable.plus,
@@ -89,7 +75,6 @@ class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
                 .height(70.dp)
                 .width(70.dp)
         ) {
-            //TODO #9
             val intent = Intent(this@EinzelumsatzVerwaltenActivity, EinzelumsatzEditActivity::class.java)
             startActivity(intent)
         }

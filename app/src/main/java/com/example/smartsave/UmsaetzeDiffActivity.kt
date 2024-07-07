@@ -64,7 +64,6 @@ class UmsaetzeDiffActivity : SmartSaveActivity() {
         ) {
             UmsatzDiffDateListItem(umsatz)
 
-            //TODO Umsatz updaten onresume
             for (einzelumsatz in umsatz.einzelumsatzListe) {
                 UmsatzDiffListItem(einzelumsatz)
             }
@@ -78,7 +77,6 @@ class UmsaetzeDiffActivity : SmartSaveActivity() {
                 .height(70.dp)
                 .width(70.dp)
         ) {
-            //TODO #9
             val intent = Intent(this@UmsaetzeDiffActivity, EinzelumsatzEditActivity::class.java)
             startActivity(intent)
         }
@@ -90,7 +88,6 @@ class UmsaetzeDiffActivity : SmartSaveActivity() {
                 .height(70.dp)
                 .width(70.dp)
         ) {
-            //TODO #10
             val intent = Intent(this@UmsaetzeDiffActivity, EinzelumsatzVerwaltenActivity::class.java)
             startActivity(intent)
         }

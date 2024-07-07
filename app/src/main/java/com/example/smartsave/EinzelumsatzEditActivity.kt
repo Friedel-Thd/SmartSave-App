@@ -83,24 +83,15 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }
-
         }
-
-
-
-
-
         AlignedButton(alignment = Alignment.BottomStart, text = "Zurück") {finish()}
         AlignedButton(alignment = Alignment.BottomEnd, text = "Speichern"){
             isError = selectedDate.isEmpty() || textBezeichung.isEmpty() || textBetrag.isEmpty()
 
             if(!isError){
-                //TODO Datenbank ding für einzelumsatz anlegen mesisch
                 var einzelumsatz = Einzelumsatz(textBezeichung,textBetrag.toDouble(), parseDate(selectedDate))
                 einzelumsatz.kategorie = selectedKategorie!!
-
                 db.insertEinzelumsatz(einzelumsatz)
-
                 finish()
             }
         }

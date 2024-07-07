@@ -138,7 +138,6 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                     IconListItem(
                         text = kreditkonto.kontostand.toString(),
                         modifier = Modifier.clickable {
-                            //TODO KontoID mitgeben
                             val intent = Intent(this@MainActivity, KontoansichtUmsaetzeActivity::class.java)
                             intent.putExtra("Konto", kreditkonto)
                             startActivity(intent)
