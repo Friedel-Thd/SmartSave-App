@@ -46,7 +46,7 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
     @Composable
     override fun BoxScope.GenerateLayout(){
         val mode = intent.extras?.getString("mode")
-        var einzelumsatz: Einzelumsatz? = if (mode == "editieren") {
+        val einzelumsatz: Einzelumsatz? = if (mode == "editieren") {
             intent.extras?.getSerializable("einzelumsatz") as? Einzelumsatz
         } else { null }
 
@@ -56,7 +56,7 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
         var textBetrag by remember { mutableStateOf(einzelumsatz?.betrag?.toString() ?: "") }
         val kategorienListe by remember { kategorienListeState }
         var isError by remember { mutableStateOf(false) }
-        var selectedKategorie by remember { mutableStateOf<Kategorie?>(einzelumsatz?.kategorie) }
+        var selectedKategorie by remember { mutableStateOf(einzelumsatz?.kategorie) }
 
         MainColumn (
             modifier = Modifier,
@@ -91,7 +91,6 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
         AlignedButton(alignment = Alignment.BottomStart, text = "Zurück") {finish()}
         AlignedButton(alignment = Alignment.BottomEnd, text = "Speichern"){
             isError = selectedDate.isEmpty() || textBezeichung.isEmpty() || textBetrag.isEmpty()
-            //TODO bei editieren den restbetrag des umsatz holen, um sicherzugehen, dass neuer betrag nicht zu groß/klein ist
             if(!isError){
                 if (mode == "anlegen") {
                     val neweinzelumsatz = Einzelumsatz(textBezeichung,textBetrag.toDouble(), parseDate(selectedDate))
@@ -104,6 +103,7 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
                     einzelumsatz.datum = parseDate(selectedDate)
                     einzelumsatz.kategorie = selectedKategorie!!
 
+                    db.removeEinzelumsatzZuweisung(einzelumsatz)
                     db.editEinzelumsatz(einzelumsatz)
                 }
 

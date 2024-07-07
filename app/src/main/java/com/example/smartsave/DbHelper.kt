@@ -635,6 +635,16 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         Log.d("updateEinzelumsatzZuweisung", "Updated $count rows")
     }
 
+    fun removeEinzelumsatzZuweisung(einzelumsatz: Einzelumsatz) {
+        val db = writableDatabase
+        val whereClause = "${SmartSaveContract.EinzelumsatzZuweisungEntry.EINZELUMSATZ_ID} = ?"
+        val whereArgs = arrayOf(einzelumsatz.id.toString())
+
+        val count = db.delete(SmartSaveContract.EinzelumsatzZuweisungEntry.TABLE_NAME, whereClause, whereArgs)
+
+        Log.d("removeEinzelumsatzZuweisung", "Removed $count rows")
+    }
+
 
     fun getSparzielListe(): List<Sparziel> {
         val sparzielListe: MutableList<Sparziel> = mutableListOf()
