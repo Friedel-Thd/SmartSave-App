@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.smartsave.dataClasses.Kategorie
 import com.example.smartsave.helpers.AlignedButton
+import com.example.smartsave.helpers.ErrorMsg
 import com.example.smartsave.helpers.LabelledInputField
 import com.example.smartsave.helpers.ListItem
 import com.example.smartsave.helpers.MainColumn
@@ -48,6 +49,8 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
         var showDialogAnlegen by remember { mutableStateOf(false) }
         var showDialogLoeschen by remember { mutableStateOf(false) }
         var showDialogAssignedLoeschen by remember { mutableStateOf(false) }
+        var nameExistsError  by remember { mutableStateOf(false) }
+        var emptyError  by remember { mutableStateOf(false) }
 
         MainColumn(
             modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -74,6 +77,7 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
                     )
                 }
             }
+
         }
 
         AlignedButton(alignment = Alignment.BottomStart, text = "Zurück") {finish()}
@@ -81,20 +85,32 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
 
         if (showDialogAnlegen) {
             AlertDialog(
-                onDismissRequest = { showDialogAnlegen = false },
+                onDismissRequest = {
+                    emptyError = false
+                    nameExistsError = false
+                    showDialogAnlegen = false },
                 confirmButton = {
                     TextButton(onClick = {
-                        showDialogAnlegen = false
-                        //TODO Kein namen doppelt zulassen
-                        val newKategorie = Kategorie(textKategorie)
-                        db.insertKategorie(newKategorie)
-                        val newkategorienListe = kategorienListe.toMutableList()
-                        newkategorienListe.add(newKategorie)
-                        kategorienListeState.value = newkategorienListe
-                    }) {
+                        for (kat in kategorienListe){
+                            if (kat.name == textKategorie) nameExistsError = true; emptyError = false
+                        }
+                        if(textKategorie.isEmpty()) emptyError =true
+                        if(!nameExistsError && !emptyError){
+                            showDialogAnlegen = false
+                            //TODO Kein namen doppelt zulassen
+                            val newKategorie = Kategorie(textKategorie)
+                            db.insertKategorie(newKategorie)
+                            val newkategorienListe = kategorienListe.toMutableList()
+                            newkategorienListe.add(newKategorie)
+                            kategorienListeState.value = newkategorienListe
+                        }
+                    })
+                    {
                         Text("OK")
 
                     }
+                    if(nameExistsError) ErrorMsg(msg = "Kategorie mit diesem Namen existiert bereits!")
+                    if(emptyError) ErrorMsg(msg = "Bitte Textfeld ausfüllen!")
                 },
                 dismissButton = {
                     TextButton(onClick = { showDialogAnlegen = false }) {
