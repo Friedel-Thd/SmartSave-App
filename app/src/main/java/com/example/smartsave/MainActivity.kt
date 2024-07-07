@@ -179,7 +179,7 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                     iconId = R.drawable.piggy_bank,
 
                 ) {
-                    emptyKontenError = sparKontenListe.isEmpty() || (kreditkontenListe.isEmpty() || bankkonto == null)
+                    emptyKontenError = sparKontenListe.isEmpty() || (kreditkontenListe.isEmpty() && bankkonto == null)
                     if(!emptyKontenError) {
                         val intent = Intent(this@MainActivity, SparzielActivity::class.java)
                         startActivity(intent)
