@@ -57,7 +57,10 @@ class KontoAnlegenActivity : SmartSaveActivity() {
         var textBemerkung by remember { mutableStateOf("") }
         var isError by remember { mutableStateOf(false) }
         var kontonrExistsError by remember { mutableStateOf(false) }
-        val kontenListe by remember {kontenlisteState}
+        var blzExistsError by remember { mutableStateOf(false) }
+        var bicExistsError by remember { mutableStateOf(false) }
+        var ibanExistsError by remember { mutableStateOf(false) }
+        val kontenListe by remember { kontenlisteState }
         val bundle = intent.extras
         val bankkontoExists = bundle!!.getBoolean("BankkontoExists")
         val kreditkartenkontoExists = bundle.getBoolean("KreditkartenkontoExists")
@@ -79,8 +82,26 @@ class KontoAnlegenActivity : SmartSaveActivity() {
                     text = "Bitte alle Pflichtfelder ausfüllen!",
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(top = 4.dp)
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .align(Alignment.CenterHorizontally)
                 )
+            }
+
+            if (kontonrExistsError) {
+                ErrorMsg(msg = "Konto mit dieser Kontonummer existiert bereits!")
+            }
+
+            if (blzExistsError) {
+                ErrorMsg(msg = "Konto mit dieser BLZ existiert bereits!")
+            }
+
+            if (bicExistsError) {
+                ErrorMsg(msg = "Konto mit dieser BIC existiert bereits!")
+            }
+
+            if (ibanExistsError) {
+                ErrorMsg(msg = "Konto mit dieser IBAN existiert bereits!")
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -120,19 +141,27 @@ class KontoAnlegenActivity : SmartSaveActivity() {
                             modifier = Modifier.padding(start = 8.dp),
                         )
                     }
-
                 }
-                if(textKontoNr.isNotEmpty() && kontonrExistsError) ErrorMsg(msg = "Konto mit dieser Kontonummmer existiert bereits!")
             }
         }
 
         AlignedButton(alignment = Alignment.BottomStart, text = "Abbrechen") { finish() }
         AlignedButton(alignment = Alignment.BottomEnd, text = "Speichern") {
             isError = (textKontoNr.isEmpty() || textBIC.isEmpty() || textBLZ.isEmpty() || textIBAN.isEmpty())
-            for (konto in kontenListe){
+
+            kontonrExistsError = false
+            blzExistsError = false
+            bicExistsError = false
+            ibanExistsError = false
+
+            for (konto in kontenListe) {
                 if (konto.kontonr == textKontoNr.toInt()) kontonrExistsError = true
+                if (konto.blz == textBLZ) blzExistsError = true
+                if (konto.bic == textBIC) bicExistsError = true
+                if (konto.iban == textIBAN) ibanExistsError = true
             }
-            if (!isError && !kontonrExistsError) {
+
+            if (!isError && !kontonrExistsError && !blzExistsError && !bicExistsError && !ibanExistsError) {
                 val konto = Konto(textKontoNr.toInt(), textBLZ, textBIC, textIBAN, textBemerkung, selectedOption)
                 db.insertKonto(konto)
                 Log.d("Entry", "Entry so mesisch")
@@ -140,5 +169,4 @@ class KontoAnlegenActivity : SmartSaveActivity() {
             }
         }
     }
-
 }
