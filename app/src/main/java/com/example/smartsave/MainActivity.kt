@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.smartsave.dataClasses.Einzelumsatz
 import com.example.smartsave.dataClasses.Konto
 import com.example.smartsave.dataClasses.Sparziel
 import com.example.smartsave.helpers.AlignedButton
@@ -43,18 +44,19 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
     var db = DbHelper(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         bankkontoState.value = db.getBankkonto()
         kreditkontenListeState.value = db.getKreditKontenListe()
         sparzielListeState.value = db.getSparzielListe()
 
-        super.onCreate(savedInstanceState)
+        db.insertDefaultData()
     }
     override fun onResume() {
+        super.onResume()
         bankkontoState.value = db.getBankkonto()
         sparKontoListState.value = db.getSparKontenListe()
         kreditkontenListeState.value = db.getKreditKontenListe()
         sparzielListeState.value = db.getSparzielListe()
-        super.onResume()
     }
 
     @Preview

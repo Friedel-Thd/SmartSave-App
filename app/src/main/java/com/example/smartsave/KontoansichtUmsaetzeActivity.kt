@@ -359,6 +359,7 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
                 .height(70.dp)
                 .width(70.dp)
         ) {
+            //TODO Testdaten löschen (umsätze mäesisch)
 
         }
         AlignedButton(
@@ -368,6 +369,9 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
                 .height(70.dp)
                 .width(70.dp)
         ) {
+            //TODO Testdaten einfügen
+            db.insertRandomUmsatzForExistingKonto(konto)
+            konto = db.getKontoByKontonummer(konto.kontonr)!!
 
         }
         AlignedButton(alignment = Alignment.BottomCenter, text = "Zurück", modifier = Modifier.height(70.dp)) {

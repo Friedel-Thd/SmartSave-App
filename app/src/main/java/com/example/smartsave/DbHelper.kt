@@ -914,5 +914,51 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         }
     }
 
+    fun insertRandomUmsatzForExistingKonto(konto: Konto) {
+        val db = writableDatabase
+
+        val umsaetze = listOf(
+            Triple("Testumsatz 1", -100.0, "01/03/2024"),
+            Triple("Testumsatz 2", 450.0, "15/01/2024"),
+            Triple("Testumsatz 3", -200.0, "28/04/2024")
+        )
+
+        umsaetze.forEach { (verwendungszweck, betrag, datum) ->
+            val umsatzValues = ContentValues().apply {
+                put(SmartSaveContract.UmsatzEntry.KONTONUMMER, konto.kontonr)
+                put(SmartSaveContract.UmsatzEntry.DATUM, datum)
+                put(SmartSaveContract.UmsatzEntry.VERWENDUNGSZWECK, verwendungszweck)
+                put(SmartSaveContract.UmsatzEntry.BETRAG, betrag)
+            }
+            db.insert(SmartSaveContract.UmsatzEntry.TABLE_NAME, null, umsatzValues)
+        }
+
+        Log.d("insertRandomUmsatzForExistingKonto", "Inserted random Umsätze for Konto: ${konto.kontonr}")
+    }
+
+    fun insertDefaultData() {
+        val db = writableDatabase
+
+        val cursor = db.query(
+            SmartSaveContract.KategorieEntry.TABLE_NAME,
+            arrayOf(SmartSaveContract.KategorieEntry.NAME),
+            "${SmartSaveContract.KategorieEntry.NAME} = ?",
+            arrayOf("Nicht zugeordnet"),
+            null,
+            null,
+            null
+        )
+
+        val exists = cursor.count > 0
+        cursor.close()
+
+        if (!exists) {
+            val values = ContentValues().apply {
+                put(SmartSaveContract.KategorieEntry.NAME, "Nicht zugeordnet")
+            }
+            db.insert(SmartSaveContract.KategorieEntry.TABLE_NAME, null, values)
+        }
+    }
+
 
 }
