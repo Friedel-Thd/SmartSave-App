@@ -930,10 +930,23 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
                 put(SmartSaveContract.UmsatzEntry.VERWENDUNGSZWECK, verwendungszweck)
                 put(SmartSaveContract.UmsatzEntry.BETRAG, betrag)
             }
-            db.insert(SmartSaveContract.UmsatzEntry.TABLE_NAME, null, umsatzValues)
-        }
 
-        Log.d("insertRandomUmsatzForExistingKonto", "Inserted random Umsätze for Konto: ${konto.kontonr}")
+            val umsatzId = db.insert(SmartSaveContract.UmsatzEntry.TABLE_NAME, null, umsatzValues)
+
+            val defaultKategorieID = this.getKategorieIdByName("Nicht zugeordnet")
+
+            // Umsatz der Kategorie "Nicht zugeordnet" zuweisen
+            val zuweisungValues = ContentValues().apply {
+                put(SmartSaveContract.KategorieZuweisungEntry.KATEGORIE_ID, defaultKategorieID)
+                put(SmartSaveContract.KategorieZuweisungEntry.UMSATZ_ID, umsatzId.toInt())
+                put(SmartSaveContract.KategorieZuweisungEntry.IS_EINZELUMSATZ, 0)
+            }
+
+            // Eintrag in die KategorieZuweisung-Tabelle einfügen
+            db.insert(SmartSaveContract.KategorieZuweisungEntry.TABLE_NAME, null, zuweisungValues)
+
+            Log.d("insertRandomUmsatzForExistingKonto", "Inserted random Umsatz for Konto: ${konto.kontonr}")
+        }
     }
 
     fun insertDefaultData() {
@@ -958,6 +971,35 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
             }
             db.insert(SmartSaveContract.KategorieEntry.TABLE_NAME, null, values)
         }
+    }
+
+    private fun getKategorieIdByName(kategorieName: String): Int {
+        val db = readableDatabase
+
+        val projection = arrayOf(SmartSaveContract.KategorieEntry.KATEGORIE_ID)
+        val selection = "${SmartSaveContract.KategorieEntry.NAME} = ?"
+        val selectionArgs = arrayOf(kategorieName)
+
+        val cursor = db.query(
+            SmartSaveContract.KategorieEntry.TABLE_NAME,
+            projection,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            null,
+            null
+        )
+
+        var kategorieId: Int = -1
+
+        if (cursor.moveToFirst()) {
+            kategorieId = cursor.getInt(cursor.getColumnIndexOrThrow(SmartSaveContract.KategorieEntry.KATEGORIE_ID))
+        }
+
+        cursor.close()
+
+        return kategorieId
     }
 
 

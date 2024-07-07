@@ -17,6 +17,8 @@ import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
 import com.example.smartsave.helpers.StandardText
 
+//TODO QRCODE/ÜBERWEISUNGSDATEN DRUCKEN
+//TODO Bei mode auflösen nicht monatsrate sondern summe angeben (alles zurücküberweisen mäßig) ((auflösen halt))
 
 class SparzielAnAufActivity: SmartSaveActivity() {
     var db = DbHelper(this)

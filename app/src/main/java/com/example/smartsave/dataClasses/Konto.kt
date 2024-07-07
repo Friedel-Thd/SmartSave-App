@@ -17,19 +17,30 @@ data class Konto(
 
     fun getAusgabenByKategorie(month: Month, kategorie: Kategorie): Double {
         var umsatzSumme = 0.0
+        var restBetrag = 0.0
         val selectedDate = LocalDate.of(month.year, month.month, 1)
 
         for (umsatz in umsatzList) {
-            if (umsatz.hasAssignedEinzelumsatz()) {
+            if ((umsatz.datum.isAfter(selectedDate) && umsatz.kategorie.id == kategorie.id && umsatz.betrag < 0) && kategorie.name == "Nicht zugeordnet" && umsatz.hasAssignedEinzelumsatz()) {
+                restBetrag = umsatz.betrag
                 for (einzelumsatz in umsatz.einzelumsatzListe) {
-                    if (einzelumsatz.datum.isAfter(selectedDate) && einzelumsatz.kategorie.id == kategorie.id && einzelumsatz.betrag < 0) {
-                        umsatzSumme += -einzelumsatz.betrag
+                    if (einzelumsatz.datum.isAfter(selectedDate) && einzelumsatz.betrag < 0) {
+                        restBetrag += -einzelumsatz.betrag
                     }
                 }
-            } else if (umsatz.datum.isAfter(selectedDate) && umsatz.kategorie.id == kategorie.id && umsatz.betrag < 0) {
-                umsatzSumme += -umsatz.betrag
+                umsatzSumme = -restBetrag
+            } else {
+                if (umsatz.hasAssignedEinzelumsatz()) {
+                    for (einzelumsatz in umsatz.einzelumsatzListe) {
+                        if (einzelumsatz.datum.isAfter(selectedDate) && einzelumsatz.kategorie.id == kategorie.id && einzelumsatz.betrag < 0) {
+                            umsatzSumme += -einzelumsatz.betrag
+                        }
+                    }
+                } else if (umsatz.datum.isAfter(selectedDate) && umsatz.kategorie.id == kategorie.id && umsatz.betrag < 0) {
+                    umsatzSumme += -umsatz.betrag
                 }
             }
+        }
 
         return umsatzSumme
     }

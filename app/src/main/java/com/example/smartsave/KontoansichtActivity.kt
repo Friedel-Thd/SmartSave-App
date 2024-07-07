@@ -3,6 +3,7 @@ package com.example.smartsave
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -53,15 +54,19 @@ class KontoansichtActivity : SmartSaveActivity() {
     private lateinit var bankkonto: Konto
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
         bankkonto = db.getBankkonto()!!
         kategorienListe = db.getKategorienListe()
-        super.onCreate(savedInstanceState)
     }
 
     override fun onResume() {
+        super.onResume()
+
         bankkonto = db.getBankkonto()!!
         kategorienListe = db.getKategorienListe()
-        super.onResume()
+
+        setContent { GenerateContent() }
     }
 
     @Preview

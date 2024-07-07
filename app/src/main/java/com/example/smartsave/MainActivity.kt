@@ -2,6 +2,7 @@ package com.example.smartsave
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -57,6 +58,8 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
         sparKontoListState.value = db.getSparKontenListe()
         kreditkontenListeState.value = db.getKreditKontenListe()
         sparzielListeState.value = db.getSparzielListe()
+
+        setContent { GenerateContent() }
     }
 
     @Preview

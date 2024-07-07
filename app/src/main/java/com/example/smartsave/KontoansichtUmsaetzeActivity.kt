@@ -2,6 +2,7 @@ package com.example.smartsave
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
@@ -372,6 +373,7 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
             //TODO Testdaten einfügen
             db.insertRandomUmsatzForExistingKonto(konto)
             konto = db.getKontoByKontonummer(konto.kontonr)!!
+            setContent { GenerateContent() }
 
         }
         AlignedButton(alignment = Alignment.BottomCenter, text = "Zurück", modifier = Modifier.height(70.dp)) {
