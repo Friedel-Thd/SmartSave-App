@@ -2,6 +2,7 @@ package com.example.smartsave
 
 import DbHelper
 import android.os.Bundle
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
@@ -36,16 +37,18 @@ class UmsatzAuswahlZuordnungActivity : SmartSaveActivity() {
     fun PreviewLayout() = GenerateContent()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         val bundle = intent.extras
         kontoState.value = bundle!!.getSerializable("Konto") as Konto
         kontoState.value = db.getKontoByKontonummer(kontoState.value!!.kontonr)
         umsatzListeState.value = kontoState.value!!.umsatzList
-        super.onCreate(savedInstanceState)
+
     }
 
     override fun onResume() {
         kontoState.value = db.getKontoByKontonummer(kontoState.value!!.kontonr)
         umsatzListeState.value = kontoState.value!!.umsatzList
+        Log.d("Resume zuordnung","ON RESUME CALLED")
         super.onResume()
     }
 

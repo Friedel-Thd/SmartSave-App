@@ -4,6 +4,8 @@ import DbHelper
 import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.util.Log
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
@@ -30,21 +32,27 @@ import com.example.smartsave.helpers.SmartSaveActivity
 import com.example.smartsave.helpers.UmsatzDiffListItem
 
 class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
-    private val einzelUmsatzListeState = mutableStateOf<List<Einzelumsatz>>(emptyList())
+    private lateinit var einzelUmsatzListe : List<Einzelumsatz>
     private lateinit var  kontoList : List<Konto>
     var db = DbHelper(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         //TODO get alle konten (außer sparkonten evtl)
         kontoList = db.getAllKonten()
-        einzelUmsatzListeState.value = db.getEinzelumsatzListe()
-        super.onCreate(savedInstanceState)
+        einzelUmsatzListe = db.getEinzelumsatzListe()
+
     }
 
     override fun onResume() {
-        einzelUmsatzListeState.value = db.getEinzelumsatzListe()
-        kontoList = db.getAllKonten()
         super.onResume()
+        kontoList = db.getAllKonten()
+        einzelUmsatzListe = db.getEinzelumsatzListe()
+
+
+       // Log.d("Resume verwaltung","ON RESUME CALLED")
+        setContent{GenerateContent()}
+
     }
     @Preview
     @Composable
@@ -56,18 +64,18 @@ class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
         //TODO je nach aufruf einzelumsätze eines umsatzes bzw. einzelumsätze ohne zugewiesenen umsatz glaub ich so mäßisch
 
 
-        val einzelumsatzListe by remember { einzelUmsatzListeState }
+        //val einzelumsatzListe by remember { einzelUmsatzListeState }
                 // val kontoListe by remember { kontoListState }
 
         MainColumn(
             modifier = Modifier.verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            for (einzelumsatz in einzelumsatzListe){
+            for (einzelumsatz in einzelUmsatzListe){
                 //TODO psychosen shit mit update in geschachteltem composable
                 EinzelumsatzListItem(einzelumsatz = einzelumsatz, context = LocalContext.current, kontenListe = kontoList,
                     onUpdate = {
-                        einzelUmsatzListeState.value = db.getEinzelumsatzListe()
+                        einzelUmsatzListe = db.getEinzelumsatzListe()
                     })
             }
 
@@ -91,5 +99,6 @@ class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
         }
 
     }
+
 
 }

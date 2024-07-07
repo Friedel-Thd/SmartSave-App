@@ -41,9 +41,10 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
     private val kategorienListeState = mutableStateOf<List<Kategorie>>(emptyList())
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         kategorienListeState.value = db.getKategorienListe()
 
-        super.onCreate(savedInstanceState)
+
     }
     @Preview
     @Composable
