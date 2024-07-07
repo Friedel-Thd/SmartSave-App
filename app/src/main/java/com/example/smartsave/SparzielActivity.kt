@@ -78,7 +78,8 @@ class SparzielActivity : SmartSaveActivity() {
             LabelledDatePickerButton(label = "Auszahlungszeitraum*",
                 selectedDate = selectedDate,
                 onDateSelected = { date -> selectedDate = date },
-                true
+                mindate = true,
+                maxdate = false
             )
 
             //TODO Bei leerer Kontoliste auf Layout #4a Weiterleiten ( Popup alter mäßisch aber erst bei click auf die menues)

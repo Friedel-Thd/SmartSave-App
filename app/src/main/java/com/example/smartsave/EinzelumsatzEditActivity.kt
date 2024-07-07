@@ -70,7 +70,8 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
             LabelledDatePickerButton(label = "Datum*",
                 selectedDate = selectedDate,
                 onDateSelected = { date -> selectedDate = date },
-                false
+                mindate = false,
+                maxdate = true
             )
             selectedKategorie = LabelledDropdownMenuKategory(label = "Kategorie", options = kategorienListe)
 

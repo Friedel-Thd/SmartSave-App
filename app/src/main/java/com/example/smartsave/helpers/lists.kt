@@ -382,7 +382,7 @@ fun LabelledDropdownMenuKategory(label: String, options: List<Kategorie>): Kateg
 
 //TODO Layout
 @Composable
-fun LabelledDatePickerButton(label: String, selectedDate: String, onDateSelected: (String) -> Unit, mindate: Boolean) {
+fun LabelledDatePickerButton(label: String, selectedDate: String, onDateSelected: (String) -> Unit, mindate: Boolean, maxdate: Boolean) {
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
     val year = calendar.get(Calendar.YEAR)
@@ -397,6 +397,9 @@ fun LabelledDatePickerButton(label: String, selectedDate: String, onDateSelected
     )
     if(mindate) {
         datePickerDialog.datePicker.minDate = calendar.timeInMillis
+    }
+    if(maxdate) {
+        datePickerDialog.datePicker.maxDate = calendar.timeInMillis
     }
     Row(
         modifier = Modifier
