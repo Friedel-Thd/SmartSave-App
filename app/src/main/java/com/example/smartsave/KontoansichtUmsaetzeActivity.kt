@@ -275,8 +275,6 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
                                         ElevatedButton(
                                             enabled = !umsatz.isAssigned(),
                                             onClick = {
-                                                // TODO Übergabeparameter aktueller Umsatz mäßisch
-                                                // TODO Fixxen??
                                                 val intent = Intent(this@KontoansichtUmsaetzeActivity, UmsaetzeDiffActivity::class.java)
                                                 intent.putExtra("Umsatz", umsatz)
                                                 startActivity(intent)

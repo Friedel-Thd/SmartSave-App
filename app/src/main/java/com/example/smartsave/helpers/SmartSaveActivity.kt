@@ -32,7 +32,7 @@ abstract class SmartSaveActivity(
     }
 
     @Composable
-    protected fun GenerateContent() = Scaffold {paddingValues ->
+    fun GenerateContent() = Scaffold {paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()

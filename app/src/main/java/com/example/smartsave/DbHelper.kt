@@ -584,21 +584,22 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         val db = writableDatabase
         val values = ContentValues().apply {
             put(SmartSaveContract.KategorieZuweisungEntry.KATEGORIE_ID, kategorieId)
-            put(SmartSaveContract.KategorieZuweisungEntry.IS_EINZELUMSATZ, if (isEinzelumsatz) 1 else 0)
         }
-        val selection = "${SmartSaveContract.KategorieZuweisungEntry.UMSATZ_ID} = ?"
-        val selectionArgs = arrayOf(umsatzId.toString())
+        val selection = "${SmartSaveContract.KategorieZuweisungEntry.UMSATZ_ID} = ? AND ${SmartSaveContract.KategorieZuweisungEntry.IS_EINZELUMSATZ} = ?"
+        val selectionArgs = arrayOf(umsatzId.toString(), if (isEinzelumsatz) "1" else "0")
 
         Log.d("DbHelper", "Values: $values")
         Log.d("DbHelper", "Selection: $selection")
-        Log.d("DbHelper", "SelectionArgs: ${selectionArgs.contentToString()}")
+        Log.d("DbHelper", "SelectionArgs: ${selectionArgs.joinToString()}")
 
+        // Execute the update query
         val count = db.update(
             SmartSaveContract.KategorieZuweisungEntry.TABLE_NAME,
             values,
             selection,
             selectionArgs
         )
+
         Log.d("DbHelper", "Updated $count rows")
     }
 
@@ -687,6 +688,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         return LocalDate.parse(datumString, dateFormat)
     }
 
+    //TODO Testdaten anpassen || isEinzelumsatz Teil
     fun insertTestData(dbHelper: DbHelper) {
         val db = dbHelper.writableDatabase
 
@@ -738,12 +740,14 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
             }
             cursor.close()
 
+            // Bestimmen Sie, ob es sich um einen Einzelumsatz handelt
+            val isEinzelumsatz = verwendungszweck.startsWith("Test Einzelumsatz")
+
             // Kategoriezuweisung einfügen
             val kategoriezuweisungValues = ContentValues().apply {
-                //TODO wieder zurück changen ID technische diese diese
                 put(SmartSaveContract.KategorieZuweisungEntry.KATEGORIE_ID, kategorieId)
                 put(SmartSaveContract.KategorieZuweisungEntry.UMSATZ_ID, umsatzId)
-                put(SmartSaveContract.KategorieZuweisungEntry.IS_EINZELUMSATZ, 0)
+                put(SmartSaveContract.KategorieZuweisungEntry.IS_EINZELUMSATZ, if (isEinzelumsatz) 1 else 0)
             }
             db.insert(SmartSaveContract.KategorieZuweisungEntry.TABLE_NAME, null, kategoriezuweisungValues)
         }
@@ -764,6 +768,9 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
                 put(SmartSaveContract.EinzelumsatzEntry.DATUM, datum)
             }
             val einzelumsatzId = db.insert(SmartSaveContract.EinzelumsatzEntry.TABLE_NAME, null, einzelumsatzValues)
+
+            // Bestimmen Sie, ob es sich um einen Einzelumsatz handelt
+            val isEinzelumsatz = true
 
             // Einzelumsatzzuweisung einfügen
             val einzelumsatzzuweisungValues = ContentValues().apply {
