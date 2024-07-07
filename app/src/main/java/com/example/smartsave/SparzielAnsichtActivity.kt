@@ -50,6 +50,7 @@ class SparzielAnsichtActivity: SmartSaveActivity() {
         AlignedButton(alignment = Alignment.BottomEnd, text = "Auszahlen") {
             val intent = Intent(this@SparzielAnsichtActivity, SparzielAnAufActivity::class.java)
             intent.putExtra("Sparziel", sparziel)
+            intent.putExtra("Summe", summe)
             intent.putExtra("mode", "auflösen")
             startActivity(intent)
             finish()

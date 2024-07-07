@@ -821,97 +821,16 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         return LocalDate.parse(datumString, dateFormat)
     }
 
-    //TODO Testdaten anpassen || isEinzelumsatz Teil
-    fun insertTestData(dbHelper: DbHelper) {
-        val db = dbHelper.writableDatabase
-
-        // Konto einfügen
-        val konto = Konto(1, "12345678", "ABCDEFGH", "DE12345678901234567890", "Girokonto", "Bankkonto")
-        dbHelper.insertKonto(konto)
-
-        // Kategorien einfügen
-        val kategorien = listOf("Nicht zugeordnet", "Lebensmittel", "Auto", "Miete", "Unterhaltung", "Reisen", "Bildung")
-        kategorien.forEach { kategorie ->
-            dbHelper.insertKategorie(Kategorie(kategorie))
-        }
-
-        // Umsätze einfügen
-        val umsaetze = listOf(
-            Triple("Testumsatz 1", -3000.0, "01/02/2024"),
-            Triple("Testumsatz 2", -150.0, "15/03/2024"),
-            Triple("Testumsatz 3", -200.0, "28/04/2024"),
-            Triple("Testumsatz 4", 250.0, "12/05/2024"),
-            Triple("Testumsatz 5", 300.0, "05/06/2024"),
-            Triple("Testumsatz 6", 50.0, "20/09/2023"),
-            Triple("Testumsatz 7", 75.0, "10/10/2023"),
-            Triple("Testumsatz 8", 125.0, "25/11/2023"),
-            Triple("Testumsatz 9", 175.0, "08/12/2023"),
-            Triple("Testumsatz 10", 225.0, "30/01/2024"),
-            Triple("Tester", -200.0, "30/01/2024"),
-            Triple("Tester", -225.0, "30/01/2024")
-        )
-
-        val random = java.util.Random()
-
-        umsaetze.forEachIndexed { index, (verwendungszweck, betrag, datum) ->
-            val umsatzValues = ContentValues().apply {
-                put(SmartSaveContract.UmsatzEntry.KONTONUMMER, 1)
-                put(SmartSaveContract.UmsatzEntry.DATUM, datum)
-                put(SmartSaveContract.UmsatzEntry.VERWENDUNGSZWECK, verwendungszweck)
-                put(SmartSaveContract.UmsatzEntry.BETRAG, betrag)
-            }
-            val umsatzId = db.insert(SmartSaveContract.UmsatzEntry.TABLE_NAME, null, umsatzValues)
-
-            // Kategorie zufällig auswählen
-            val kategorieIndex = random.nextInt(kategorien.size)
-            val kategorieName = kategorien[kategorieIndex]
-            val kategorieIdQuery = "SELECT ${SmartSaveContract.KategorieEntry.KATEGORIE_ID} FROM ${SmartSaveContract.KategorieEntry.TABLE_NAME} WHERE ${SmartSaveContract.KategorieEntry.NAME} = ?"
-            val cursor = db.rawQuery(kategorieIdQuery, arrayOf(kategorieName))
-            var kategorieId: Long = -1
-            if (cursor.moveToFirst()) {
-                kategorieId = cursor.getLong(cursor.getColumnIndexOrThrow(SmartSaveContract.KategorieEntry.KATEGORIE_ID))
-            }
-            cursor.close()
-
-            // Bestimmen Sie, ob es sich um einen Einzelumsatz handelt
-            val isEinzelumsatz = verwendungszweck.startsWith("Test Einzelumsatz")
-
-            // Kategoriezuweisung einfügen
-            val kategoriezuweisungValues = ContentValues().apply {
-                put(SmartSaveContract.KategorieZuweisungEntry.KATEGORIE_ID, kategorieId)
-                put(SmartSaveContract.KategorieZuweisungEntry.UMSATZ_ID, umsatzId)
-                put(SmartSaveContract.KategorieZuweisungEntry.IS_EINZELUMSATZ, if (isEinzelumsatz) 1 else 0)
-            }
-            db.insert(SmartSaveContract.KategorieZuweisungEntry.TABLE_NAME, null, kategoriezuweisungValues)
-        }
-
-        // Einzelumsätze einfügen
-        val einzelumsaetze = listOf(
-            Triple("Test Einzelumsatz 1", -50.0, "02/01/2024"),
-            Triple("Test Einzelumsatz 2", -75.0, "14/02/2024"),
-            Triple("Test Einzelumsatz 3", -100.0, "27/03/2024"),
-            Triple("Test Einzelumsatz 4", -125.0, "10/04/2024"),
-            Triple("Test Einzelumsatz 5", -150.0, "23/05/2024")
-        )
-
-        einzelumsaetze.forEachIndexed { index, (verwendungszweck, betrag, datum) ->
-            val einzelumsatzValues = ContentValues().apply {
-                put(SmartSaveContract.EinzelumsatzEntry.VERWENDUNGSZWECK, verwendungszweck)
-                put(SmartSaveContract.EinzelumsatzEntry.BETRAG, betrag)
-                put(SmartSaveContract.EinzelumsatzEntry.DATUM, datum)
-            }
-            val einzelumsatzId = db.insert(SmartSaveContract.EinzelumsatzEntry.TABLE_NAME, null, einzelumsatzValues)
-
-            // Bestimmen Sie, ob es sich um einen Einzelumsatz handelt
-            val isEinzelumsatz = true
-
-            // Einzelumsatzzuweisung einfügen
-            val einzelumsatzzuweisungValues = ContentValues().apply {
-                put(SmartSaveContract.EinzelumsatzZuweisungEntry.UMSATZ_ID, 1)
-                put(SmartSaveContract.EinzelumsatzZuweisungEntry.EINZELUMSATZ_ID, einzelumsatzId)
-            }
-            db.insert(SmartSaveContract.EinzelumsatzZuweisungEntry.TABLE_NAME, null, einzelumsatzzuweisungValues)
-        }
+    fun clearAllData() {
+        val db = writableDatabase
+        db.execSQL("DELETE FROM ${SmartSaveContract.KontoEntry.TABLE_NAME}")
+        db.execSQL("DELETE FROM ${SmartSaveContract.UmsatzEntry.TABLE_NAME}")
+        db.execSQL("DELETE FROM ${SmartSaveContract.EinzelumsatzEntry.TABLE_NAME}")
+        db.execSQL("DELETE FROM ${SmartSaveContract.KategorieEntry.TABLE_NAME}")
+        db.execSQL("DELETE FROM ${SmartSaveContract.KategorieZuweisungEntry.TABLE_NAME}")
+        db.execSQL("DELETE FROM ${SmartSaveContract.EinzelumsatzZuweisungEntry.TABLE_NAME}")
+        db.execSQL("DELETE FROM ${SmartSaveContract.SparzielEntry.TABLE_NAME}")
+        db.execSQL("DELETE FROM ${SmartSaveContract.SparzielZuweisungEntry.TABLE_NAME}")
     }
 
     fun insertRandomUmsatzForExistingKonto(konto: Konto) {

@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.smartsave.dataClasses.Einzelumsatz
+import com.example.smartsave.dataClasses.Kategorie
 import com.example.smartsave.dataClasses.Konto
 import com.example.smartsave.dataClasses.Sparziel
 import com.example.smartsave.helpers.AlignedButton
@@ -38,26 +39,27 @@ import com.example.smartsave.helpers.SparzielListItem
 import kotlinx.coroutines.launch
 
 class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
-    private val bankkontoState = mutableStateOf<Konto?>(null)
-    private val kreditkontenListeState = mutableStateOf<List<Konto>>(emptyList())
-    private val sparzielListeState = mutableStateOf<List<Sparziel>>(emptyList())
-    private val sparKontoListState = mutableStateOf<List<Konto>>(emptyList())
     var db = DbHelper(this)
+    private var bankkonto: Konto? = null
+    private lateinit var kreditkontenListe: List<Konto>
+    private lateinit var sparzielListe: List<Sparziel>
+    private lateinit var sparKontenListe: List<Konto>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        bankkontoState.value = db.getBankkonto()
-        kreditkontenListeState.value = db.getKreditKontenListe()
-        sparzielListeState.value = db.getSparzielListe()
+        bankkonto = db.getBankkonto()
+        kreditkontenListe = db.getKreditKontenListe()
+        sparzielListe = db.getSparzielListe()
 
         db.insertDefaultData()
     }
     override fun onResume() {
         super.onResume()
-        bankkontoState.value = db.getBankkonto()
-        sparKontoListState.value = db.getSparKontenListe()
-        kreditkontenListeState.value = db.getKreditKontenListe()
-        sparzielListeState.value = db.getSparzielListe()
+        bankkonto = db.getBankkonto()
+        sparKontenListe = db.getSparKontenListe()
+        kreditkontenListe = db.getKreditKontenListe()
+        sparzielListe = db.getSparzielListe()
 
         setContent { GenerateContent() }
     }
@@ -71,10 +73,6 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
 
-        val bankkonto by remember { bankkontoState }
-        val kreditkontenListe by remember { kreditkontenListeState }
-        val sparzielListe by remember { sparzielListeState }
-        val sparKontenListe by remember { sparKontoListState}
         var emptyKontenError  by remember { mutableStateOf(false) }
 
         LaunchedEffect(Unit) {
@@ -122,10 +120,14 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                                     startActivity(intent)
                                 }
                             })
-                        //TODO DELETE
-                        ListItem(text = "Testdaten anlegen",
+                        ListItem(text = "Daten löschen",
                             modifier = Modifier.clickable {
-                                db.insertTestData(db)
+                                db.clearAllData()
+                                db.insertDefaultData()
+                                bankkonto = db.getBankkonto()
+                                sparKontenListe = db.getSparKontenListe()
+                                kreditkontenListe = db.getKreditKontenListe()
+                                sparzielListe = db.getSparzielListe()
                             })
                     }
                 }

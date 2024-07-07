@@ -18,7 +18,6 @@ import com.example.smartsave.helpers.SmartSaveActivity
 import com.example.smartsave.helpers.StandardText
 
 //TODO QRCODE/ÜBERWEISUNGSDATEN DRUCKEN
-//TODO Bei mode auflösen nicht monatsrate sondern summe angeben (alles zurücküberweisen mäßig) ((auflösen halt))
 
 class SparzielAnAufActivity: SmartSaveActivity() {
     var db = DbHelper(this)
@@ -32,6 +31,7 @@ class SparzielAnAufActivity: SmartSaveActivity() {
         val bundle = intent.extras
         val tempSparziel = bundle!!.getSerializable("Sparziel") as Sparziel
         val mode = bundle.getString("mode")
+        val betrag = if(mode == "auflösen") { bundle.getDouble("Summe") } else { tempSparziel.monatsrate }
 
 
         MainColumn(
@@ -49,7 +49,7 @@ class SparzielAnAufActivity: SmartSaveActivity() {
             }
             Row (modifier = Modifier.fillMaxWidth(),  horizontalArrangement = Arrangement.SpaceBetween){
                 StandardText("Betrag")
-                StandardText(tempSparziel.monatsrate.toString())
+                StandardText(betrag.toString())
             }
             Row (modifier = Modifier.fillMaxWidth(),  horizontalArrangement = Arrangement.SpaceBetween){
                 StandardText("Verwendungszweck")

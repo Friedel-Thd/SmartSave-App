@@ -352,17 +352,6 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
             )
         }
 
-
-        AlignedButton(
-            alignment = Alignment.BottomStart,
-            iconId = R.drawable.arrow_forward,
-            modifier = Modifier
-                .height(70.dp)
-                .width(70.dp)
-        ) {
-            //TODO Testdaten löschen (umsätze mäesisch)
-
-        }
         AlignedButton(
             alignment = Alignment.BottomEnd,
             iconId = R.drawable.plus,
@@ -370,7 +359,6 @@ class KontoansichtUmsaetzeActivity : SmartSaveActivity() {
                 .height(70.dp)
                 .width(70.dp)
         ) {
-            //TODO Testdaten einfügen
             db.insertRandomUmsatzForExistingKonto(konto)
             konto = db.getKontoByKontonummer(konto.kontonr)!!
             setContent { GenerateContent() }
