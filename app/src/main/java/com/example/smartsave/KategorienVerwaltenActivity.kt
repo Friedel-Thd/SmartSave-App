@@ -81,7 +81,8 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
         }
 
         AlignedButton(alignment = Alignment.BottomStart, text = "Zurück") {finish()}
-        AlignedButton(alignment = Alignment.BottomEnd, iconId = R.drawable.plus) { showDialogAnlegen = true }
+        AlignedButton(alignment = Alignment.BottomEnd, iconId = R.drawable.plus) { showDialogAnlegen = true
+        textKategorie = ""}
 
         if (showDialogAnlegen) {
             AlertDialog(
@@ -91,18 +92,22 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
                     showDialogAnlegen = false },
                 confirmButton = {
                     TextButton(onClick = {
-                        for (kat in kategorienListe){
-                            if (kat.name == textKategorie) nameExistsError = true; emptyError = false
+                        if(textKategorie.isEmpty()){
+                            emptyError = true
+                            nameExistsError = false
+                        } else if (kategorienListe.any{it.name == textKategorie}){
+                            nameExistsError = true
+                            emptyError = false
                         }
-                        if(textKategorie.isEmpty()) emptyError =true
-                        if(!nameExistsError && !emptyError){
+                        else {
                             showDialogAnlegen = false
-                            //TODO Kein namen doppelt zulassen
                             val newKategorie = Kategorie(textKategorie)
                             db.insertKategorie(newKategorie)
                             val newkategorienListe = kategorienListe.toMutableList()
                             newkategorienListe.add(newKategorie)
                             kategorienListeState.value = newkategorienListe
+                            emptyError = false
+                            nameExistsError = false
                         }
                     })
                     {
@@ -113,7 +118,10 @@ class KategorienVerwaltenActivity : SmartSaveActivity() {
                     if(emptyError) ErrorMsg(msg = "Bitte Textfeld ausfüllen!")
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDialogAnlegen = false }) {
+                    TextButton(onClick = {
+                        showDialogAnlegen = false
+                        emptyError = false
+                        nameExistsError = false}) {
                         Text("Abbrechen")
                     }
                 },

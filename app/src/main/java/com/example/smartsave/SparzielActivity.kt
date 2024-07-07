@@ -84,7 +84,6 @@ class SparzielActivity : SmartSaveActivity() {
                 maxdate = false
             )
 
-            //TODO Bei leerer Kontoliste auf Layout #4a Weiterleiten ( Popup alter mäßisch aber erst bei click auf die menues)
             ausgangKonto = labelledDropdownMenu("Auszahlungskonto*", kontolist)
             zielKonto = labelledDropdownMenu("Zielkonto*", sparkontolist)
             if (kontolist.isEmpty()) {
@@ -103,7 +102,7 @@ class SparzielActivity : SmartSaveActivity() {
 
         }
 
-        //TODO bei Zielkonto nur alle Sparkonten listen
+
         AlignedButton(alignment = Alignment.BottomStart, text = "Abbrechen") {finish()}
         AlignedButton(alignment = Alignment.BottomEnd, text = "Weiter") {
 
