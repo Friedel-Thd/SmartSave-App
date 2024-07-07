@@ -16,6 +16,17 @@ import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
 import com.example.smartsave.helpers.StandardText
+import android.graphics.Bitmap
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.MultiFormatWriter
+import com.google.zxing.common.BitMatrix
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.graphics.asImageBitmap
+
 
 //TODO QRCODE/ÜBERWEISUNGSDATEN DRUCKEN
 
@@ -49,15 +60,22 @@ class SparzielAnAufActivity: SmartSaveActivity() {
             }
             Row (modifier = Modifier.fillMaxWidth(),  horizontalArrangement = Arrangement.SpaceBetween){
                 StandardText("Betrag")
-                StandardText(betrag.toString())
+                StandardText("${betrag}€")
             }
             Row (modifier = Modifier.fillMaxWidth(),  horizontalArrangement = Arrangement.SpaceBetween){
                 StandardText("Verwendungszweck")
                 StandardText(tempSparziel.name)
             }
-        }
+            // QR Code anzeigen
+            val qrData = """
+            Auszahlkonto: ${tempSparziel.auszahlungsKonto.kontonr}
+            Zielkonto: ${tempSparziel.zielKonto.kontonr}
+            Betrag: ${tempSparziel.monatsrate}
+            Verwendungszweck: ${tempSparziel.name}
+        """.trimIndent()
 
-        //TODO Darstellung Drucken/QR-Code und so mäßig
+            QRCodeComposable(text = qrData, size = 200)
+        }
 
         AlignedButton(alignment = Alignment.BottomStart, text = "Abbrechen") {finish()}
         AlignedButton(
@@ -81,4 +99,36 @@ class SparzielAnAufActivity: SmartSaveActivity() {
             }
         }
     }
+
+
+    fun generateQRCode(text: String, size: Int): Bitmap {
+        val bitMatrix: BitMatrix = MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, size, size)
+        val width = bitMatrix.width
+        val height = bitMatrix.height
+        val bmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                bmp.setPixel(x, y, if (bitMatrix.get(x, y)) android.graphics.Color.BLACK else android.graphics.Color.WHITE)
+            }
+        }
+        return bmp
+    }
+
+
+    @Composable
+    fun QRCodeComposable(text: String, size: Int) {
+        val bitmap = generateQRCode(text, size)
+        Box(
+            modifier = Modifier.fillMaxSize().padding(top= 40.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                bitmap = bitmap.asImageBitmap(),
+                contentDescription = "QR Code",
+                modifier = Modifier.size(size.dp)
+            )
+        }
+    }
+
+
 }

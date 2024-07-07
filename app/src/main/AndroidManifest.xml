@@ -11,9 +11,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartSave">
         <activity
-            android:name=".MainActivity2"
-            android:exported="false" />
-        <activity
             android:name=".UmsatzAuswahlZuordnungActivity"
             android:exported="false" />
         <activity
@@ -47,7 +44,6 @@
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.SmartSave">
-            android:name="android.permission.WRITE_EXTERNAL_STORAGE"
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
