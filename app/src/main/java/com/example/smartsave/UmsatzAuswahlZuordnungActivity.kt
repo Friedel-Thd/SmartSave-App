@@ -50,7 +50,6 @@ class UmsatzAuswahlZuordnungActivity : SmartSaveActivity() {
     override fun BoxScope.GenerateLayout(){
         val bundle = intent.extras
         val einzelumsatz = bundle!!.getSerializable("Einzelumsatz") as Einzelumsatz
-       // val umsatzListe by remember { umsatzListeState }
         var restBetrag = 0.0
 
         MainColumn (modifier = Modifier

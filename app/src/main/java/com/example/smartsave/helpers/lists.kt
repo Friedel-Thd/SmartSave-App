@@ -148,17 +148,18 @@ fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifi
     var selectedKonto by remember { mutableStateOf<Konto?>(null) }
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
             .combinedClickable(
                 onClick = {
-
                     showDialogAnlegen = true
-                          },
+                },
                 onLongClick = {
-
                     val intent = Intent(context, EinzelumsatzEditActivity::class.java)
+                    intent.putExtra("einzelumsatz", einzelumsatz)
+                    intent.putExtra("mode", "editieren")
                     context.startActivity(intent)
-                              },
+                },
             )
 
     ){
@@ -202,6 +203,7 @@ fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifi
                     onUpdate()
 
                 }) {
+                    //TODO Neue Kategorie anlegen
                     Text("OK")
 
                 }
@@ -338,6 +340,61 @@ fun LabelledDropdownMenuKategory(label: String, options: List<Kategorie>): Kateg
                 style = TextStyle(fontSize = 20.sp),
 
             )
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded }
+            ) {
+                TextField(
+                    readOnly = true,
+                    value = selectedOptionText.name,
+                    onValueChange = { },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(
+                            expanded = expanded
+                        )
+                    },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    modifier = Modifier.menuAnchor()
+                )
+                ExposedDropdownMenu(
+
+                    expanded = expanded,
+                    onDismissRequest = {
+                        expanded = false
+                    }
+                ) {
+                    options.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            text = { Text(text = selectionOption.name) },
+                            onClick = {
+                                selectedOptionText = selectionOption
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+    return selectedOptionText
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LabelledDropdownMenuKategoryPreset(label: String, options: List<Kategorie>, preset: Kategorie): Kategorie {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOptionText by remember { mutableStateOf(preset) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "$label: ",
+                style = TextStyle(fontSize = 20.sp),
+
+                )
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded }

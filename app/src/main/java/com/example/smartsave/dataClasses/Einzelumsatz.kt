@@ -5,7 +5,7 @@ import java.io.Serializable
 import java.time.LocalDate
 import java.util.Date
 
-data class Einzelumsatz (val verwendungsZweck: String, val betrag: Double, val datum: LocalDate): Serializable {
+data class Einzelumsatz (var verwendungsZweck: String, var betrag: Double, var datum: LocalDate): Serializable {
     var kategorie = Kategorie("Nicht zugeordnet")
     var id = 0
     var hasParentUmsatz = false

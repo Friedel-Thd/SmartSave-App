@@ -28,12 +28,14 @@ import com.example.smartsave.dataClasses.parseDate
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.LabelledDatePickerButton
 import com.example.smartsave.helpers.LabelledDropdownMenuKategory
+import com.example.smartsave.helpers.LabelledDropdownMenuKategoryPreset
 import com.example.smartsave.helpers.LabelledDropdownMenuUmsatz
 import com.example.smartsave.helpers.LabelledInputField
 import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class EinzelumsatzEditActivity : SmartSaveActivity() {
@@ -44,7 +46,6 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
         super.onCreate(savedInstanceState)
         kategorienListeState.value = db.getKategorienListe()
 
-
     }
     @Preview
     @Composable
@@ -53,27 +54,38 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
 
     @Composable
     override fun BoxScope.GenerateLayout(){
-        var selectedDate by remember { mutableStateOf("") }
-        var textBezeichung by remember { mutableStateOf("") }
-        var textBetrag by remember { mutableStateOf("") }
+        val mode = intent.extras?.getString("mode")
+        var einzelumsatz: Einzelumsatz? = if (mode == "editieren") {
+            intent.extras?.getSerializable("einzelumsatz") as? Einzelumsatz
+        } else { null }
+
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        var selectedDate by remember { mutableStateOf(einzelumsatz?.datum?.format(formatter) ?: "") }
+        var textBezeichung by remember { mutableStateOf(einzelumsatz?.verwendungsZweck ?: "") }
+        var textBetrag by remember { mutableStateOf(einzelumsatz?.betrag?.toString() ?: "") }
         val kategorienListe by remember { kategorienListeState }
         var isError by remember { mutableStateOf(false) }
-        var selectedKategorie by remember { mutableStateOf<Kategorie?>(null) }
+        var selectedKategorie by remember { mutableStateOf<Kategorie?>(einzelumsatz?.kategorie) }
 
         MainColumn (
             modifier = Modifier,
             verticalArrangement = Arrangement.spacedBy(12.dp)
             )
         {
-            LabelledInputField(label = "Bezeichung*", value =textBezeichung, KeyboardOptions() ) {textBezeichung = it}
-            LabelledInputField(label = "Betrag*", value =textBetrag, KeyboardOptions(keyboardType = KeyboardType.Number) ) { textBetrag = it}
+            LabelledInputField(label = "Verwendungszweck*", value = textBezeichung, KeyboardOptions() ) {textBezeichung = it}
+            LabelledInputField(label = "Betrag*", value = textBetrag, KeyboardOptions(keyboardType = KeyboardType.Number) ) { textBetrag = it}
             LabelledDatePickerButton(label = "Datum*",
                 selectedDate = selectedDate,
                 onDateSelected = { date -> selectedDate = date },
                 mindate = false,
                 maxdate = true
             )
-            selectedKategorie = LabelledDropdownMenuKategory(label = "Kategorie", options = kategorienListe)
+
+            if (mode == "anlegen") {
+                selectedKategorie = LabelledDropdownMenuKategory(label = "Kategorie", options = kategorienListe)
+            } else if (mode == "editieren" && selectedKategorie != null) {
+                selectedKategorie = LabelledDropdownMenuKategoryPreset(label = "Kategorie", options = kategorienListe, preset = selectedKategorie!!)
+            }
 
             if(isError) {
                 Text(
@@ -84,14 +96,26 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
                 )
             }
         }
+
         AlignedButton(alignment = Alignment.BottomStart, text = "Zurück") {finish()}
         AlignedButton(alignment = Alignment.BottomEnd, text = "Speichern"){
             isError = selectedDate.isEmpty() || textBezeichung.isEmpty() || textBetrag.isEmpty()
-
+            //TODO bei editieren den restbetrag des umsatz holen, um sicherzugehen, dass neuer betrag nicht zu groß/klein ist
             if(!isError){
-                var einzelumsatz = Einzelumsatz(textBezeichung,textBetrag.toDouble(), parseDate(selectedDate))
-                einzelumsatz.kategorie = selectedKategorie!!
-                db.insertEinzelumsatz(einzelumsatz)
+                if (mode == "anlegen") {
+                    val neweinzelumsatz = Einzelumsatz(textBezeichung,textBetrag.toDouble(), parseDate(selectedDate))
+                    neweinzelumsatz.kategorie = selectedKategorie!!
+
+                    db.insertEinzelumsatz(neweinzelumsatz)
+                } else if (mode == "editieren" && einzelumsatz != null) {
+                    einzelumsatz.verwendungsZweck = textBezeichung
+                    einzelumsatz.betrag = textBetrag.toDouble()
+                    einzelumsatz.datum = parseDate(selectedDate)
+                    einzelumsatz.kategorie = selectedKategorie!!
+
+                    db.editEinzelumsatz(einzelumsatz)
+                }
+
                 finish()
             }
         }

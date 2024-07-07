@@ -263,6 +263,46 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         db.insert(SmartSaveContract.KategorieZuweisungEntry.TABLE_NAME, null, kategorieZuweisungValues)
     }
 
+    fun editEinzelumsatz(einzelumsatz: Einzelumsatz) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(SmartSaveContract.EinzelumsatzEntry.BETRAG, einzelumsatz.betrag)
+            put(SmartSaveContract.EinzelumsatzEntry.DATUM, einzelumsatz.datum.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+            put(SmartSaveContract.EinzelumsatzEntry.VERWENDUNGSZWECK, einzelumsatz.verwendungsZweck)
+        }
+
+        val einzelumsatzId = einzelumsatz.id
+
+        val updateCount = db.update(
+            SmartSaveContract.EinzelumsatzEntry.TABLE_NAME,
+            values,
+            "${SmartSaveContract.EinzelumsatzEntry.EINZELUMSATZ_ID} = ?",
+            arrayOf(einzelumsatzId.toString())
+        )
+
+        if (updateCount > 0) {
+            val kategorieZuweisungValues = ContentValues().apply {
+                put(SmartSaveContract.KategorieZuweisungEntry.KATEGORIE_ID, einzelumsatz.kategorie.id)
+            }
+
+            val updateKategorieZuweisungCount = db.update(
+                SmartSaveContract.KategorieZuweisungEntry.TABLE_NAME,
+                kategorieZuweisungValues,
+                "${SmartSaveContract.KategorieZuweisungEntry.UMSATZ_ID} = ? AND ${SmartSaveContract.KategorieZuweisungEntry.IS_EINZELUMSATZ} = 1",
+                arrayOf(einzelumsatzId.toString())
+            )
+
+            if (updateKategorieZuweisungCount == 0) {
+                val newKategorieZuweisungValues = ContentValues().apply {
+                    put(SmartSaveContract.KategorieZuweisungEntry.UMSATZ_ID, einzelumsatzId)
+                    put(SmartSaveContract.KategorieZuweisungEntry.KATEGORIE_ID, einzelumsatz.kategorie.id)
+                    put(SmartSaveContract.KategorieZuweisungEntry.IS_EINZELUMSATZ, 1)
+                }
+                db.insert(SmartSaveContract.KategorieZuweisungEntry.TABLE_NAME, null, newKategorieZuweisungValues)
+            }
+        }
+    }
+
 
 
     private fun loadUmsaetzeForKonto(kontonummer: Int): List<Umsatz> {

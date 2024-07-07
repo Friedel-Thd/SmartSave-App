@@ -76,6 +76,7 @@ class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
                 .width(70.dp)
         ) {
             val intent = Intent(this@EinzelumsatzVerwaltenActivity, EinzelumsatzEditActivity::class.java)
+            intent.putExtra("mode", "anlegen")
             startActivity(intent)
         }
 
