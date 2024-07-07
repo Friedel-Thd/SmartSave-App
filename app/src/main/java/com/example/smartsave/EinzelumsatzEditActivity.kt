@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.smartsave.dataClasses.Einzelumsatz
@@ -63,7 +64,7 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
             )
         {
             LabelledInputField(label = "Bezeichung*", value =textBezeichung, KeyboardOptions() ) {textBezeichung = it}
-            LabelledInputField(label = "Betrag*", value =textBetrag, KeyboardOptions() ) { textBetrag = it}
+            LabelledInputField(label = "Betrag*", value =textBetrag, KeyboardOptions(keyboardType = KeyboardType.Number) ) { textBetrag = it}
             LabelledDatePickerButton(label = "Datum*",
                 selectedDate = selectedDate,
                 onDateSelected = { date -> selectedDate = date },

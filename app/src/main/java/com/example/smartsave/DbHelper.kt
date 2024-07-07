@@ -688,16 +688,16 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
         // Umsätze einfügen
         val umsaetze = listOf(
-            Triple("Nicht zugeordnet", -3000.0, "01/02/2024"),
+            Triple("Testumsatz 1", -3000.0, "01/02/2024"),
             Triple("Testumsatz 2", -150.0, "15/03/2024"),
-            Triple("Nicht zugeordnet", -200.0, "28/04/2024"),
-            Triple("Testumsatz 4", -250.0, "12/05/2024"),
-            Triple("Testumsatz 5", -300.0, "05/06/2024"),
+            Triple("Testumsatz 3", -200.0, "28/04/2024"),
+            Triple("Testumsatz 4", 250.0, "12/05/2024"),
+            Triple("Testumsatz 5", 300.0, "05/06/2024"),
             Triple("Testumsatz 6", 50.0, "20/09/2023"),
-            Triple("Testumsatz 7", -75.0, "10/10/2023"),
-            Triple("Testumsatz 8", -125.0, "25/11/2023"),
+            Triple("Testumsatz 7", 75.0, "10/10/2023"),
+            Triple("Testumsatz 8", 125.0, "25/11/2023"),
             Triple("Testumsatz 9", 175.0, "08/12/2023"),
-            Triple("Testumsatz 10", -225.0, "30/01/2024"),
+            Triple("Testumsatz 10", 225.0, "30/01/2024"),
             Triple("Tester", -200.0, "30/01/2024"),
             Triple("Tester", -225.0, "30/01/2024")
         )

@@ -31,18 +31,19 @@ import com.example.smartsave.helpers.UmsatzDiffListItem
 
 class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
     private val einzelUmsatzListeState = mutableStateOf<List<Einzelumsatz>>(emptyList())
-    private val kontoListState = mutableStateOf<List<Konto>>(emptyList())
+    private lateinit var  kontoList : List<Konto>
     var db = DbHelper(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         //TODO get alle konten (außer sparkonten evtl)
+        kontoList = db.getAllKonten()
         einzelUmsatzListeState.value = db.getEinzelumsatzListe()
         super.onCreate(savedInstanceState)
     }
 
     override fun onResume() {
         einzelUmsatzListeState.value = db.getEinzelumsatzListe()
-        kontoListState.value = db.getAllKonten()
+        kontoList = db.getAllKonten()
         super.onResume()
     }
     @Preview
@@ -56,7 +57,7 @@ class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
 
 
         val einzelumsatzListe by remember { einzelUmsatzListeState }
-        val kontoListe by remember { kontoListState }
+                // val kontoListe by remember { kontoListState }
 
         MainColumn(
             modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -64,7 +65,7 @@ class EinzelumsatzVerwaltenActivity : SmartSaveActivity() {
         ) {
             for (einzelumsatz in einzelumsatzListe){
                 //TODO psychosen shit mit update in geschachteltem composable
-                EinzelumsatzListItem(einzelumsatz = einzelumsatz, context = LocalContext.current, kontenListe = kontoListe,
+                EinzelumsatzListItem(einzelumsatz = einzelumsatz, context = LocalContext.current, kontenListe = kontoList,
                     onUpdate = {
                         einzelUmsatzListeState.value = db.getEinzelumsatzListe()
                     })

@@ -38,13 +38,14 @@ class UmsatzAuswahlZuordnungActivity : SmartSaveActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val bundle = intent.extras
         kontoState.value = bundle!!.getSerializable("Konto") as Konto
+        kontoState.value = db.getKontoByKontonummer(kontoState.value!!.kontonr)
+        umsatzListeState.value = kontoState.value!!.umsatzList
         super.onCreate(savedInstanceState)
     }
 
     override fun onResume() {
         kontoState.value = db.getKontoByKontonummer(kontoState.value!!.kontonr)
         umsatzListeState.value = kontoState.value!!.umsatzList
-
         super.onResume()
     }
 
@@ -67,19 +68,37 @@ class UmsatzAuswahlZuordnungActivity : SmartSaveActivity() {
                 for(einzelUmsatz in umsatz.einzelumsatzListe){
                     restBetrag -= einzelUmsatz.betrag
                 }
-                if (umsatz.kategorie.name == "Nicht zugeordnet" && einzelumsatz.betrag >= restBetrag){
-                    UmsatzDiffDateListItem(umsatz,modifier = Modifier.clickable {
-                        //TODO wenn man auf umsatz klickt wird der einzelumsatz da in die liste inserted
+                if(umsatz.betrag > 0 && einzelumsatz.betrag >0){
+                    if (umsatz.kategorie.name == "Nicht zugeordnet" && einzelumsatz.betrag <= restBetrag){
+                        UmsatzDiffDateListItem(umsatz,modifier = Modifier.clickable {
+                            //TODO wenn man auf umsatz klickt wird der einzelumsatz da in die liste inserted
 
-                        if( einzelumsatz.hasParentUmsatz ) {
-                            db.updateEinzelumsatzZuweisung(einzelumsatz, umsatz.id)
-                        } else {
-                            einzelumsatz.hasParentUmsatz = true
-                            db.addEinzelumsatzToUmsatz(umsatz.id,einzelumsatz)
-                        }
-                        finish()
+                            if( einzelumsatz.hasParentUmsatz ) {
+                                db.updateEinzelumsatzZuweisung(einzelumsatz, umsatz.id)
+                            } else {
+                                einzelumsatz.hasParentUmsatz = true
+                                db.addEinzelumsatzToUmsatz(umsatz.id,einzelumsatz)
+                            }
+                            finish()
 
-                    })
+                        })
+                    }
+
+                } else if(umsatz.betrag < 0 && einzelumsatz.betrag <0) {
+                    if (umsatz.kategorie.name == "Nicht zugeordnet" && einzelumsatz.betrag >= restBetrag){
+                        UmsatzDiffDateListItem(umsatz,modifier = Modifier.clickable {
+                            //TODO wenn man auf umsatz klickt wird der einzelumsatz da in die liste inserted
+
+                            if( einzelumsatz.hasParentUmsatz ) {
+                                db.updateEinzelumsatzZuweisung(einzelumsatz, umsatz.id)
+                            } else {
+                                einzelumsatz.hasParentUmsatz = true
+                                db.addEinzelumsatzToUmsatz(umsatz.id,einzelumsatz)
+                            }
+                            finish()
+
+                        })
+                    }
                 }
 
             }
