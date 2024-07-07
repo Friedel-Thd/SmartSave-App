@@ -1,25 +1,20 @@
 package com.example.smartsave.helpers
-import DbHelper
+
+import com.example.smartsave.DbHelper
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-
-
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
@@ -57,8 +52,6 @@ import com.example.smartsave.dataClasses.Umsatz
 import com.example.smartsave.UmsatzAuswahlZuordnungActivity
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
-
-fun LazyListScope.listItem(text: String, modifier: Modifier = Modifier) = item { ListItem(text, modifier) }
 
 @Composable
 fun IconListItem(text: String, modifier: Modifier = Modifier, iconId: Int) {
@@ -136,7 +129,7 @@ fun UmsatzDiffListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifier
         horizontalArrangement = Arrangement.SpaceBetween
     ){
         Text(text = einzelumsatz.verwendungsZweck, modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
-        Text(text = "${einzelumsatz.betrag.toString()}€", modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
+        Text(text = "${einzelumsatz.betrag}€", modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
     }
     ListDivider()
 }
@@ -187,7 +180,7 @@ fun EinzelumsatzListItem(einzelumsatz: Einzelumsatz, modifier: Modifier = Modifi
 
 
         Text(text = einzelumsatz.verwendungsZweck, modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
-        Text(text = "${einzelumsatz.betrag.toString()}€", modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
+        Text(text = "${einzelumsatz.betrag}€", modifier = Modifier.padding(vertical = 16.dp), style = TextStyle(fontSize = 24.sp))
     }
     ListDivider()
     if (showDialogAnlegen) {
@@ -326,7 +319,7 @@ fun labelledDropdownMenu(label: String, options: List<Konto>): Konto {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LabelledDropdownMenuKategory(label: String, options: List<Kategorie>): Kategorie {
+fun labelledDropdownMenuKategory(label: String, options: List<Kategorie>): Kategorie {
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf(options[0]) }
 
@@ -381,7 +374,7 @@ fun LabelledDropdownMenuKategory(label: String, options: List<Kategorie>): Kateg
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LabelledDropdownMenuKategoryPreset(label: String, options: List<Kategorie>, preset: Kategorie): Kategorie {
+fun labelledDropdownMenuKategoryPreset(label: String, options: List<Kategorie>, preset: Kategorie): Kategorie {
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf(preset) }
 
@@ -464,7 +457,7 @@ fun LabelledDatePickerButton(label: String, selectedDate: String, onDateSelected
     ) {
         Text("$label: ", modifier = Modifier.fillMaxWidth(.6f), style = TextStyle(fontSize = 20.sp))
         Button(onClick = { datePickerDialog.show() }) {
-            Text(text = if (selectedDate.isEmpty()) "Datum auswählen" else selectedDate)
+            Text(text = selectedDate.ifEmpty { "Datum auswählen" })
         }
     }
     

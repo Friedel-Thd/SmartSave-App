@@ -1,6 +1,5 @@
 package com.example.smartsave
 
-import DbHelper
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row

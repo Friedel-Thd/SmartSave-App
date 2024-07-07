@@ -1,6 +1,5 @@
 package com.example.smartsave
 
-import DbHelper
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
@@ -28,7 +27,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.smartsave.dataClasses.Konto
-import com.example.smartsave.dataClasses.Sparziel
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.LabelledInputField
 import com.example.smartsave.helpers.MainColumn

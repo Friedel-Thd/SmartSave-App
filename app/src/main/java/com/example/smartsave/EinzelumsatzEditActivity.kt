@@ -1,13 +1,8 @@
 package com.example.smartsave
 
-import DbHelper
 import android.os.Bundle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -27,16 +22,12 @@ import com.example.smartsave.dataClasses.Kategorie
 import com.example.smartsave.dataClasses.parseDate
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.LabelledDatePickerButton
-import com.example.smartsave.helpers.LabelledDropdownMenuKategory
-import com.example.smartsave.helpers.LabelledDropdownMenuKategoryPreset
-import com.example.smartsave.helpers.LabelledDropdownMenuUmsatz
+import com.example.smartsave.helpers.labelledDropdownMenuKategory
+import com.example.smartsave.helpers.labelledDropdownMenuKategoryPreset
 import com.example.smartsave.helpers.LabelledInputField
 import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
-import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 class EinzelumsatzEditActivity : SmartSaveActivity() {
     var db = DbHelper(this)
@@ -82,9 +73,9 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
             )
 
             if (mode == "anlegen") {
-                selectedKategorie = LabelledDropdownMenuKategory(label = "Kategorie", options = kategorienListe)
+                selectedKategorie = labelledDropdownMenuKategory(label = "Kategorie", options = kategorienListe)
             } else if (mode == "editieren" && selectedKategorie != null) {
-                selectedKategorie = LabelledDropdownMenuKategoryPreset(label = "Kategorie", options = kategorienListe, preset = selectedKategorie!!)
+                selectedKategorie = labelledDropdownMenuKategoryPreset(label = "Kategorie", options = kategorienListe, preset = selectedKategorie!!)
             }
 
             if(isError) {

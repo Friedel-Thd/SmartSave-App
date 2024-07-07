@@ -1,7 +1,6 @@
 package com.example.smartsave.dataClasses
 import java.io.Serializable
 import java.time.LocalDate
-import java.util.Date
 
 data class Umsatz (val verwendungsZweck: String, var betrag: Double, val datum : LocalDate): Serializable {
     var kategorie = Kategorie("Nicht zugeordnet")
@@ -11,14 +10,8 @@ data class Umsatz (val verwendungsZweck: String, var betrag: Double, val datum :
         return (kategorie.name != "Nicht zugeordnet")
     }
 
-    fun addEinzelumsatz(einzelumsatz: Einzelumsatz) {
-        val mutableList = einzelumsatzListe.toMutableList()
-        mutableList.add(einzelumsatz)
-        einzelumsatzListe = mutableList
-    }
-
     fun hasAssignedEinzelumsatz(): Boolean {
-        var returnValue: Boolean = false
+        var returnValue = false
         for (einzelumsatz in einzelumsatzListe) {
             if (einzelumsatz.isAssigned()) {
              returnValue = true
@@ -29,11 +22,6 @@ data class Umsatz (val verwendungsZweck: String, var betrag: Double, val datum :
 
     fun hasEinzelumsatz(): Boolean {
         return einzelumsatzListe.isNotEmpty()
-    }
-    fun getRestbetrag(einzelBetrag: Double): Double{
-        var restBetrag = 0.0
-        restBetrag -= betrag-einzelBetrag
-        return restBetrag
     }
 
 }

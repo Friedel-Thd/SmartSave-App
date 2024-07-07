@@ -1,6 +1,5 @@
 package com.example.smartsave
 
-import DbHelper
 import android.os.Bundle
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
