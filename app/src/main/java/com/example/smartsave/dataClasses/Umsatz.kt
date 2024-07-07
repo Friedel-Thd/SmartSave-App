@@ -3,7 +3,7 @@ import java.io.Serializable
 import java.time.LocalDate
 import java.util.Date
 
-data class Umsatz (val verwendungsZweck: String, val betrag: Double, val datum : LocalDate): Serializable {
+data class Umsatz (val verwendungsZweck: String, var betrag: Double, val datum : LocalDate): Serializable {
     var kategorie = Kategorie("Nicht zugeordnet")
     var einzelumsatzListe: List<Einzelumsatz> = listOf()
     var id = 0
@@ -29,6 +29,11 @@ data class Umsatz (val verwendungsZweck: String, val betrag: Double, val datum :
 
     fun hasEinzelumsatz(): Boolean {
         return einzelumsatzListe.isNotEmpty()
+    }
+    fun getRestbetrag(einzelBetrag: Double): Double{
+        var restBetrag = 0.0
+        restBetrag -= betrag-einzelBetrag
+        return restBetrag
     }
 
 }

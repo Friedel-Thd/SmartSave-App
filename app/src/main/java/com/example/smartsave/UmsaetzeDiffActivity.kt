@@ -40,7 +40,7 @@ class UmsaetzeDiffActivity : SmartSaveActivity() {
             modifier = Modifier.verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            UmsatzDiffDateListItem(umsatz)
+           // UmsatzDiffDateListItem(umsatz)
 
             for (einzelumsatz in umsatz.einzelumsatzListe) {
                 UmsatzDiffListItem(einzelumsatz)
