@@ -27,9 +27,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.graphics.asImageBitmap
 
-
-//TODO QRCODE/ÜBERWEISUNGSDATEN DRUCKEN
-
 class SparzielAnAufActivity: SmartSaveActivity() {
     var db = DbHelper(this)
 
@@ -44,6 +41,10 @@ class SparzielAnAufActivity: SmartSaveActivity() {
         val mode = bundle.getString("mode")
         val betrag = if(mode == "auflösen") { bundle.getDouble("Summe") } else { tempSparziel.monatsrate }
 
+        val zielkonto = if(mode == "auflösen") { tempSparziel.auszahlungsKonto } else { tempSparziel.zielKonto }
+        val auszahlkonto = if(mode == "auflösen") { tempSparziel.zielKonto } else { tempSparziel.auszahlungsKonto }
+
+
 
         MainColumn(
             modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -52,11 +53,11 @@ class SparzielAnAufActivity: SmartSaveActivity() {
             StandardText("Bitte richten Sie folgenden Dauerauftrag/Terminüberweisung ein:")
             Row (modifier = Modifier.fillMaxWidth(),  horizontalArrangement = Arrangement.SpaceBetween){
                 StandardText("Auszahlkonto")
-                StandardText(tempSparziel.auszahlungsKonto.kontonr.toString())
+                StandardText(zielkonto.kontonr.toString())
             }
             Row (modifier = Modifier.fillMaxWidth(),  horizontalArrangement = Arrangement.SpaceBetween){
                 StandardText("Zielkonto")
-                StandardText(tempSparziel.zielKonto.kontonr.toString())
+                StandardText(auszahlkonto.kontonr.toString())
             }
             Row (modifier = Modifier.fillMaxWidth(),  horizontalArrangement = Arrangement.SpaceBetween){
                 StandardText("Betrag")
@@ -66,13 +67,13 @@ class SparzielAnAufActivity: SmartSaveActivity() {
                 StandardText("Verwendungszweck")
                 StandardText(tempSparziel.name)
             }
-            // QR Code anzeigen
+
             val qrData = """
-            Auszahlkonto: ${tempSparziel.auszahlungsKonto.kontonr}
-            Zielkonto: ${tempSparziel.zielKonto.kontonr}
-            Betrag: ${tempSparziel.monatsrate}
+            Auszahlkonto: ${auszahlkonto.kontonr}
+            Zielkonto: ${zielkonto.kontonr}
+            Betrag: ${betrag}
             Verwendungszweck: ${tempSparziel.name}
-        """.trimIndent()
+            """.trimIndent()
 
             QRCodeComposable(text = qrData, size = 200)
         }
@@ -101,7 +102,7 @@ class SparzielAnAufActivity: SmartSaveActivity() {
     }
 
 
-    fun generateQRCode(text: String, size: Int): Bitmap {
+    private fun generateQRCode(text: String, size: Int): Bitmap {
         val bitMatrix: BitMatrix = MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, size, size)
         val width = bitMatrix.width
         val height = bitMatrix.height

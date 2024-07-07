@@ -76,5 +76,4 @@ dependencies {
     implementation("androidx.sqlite:sqlite-framework:$sqlite_version")
     implementation ("com.google.zxing:core:3.5.1")
 
-
 }
