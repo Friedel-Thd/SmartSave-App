@@ -245,7 +245,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
             arrayOf(kat.name)
         )
     }
-    fun insertEinzelumsatz(einzelumsatz: Einzelumsatz) {
+    fun insertEinzelumsatz(einzelumsatz: Einzelumsatz): Int {
         val db = writableDatabase
         val values = ContentValues().apply {
             put(SmartSaveContract.EinzelumsatzEntry.BETRAG, einzelumsatz.betrag)
@@ -261,6 +261,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
             put(SmartSaveContract.KategorieZuweisungEntry.IS_EINZELUMSATZ, 1)
         }
         db.insert(SmartSaveContract.KategorieZuweisungEntry.TABLE_NAME, null, kategorieZuweisungValues)
+        return einzelumsatzId.toInt()
     }
 
     fun editEinzelumsatz(einzelumsatz: Einzelumsatz) {

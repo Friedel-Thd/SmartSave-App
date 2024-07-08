@@ -35,6 +35,26 @@ fun LabelledInputField(label: String, value: String, keyboardOptions: KeyboardOp
 }
 
 @Composable
+fun LabelledInputFieldBetrag(label: String, value: String, keyboardOptions: KeyboardOptions, onValueChange: (String) -> Unit) = Row(
+    modifier = Modifier.fillMaxWidth(),
+    verticalAlignment = Alignment.CenterVertically
+) {
+    Text("$label: ", modifier = Modifier.fillMaxWidth(.35f), style = TextStyle(fontSize = 20.sp))
+    TextField(
+        value = value,
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth(),
+        onValueChange = { input ->
+            val filtered = input.filter { it.isDigit() || it == '.' || it == '-' }
+            val valid = filtered.isValidNumberInput()
+            if (valid) { onValueChange(filtered) }
+        },
+        textStyle = standardTextStyle,
+        keyboardOptions = keyboardOptions
+    )
+}
+
+@Composable
 fun CenteredText(text: String, modifier: Modifier = Modifier) = Text(
     text = text,
     modifier = Modifier
@@ -60,6 +80,15 @@ fun ErrorMsg (msg : String) =  Text(
     style = MaterialTheme.typography.bodyLarge,
     modifier = Modifier.padding(top = 4.dp)
 )
+
+private fun String.isValidNumberInput(): Boolean {
+    if (this.count { it == '.' } > 1) return false
+    if (this.count { it == '-' } > 1) return false
+    if (this.contains('-') && this.indexOf('-') != 0) return false
+    if (this == "-.") return false
+    if (this.indexOf('.') == 0 && this.length == 1) return false
+    return true
+}
 
 
 

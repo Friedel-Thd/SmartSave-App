@@ -50,7 +50,11 @@ class SparzielAnAufActivity: SmartSaveActivity() {
             modifier = Modifier.verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            StandardText("Bitte richten Sie folgenden Dauerauftrag/Terminüberweisung ein:")
+            if(mode == "auflösen") {
+                StandardText("Bitte richten Sie folgende Überweisung ein:")
+            } else {
+                StandardText("Bitte richten Sie folgenden Dauerauftrag/Terminüberweisung ein:")
+            }
             Row (modifier = Modifier.fillMaxWidth(),  horizontalArrangement = Arrangement.SpaceBetween){
                 StandardText("Auszahlkonto")
                 StandardText(zielkonto.kontonr.toString())

@@ -28,6 +28,7 @@ import com.example.smartsave.helpers.LabelledInputField
 import com.example.smartsave.helpers.MainColumn
 import com.example.smartsave.helpers.SmartSaveActivity
 import com.example.smartsave.helpers.LabelledDatePickerButton
+import com.example.smartsave.helpers.LabelledInputFieldBetrag
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
@@ -76,7 +77,7 @@ class SparzielActivity : SmartSaveActivity() {
             LabelledInputField(label = "Name*", value = textName, KeyboardOptions()) {
                 textName = it
             }
-            LabelledInputField(label = "Betrag*", value = textBetrag, KeyboardOptions(keyboardType = KeyboardType.Number)) { textBetrag = it }
+            LabelledInputFieldBetrag(label = "Betrag*", value = textBetrag, KeyboardOptions(keyboardType = KeyboardType.Number)) { textBetrag = it }
             LabelledDatePickerButton(label = "Auszahlungszeitraum*",
                 selectedDate = selectedDate,
                 onDateSelected = { date -> selectedDate = date },

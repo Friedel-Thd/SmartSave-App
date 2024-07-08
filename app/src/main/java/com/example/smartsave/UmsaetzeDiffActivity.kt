@@ -67,7 +67,8 @@ class UmsaetzeDiffActivity : SmartSaveActivity() {
                 .width(70.dp)
         ) {
             val intent = Intent(this@UmsaetzeDiffActivity, EinzelumsatzEditActivity::class.java)
-            intent.putExtra("mode", "anlegen")
+            intent.putExtra("mode", "adden")
+            intent.putExtra("umsatz", umsatz)
             startActivity(intent)
         }
 
