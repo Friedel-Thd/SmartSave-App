@@ -66,7 +66,7 @@ class SparzielActivity : SmartSaveActivity() {
         var ausgangKonto by remember { mutableStateOf<Konto?>(null) }
         var zielKonto by remember { mutableStateOf<Konto?>(null) }
         var monatsRate = 0.0
-        var negNumError  by remember { mutableStateOf(false) }
+        var numError  by remember { mutableStateOf(false) }
         var matchingKontoError  by remember { mutableStateOf(false) }
 
 
@@ -97,7 +97,7 @@ class SparzielActivity : SmartSaveActivity() {
             CenteredText(text = "Monatliche Rate: ")
             CenteredText(text = "$monatsRate€")
             if(isError) ErrorMsg(msg = "Bitte alle Pflichtfelder ausfüllen!")
-            if(negNumError) ErrorMsg(msg = "Bitte einen gültigen Betrag angeben!")
+            if(numError) ErrorMsg(msg = "Bitte einen gültigen Betrag angeben!")
             if(matchingKontoError) ErrorMsg(msg = "Auszahl- und Zielkonto müssen unterschiedlich sein!")
             if(sparzielListe.any { it.name == textName }) ErrorMsg(msg = "Sparziel mit diesem Namen existiert bereits!")
 
@@ -109,19 +109,19 @@ class SparzielActivity : SmartSaveActivity() {
 
                 isError = textBetrag.isEmpty() || textName.isEmpty() || selectedDate.isEmpty() || zielKonto == null || ausgangKonto == null
                 if(textBetrag != "-"){
-                    if (textBetrag.isNotEmpty()) negNumError = textBetrag.toDouble()< 0
+                    if (textBetrag.isNotEmpty()) numError = textBetrag.toDouble()< 0
+                } else {
+                    numError = true
                 }
 
                 if(!(ausgangKonto == null && zielKonto == null) && ausgangKonto == zielKonto) matchingKontoError = true
-                if(!isError && !negNumError && !matchingKontoError && textBetrag != "-"){
+                if(!isError && !numError && !matchingKontoError && textBetrag != "-"){
                     val intent = Intent(this@SparzielActivity, SparzielAnAufActivity::class.java)
                     val tempSparziel = Sparziel(textName, textBetrag.toDouble(),  parseDate(selectedDate), monatsRate, zielKonto!!, ausgangKonto!!)
                     intent.putExtra("Sparziel", tempSparziel)
                     intent.putExtra("mode", "anlegen")
                     startActivity(intent)
                     finish()
-                } else {
-                    negNumError = true
                 }
 
         }
