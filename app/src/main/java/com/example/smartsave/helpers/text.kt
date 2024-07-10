@@ -28,7 +28,11 @@ fun LabelledInputField(label: String, value: String, keyboardOptions: KeyboardOp
         value = value,
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
-        onValueChange = onValueChange,
+        onValueChange = { input ->
+            if (input.isLegalStringInput()) {
+                onValueChange(input)
+            }
+        },
         textStyle = standardTextStyle,
         keyboardOptions = keyboardOptions
     )
@@ -87,6 +91,13 @@ private fun String.isValidNumberInput(): Boolean {
     if (this.contains('-') && this.indexOf('-') != 0) return false
     if (this == "-.") return false
     if (this.indexOf('.') == 0 && this.length == 1) return false
+    val decimalIndex = this.indexOf('.')
+    if (decimalIndex != -1 && this.length - decimalIndex - 1 > 2) return false
+
+    return true
+}
+private  fun String.isLegalStringInput(): Boolean{
+    if (this.startsWith(" ")) return false
     return true
 }
 

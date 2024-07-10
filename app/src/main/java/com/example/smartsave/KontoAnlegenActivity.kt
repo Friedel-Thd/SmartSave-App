@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.text.isDigitsOnly
 import com.example.smartsave.dataClasses.Konto
 import com.example.smartsave.helpers.AlignedButton
 import com.example.smartsave.helpers.ErrorMsg
@@ -71,8 +72,8 @@ class KontoAnlegenActivity : SmartSaveActivity() {
             modifier = Modifier.verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            LabelledInputField(label = "Konto Nr.*", value = textKontoNr, KeyboardOptions(keyboardType = KeyboardType.Number)) { textKontoNr = it }
-            LabelledInputField(label = "BLZ*", value = textBLZ, KeyboardOptions(keyboardType = KeyboardType.Number)) { textBLZ = it }
+            LabelledInputField(label = "Konto Nr.*", value = textKontoNr, KeyboardOptions(keyboardType = KeyboardType.Number),) { if(it.isDigitsOnly())textKontoNr = it  }
+            LabelledInputField(label = "BLZ*", value = textBLZ, KeyboardOptions(keyboardType = KeyboardType.Number)) { if(it.isDigitsOnly())textBLZ = it }
             LabelledInputField(label = "BIC*", value = textBIC, KeyboardOptions()) { textBIC = it }
             LabelledInputField(label = "IBAN*", value = textIBAN, KeyboardOptions()) { textIBAN = it }
             LabelledInputField(label = "Bemerkung", value = textBemerkung, KeyboardOptions()) { textBemerkung = it }
@@ -155,10 +156,12 @@ class KontoAnlegenActivity : SmartSaveActivity() {
             ibanExistsError = false
 
             for (konto in kontenListe) {
-                if (konto.kontonr == textKontoNr.toInt()) kontonrExistsError = true
-                if (konto.blz == textBLZ) blzExistsError = true
-                if (konto.bic == textBIC) bicExistsError = true
-                if (konto.iban == textIBAN) ibanExistsError = true
+                if(!isError) {
+                    if (konto.kontonr == textKontoNr.toInt()) kontonrExistsError = true
+                    if (konto.blz == textBLZ) blzExistsError = true
+                    if (konto.bic == textBIC) bicExistsError = true
+                    if (konto.iban == textIBAN) ibanExistsError = true
+                }
             }
 
             if (!isError && !kontonrExistsError && !blzExistsError && !bicExistsError && !ibanExistsError) {
