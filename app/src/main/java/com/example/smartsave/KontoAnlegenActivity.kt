@@ -61,6 +61,7 @@ class KontoAnlegenActivity : SmartSaveActivity() {
         var blzExistsError by remember { mutableStateOf(false) }
         var bicExistsError by remember { mutableStateOf(false) }
         var ibanExistsError by remember { mutableStateOf(false) }
+        var illegalFormatError by remember { mutableStateOf(false)}
         val kontenListe by remember { kontenlisteState }
         val bundle = intent.extras
         val bankkontoExists = bundle!!.getBoolean("BankkontoExists")
@@ -68,14 +69,16 @@ class KontoAnlegenActivity : SmartSaveActivity() {
         val radioOptions = listOf("Bankkonto", "Sparkonto", "Kreditkartenkonto")
         val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[1]) }
 
+
+
         MainColumn(
             modifier = Modifier.verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            LabelledInputField(label = "Konto Nr.*", value = textKontoNr, KeyboardOptions(keyboardType = KeyboardType.Number),) { if(it.isDigitsOnly())textKontoNr = it  }
-            LabelledInputField(label = "BLZ*", value = textBLZ, KeyboardOptions(keyboardType = KeyboardType.Number)) { if(it.isDigitsOnly())textBLZ = it }
-            LabelledInputField(label = "BIC*", value = textBIC, KeyboardOptions()) { textBIC = it }
-            LabelledInputField(label = "IBAN*", value = textIBAN, KeyboardOptions()) { textIBAN = it }
+            LabelledInputField(label = "Konto Nr.*", value = textKontoNr, KeyboardOptions(keyboardType = KeyboardType.Number),) { if(it.isDigitsOnly()&& it.length <= 10)textKontoNr = it}
+            LabelledInputField(label = "BLZ*", value = textBLZ, KeyboardOptions(keyboardType = KeyboardType.Number)) { if(it.isDigitsOnly() && it.length <= 9)textBLZ = it }
+            LabelledInputField(label = "BIC*", value = textBIC, KeyboardOptions()) { if(it.length <= 11 && !it.contains(" "))textBIC = it }
+            LabelledInputField(label = "IBAN*", value = textIBAN, KeyboardOptions()) { if(it.length <= 22 && !it.contains(" "))textIBAN = it}
             LabelledInputField(label = "Bemerkung", value = textBemerkung, KeyboardOptions()) { textBemerkung = it }
 
             if (isError) {
@@ -103,6 +106,9 @@ class KontoAnlegenActivity : SmartSaveActivity() {
 
             if (ibanExistsError) {
                 ErrorMsg(msg = "Konto mit dieser IBAN existiert bereits!")
+            }
+            if(illegalFormatError){
+                ErrorMsg(msg = "Bitte ein gültiges Format für Konto Nr./BLZ/BIC/IBAN angeben!")
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -150,6 +156,11 @@ class KontoAnlegenActivity : SmartSaveActivity() {
         AlignedButton(alignment = Alignment.BottomEnd, text = "Speichern") {
             isError = (textKontoNr.isEmpty() || textBIC.isEmpty() || textBLZ.isEmpty() || textIBAN.isEmpty())
 
+            if(!isError){
+                if(textKontoNr.length != 10 || textBLZ.length != 9 || (textBIC.length !=8 && textBIC.length !=11) || textIBAN.length != 22) illegalFormatError = true
+            }
+
+
             kontonrExistsError = false
             blzExistsError = false
             bicExistsError = false
@@ -157,19 +168,21 @@ class KontoAnlegenActivity : SmartSaveActivity() {
 
             for (konto in kontenListe) {
                 if(!isError) {
-                    if (konto.kontonr == textKontoNr.toInt()) kontonrExistsError = true
+                    if (konto.kontonr == textKontoNr.toLong()) kontonrExistsError = true
                     if (konto.blz == textBLZ) blzExistsError = true
                     if (konto.bic == textBIC) bicExistsError = true
                     if (konto.iban == textIBAN) ibanExistsError = true
                 }
             }
 
-            if (!isError && !kontonrExistsError && !blzExistsError && !bicExistsError && !ibanExistsError) {
-                val konto = Konto(textKontoNr.toInt(), textBLZ, textBIC, textIBAN, textBemerkung, selectedOption)
+            if (!isError && !kontonrExistsError && !blzExistsError && !bicExistsError && !ibanExistsError && !illegalFormatError) {
+                val konto = Konto(textKontoNr.toLong(), textBLZ, textBIC, textIBAN, textBemerkung, selectedOption)
                 db.insertKonto(konto)
                 Log.d("Entry", "Entry so mesisch")
                 finish()
             }
         }
+
     }
+
 }

@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 
 val standardTextStyle = TextStyle(fontSize = 20.sp)
 
+
 @Composable
 fun LabelledInputField(label: String, value: String, keyboardOptions: KeyboardOptions, onValueChange: (String) -> Unit) = Row(
     modifier = Modifier.fillMaxWidth(),
@@ -100,6 +101,7 @@ private  fun String.isLegalStringInput(): Boolean{
     if (this.startsWith(" ")) return false
     return true
 }
+
 
 
 

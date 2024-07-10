@@ -108,15 +108,20 @@ class SparzielActivity : SmartSaveActivity() {
         AlignedButton(alignment = Alignment.BottomEnd, text = "Weiter") {
 
                 isError = textBetrag.isEmpty() || textName.isEmpty() || selectedDate.isEmpty() || zielKonto == null || ausgangKonto == null
-                if (textBetrag.isNotEmpty()) negNumError = textBetrag.toDouble()< 0
+                if(textBetrag != "-"){
+                    if (textBetrag.isNotEmpty()) negNumError = textBetrag.toDouble()< 0
+                }
+
                 if(!(ausgangKonto == null && zielKonto == null) && ausgangKonto == zielKonto) matchingKontoError = true
-                if(!isError && !negNumError && !matchingKontoError){
+                if(!isError && !negNumError && !matchingKontoError && textBetrag != "-"){
                     val intent = Intent(this@SparzielActivity, SparzielAnAufActivity::class.java)
                     val tempSparziel = Sparziel(textName, textBetrag.toDouble(),  parseDate(selectedDate), monatsRate, zielKonto!!, ausgangKonto!!)
                     intent.putExtra("Sparziel", tempSparziel)
                     intent.putExtra("mode", "anlegen")
                     startActivity(intent)
                     finish()
+                } else {
+                    negNumError = true
                 }
 
         }

@@ -4,13 +4,22 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
@@ -45,7 +54,6 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
     private lateinit var sparzielListe: List<Sparziel>
     private lateinit var sparKontenListe: List<Konto>
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bankkonto = db.getBankkonto()
@@ -54,6 +62,7 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
 
         db.insertDefaultData()
     }
+
     override fun onResume() {
         super.onResume()
         bankkonto = db.getBankkonto()
@@ -73,7 +82,7 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
 
-        var emptyKontenError  by remember { mutableStateOf(false) }
+        var emptyKontenError by remember { mutableStateOf(false) }
 
         LaunchedEffect(Unit) {
             drawerState.close()
@@ -109,7 +118,8 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                                 }
                             }
                         )
-                        ListItem(text = "Kategorien verwalten",
+                        ListItem(
+                            text = "Kategorien verwalten",
                             modifier = Modifier.clickable {
                                 scope.launch {
                                     val intent = Intent(
@@ -119,8 +129,10 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                                     drawerState.close()
                                     startActivity(intent)
                                 }
-                            })
-                        ListItem(text = "Daten löschen",
+                            }
+                        )
+                        ListItem(
+                            text = "Daten löschen",
                             modifier = Modifier.clickable {
                                 db.clearAllData()
                                 db.insertDefaultData()
@@ -128,7 +140,8 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                                 sparKontenListe = db.getSparKontenListe()
                                 kreditkontenListe = db.getKreditKontenListe()
                                 sparzielListe = db.getSparzielListe()
-                            })
+                            }
+                        )
                     }
                 }
             }
@@ -145,6 +158,26 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                         },
                         iconId = R.drawable.arrow_swap
                     )
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        ElevatedButton(
+                            onClick = {
+                                val intent = Intent(this@MainActivity, KontoAnlegenActivity::class.java)
+                                intent.putExtra("BankkontoExists", false)
+                                intent.putExtra("KreditkartenkontoExists", false)
+                                startActivity(intent)
+                                emptyKontenError = false
+                            },
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .padding(16.dp)
+                                .fillMaxWidth()
+                        ) {
+                            Text("Bitte ein Bankkonto anlegen")
+                        }
+                    }
                 }
 
                 for (kreditkonto in kreditkontenListe) {
@@ -170,22 +203,19 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                         iconId = R.drawable.piggy_bank,
                         progress = sparziel.calculateProgress()
                     )
-
                 }
-                if(emptyKontenError) ErrorMsg(msg = "Es müssen zuerst mindestens ein Bankkonto/Kreditkonto und ein Sparkonto angelegt werden, um ein Sparziel zu erstellen")
 
+                if (emptyKontenError) ErrorMsg(msg = "Es müssen zuerst mindestens ein Bankkonto/Kreditkonto und ein Sparkonto angelegt werden, um ein Sparziel zu erstellen")
             }
-
 
             if (drawerState.isClosed && !drawerState.isAnimationRunning) {
                 AlignedButton(
                     alignment = Alignment.BottomStart,
                     modifier = Modifier.padding(bottom = standardPadBottom, start = standardPadH),
-                    iconId = R.drawable.piggy_bank,
-
+                    iconId = R.drawable.piggy_bank
                 ) {
                     emptyKontenError = sparKontenListe.isEmpty() || (kreditkontenListe.isEmpty() && bankkonto == null)
-                    if(!emptyKontenError) {
+                    if (!emptyKontenError) {
                         val intent = Intent(this@MainActivity, SparzielActivity::class.java)
                         startActivity(intent)
                     }

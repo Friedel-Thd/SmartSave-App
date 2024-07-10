@@ -107,7 +107,7 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
         AlignedButton(alignment = Alignment.BottomStart, text = "Zurück") {finish()}
         AlignedButton(alignment = Alignment.BottomEnd, text = "Speichern"){
             isError = selectedDate.isEmpty() || textBezeichung.isEmpty() || textBetrag.isEmpty()
-            if(!isError && !isErrorBetrag){
+            if(!isError && !isErrorBetrag && textBetrag != "-"){
                 if (mode == "anlegen") {
                     val neweinzelumsatz = Einzelumsatz(textBezeichung,textBetrag.toDouble(), parseDate(selectedDate))
                     neweinzelumsatz.kategorie = selectedKategorie!!
@@ -138,6 +138,8 @@ class EinzelumsatzEditActivity : SmartSaveActivity() {
                         isErrorBetrag = true
                     }
                 }
+            } else{
+                isErrorBetrag = true
             }
         }
 

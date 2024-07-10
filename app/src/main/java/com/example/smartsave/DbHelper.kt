@@ -112,7 +112,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
     private val SQL_CREATE_KONTO_ENTRIES =
         "CREATE TABLE ${SmartSaveContract.KontoEntry.TABLE_NAME} (" +
-                "${SmartSaveContract.KontoEntry.KONTONUMMER} INTEGER PRIMARY KEY," +
+                "${SmartSaveContract.KontoEntry.KONTONUMMER} LONG PRIMARY KEY," +
                 "${SmartSaveContract.KontoEntry.BLZ} TEXT," +
                 "${SmartSaveContract.KontoEntry.BIC} TEXT," +
                 "${SmartSaveContract.KontoEntry.IBAN} TEXT," +
@@ -200,7 +200,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         val cursor = db.rawQuery(query, null)
         if (cursor.moveToFirst()) {
             konto = Konto(
-                cursor.getInt(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTONUMMER)),
+                cursor.getLong(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTONUMMER)),
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BLZ)),
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BIC)),
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.IBAN)),
@@ -306,7 +306,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
 
 
-    private fun loadUmsaetzeForKonto(kontonummer: Int): List<Umsatz> {
+    private fun loadUmsaetzeForKonto(kontonummer: Long): List<Umsatz> {
         val umsaetze = mutableListOf<Umsatz>()
         val db = readableDatabase
 
@@ -475,7 +475,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
         while (cursor.moveToNext()) {
             val konto = Konto(
-                cursor.getInt(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTONUMMER)),
+                cursor.getLong(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTONUMMER)),
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BLZ)),
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BIC)),
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.IBAN)),
@@ -498,7 +498,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
         while (cursor.moveToNext()) {
             val konto = Konto(
-                cursor.getInt(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTONUMMER)),
+                cursor.getLong(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTONUMMER)),
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BLZ)),
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BIC)),
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.IBAN)),
@@ -522,7 +522,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
         while (cursor.moveToNext()) {
             val konto = Konto(
-                cursor.getInt(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTONUMMER)),
+                cursor.getLong(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTONUMMER)),
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BLZ)),
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BIC)),
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.IBAN)),
@@ -546,7 +546,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
         while (cursor.moveToNext()) {
             val konto = Konto(
-                cursor.getInt(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTONUMMER)),
+                cursor.getLong(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTONUMMER)),
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BLZ)),
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BIC)),
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.IBAN)),
@@ -668,10 +668,10 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
             var auszahlkonto: Konto? = null
 
             if (kontenCursor.moveToFirst()) {
-                val zielkontoNr = kontenCursor.getInt(kontenCursor.getColumnIndexOrThrow(
+                val zielkontoNr = kontenCursor.getLong(kontenCursor.getColumnIndexOrThrow(
                     SmartSaveContract.SparzielZuweisungEntry.ZIELKONTO
                 ))
-                val auszahlkontoNr = kontenCursor.getInt(kontenCursor.getColumnIndexOrThrow(
+                val auszahlkontoNr = kontenCursor.getLong(kontenCursor.getColumnIndexOrThrow(
                     SmartSaveContract.SparzielZuweisungEntry.AUSZAHLKONTO
                 ))
 
@@ -691,7 +691,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         return sparzielListe
     }
 
-    fun getKontoByKontonummer(kontonummer: Int): Konto? {
+    fun getKontoByKontonummer(kontonummer: Long): Konto? {
         val db = readableDatabase
         val query = "SELECT * FROM ${SmartSaveContract.KontoEntry.TABLE_NAME} WHERE ${SmartSaveContract.KontoEntry.KONTONUMMER} = $kontonummer"
         val cursor = db.rawQuery(query, null)
@@ -699,7 +699,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
 
         if (cursor.moveToFirst()) {
             konto = Konto(
-                cursor.getInt(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTONUMMER)),
+                cursor.getLong(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.KONTONUMMER)),
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BLZ)),
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.BIC)),
                 cursor.getString(cursor.getColumnIndexOrThrow(SmartSaveContract.KontoEntry.IBAN)),

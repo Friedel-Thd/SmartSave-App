@@ -5,7 +5,7 @@ import java.time.LocalDate
 
 
 data class Konto(
-    val kontonr: Int,
+    val kontonr: Long,
     val blz: String,
     val bic: String,
     val iban: String,
