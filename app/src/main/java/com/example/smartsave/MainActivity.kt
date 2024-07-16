@@ -165,8 +165,16 @@ class MainActivity : SmartSaveActivity(0.dp, 0.dp, 0.dp, 0.dp) {
                         ElevatedButton(
                             onClick = {
                                 val intent = Intent(this@MainActivity, KontoAnlegenActivity::class.java)
-                                intent.putExtra("BankkontoExists", false)
-                                intent.putExtra("KreditkartenkontoExists", false)
+                                if(bankkonto == null) {
+                                    intent.putExtra("BankkontoExists", false)
+                                } else {
+                                    intent.putExtra("BankkontoExists", true)
+                                }
+                                if(kreditkontenListe.isEmpty()) {
+                                    intent.putExtra("KreditkartenkontoExists", false)
+                                } else {
+                                    intent.putExtra("KreditkartenkontoExists", true)
+                                }
                                 startActivity(intent)
                                 emptyKontenError = false
                             },

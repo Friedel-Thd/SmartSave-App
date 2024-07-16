@@ -838,9 +838,13 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         val db = writableDatabase
 
         val umsaetze = listOf(
-            Triple("Testumsatz 1", -100.0, "01/03/2024"),
-            Triple("Testumsatz 2", 450.0, "15/01/2024"),
-            Triple("Testumsatz 3", -200.0, "28/04/2024")
+            Triple("Tanken", -500.0, "01/03/2024"),
+            Triple("Miete", -450.0, "18/02/2024"),
+            Triple("Ausbildung", 900.0, "12/01/2024"),
+            Triple("Einkaufen", -100.0, "07/04/2024"),
+            Triple("Auto", -150.0, "07/06/2024"),
+            Triple("Ausbildung", 900.0, "12/02/2024"),
+            Triple("Bargeldauszahlung", -100.0, "28/04/2024")
         )
 
         umsaetze.forEach { (verwendungszweck, betrag, datum) ->
