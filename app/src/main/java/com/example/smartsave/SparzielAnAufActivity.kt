@@ -38,6 +38,9 @@ class SparzielAnAufActivity: SmartSaveActivity() {
     override fun BoxScope.GenerateLayout() {
         val bundle = intent.extras
         val tempSparziel = bundle!!.getSerializable("Sparziel") as Sparziel
+
+        val tempSparziel2 = intent.getSerializableExtra("Sparziel") as Sparziel
+
         val mode = bundle.getString("mode")
         val betrag = if(mode == "auflösen") { bundle.getDouble("Summe") } else { tempSparziel.monatsrate }
 
